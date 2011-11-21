@@ -16,6 +16,9 @@ body p{
 	margin:auto;
 /*	background-color:rgba(255,255,255,.3);*/
 }
+#interface{
+	z-index:100;
+}
 #header{
 	background-color:rgba(255,255,255,.3);
 	box-shadow: 0 3px 5px 0px rgba(0,0,0,.1);
@@ -39,7 +42,7 @@ body p{
 	margin-bottom:1px;
 }
 #selectedInfo p{
-	width:550px;
+	width:490px;
 	line-height:1.2em;
 	margin-bottom:25px;
 }
@@ -74,7 +77,11 @@ body p{
 #aboutInfoElements{
 	text-align:right;
 }
-.bgPhoto{
+/*============= BG ==============*/
+#bg{
+	z-index:1;
+}
+#bgPhoto{
 	background-image: url(../img/5807793226_9a80841d61_b.jpeg);
 	background-repeat: no-repeat;
 	background-position: center;
@@ -82,7 +89,7 @@ body p{
 	-webkit-background-size: cover;
 	background-size: cover;
 }
-/*input*/
+/*=========== input ============*/
 button, input, select {
 	font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
 	font-size:11px;
@@ -97,7 +104,7 @@ input {
 	height:14px;
 }
 button, input[type="radio"]{
-	margin-left:15px;
+	margin-left:5px;
 }
 input[type="radio"]{
 	height:14px;
@@ -113,4 +120,66 @@ input[type="text"]{
 }
 button{
 	height:20px;
+}
+/*=========== timeline ============*/
+#events{
+	position:absolute;
+}
+.dot{
+	display:block;
+	clear:both;
+	width:1px;
+	height:1px;
+	border-radius:5px;
+	border-width:2px;
+	border-style:solid;
+	border-color:white;
+	background-color:white;
+	box-shadow: 0 1px 2px 0px rgba(0,0,0,.5);
+	margin-top:5px;
+	margin-bottom:5px;
+}
+.dot.big{
+	border-radius:15px;
+	border-width:15px;
+}
+.dot.big.unselected{
+	width:23px;
+	height:23px;
+	border-width:4px;
+	background-color:rgba(255,255,255,0);
+}
+.dot.disabled{
+	box-shadow:none;
+	opacity:.6;
+}
+.dot.range{
+	width:100px;
+	height:31px;
+	border-width:0px;
+	border-radius:30px;
+	background-color:rgba(255,255,255,.5);
+}
+#timelineGrid{
+	position:absolute;
+}
+.bullet{
+	font-size:14px;
+	vertical-align:-2px;
+	margin-right:5px;
+	line-height:70px;
+}
+.line{
+	position:absolute;
+	width:1px;
+	height:100px;
+	font-size:11px;
+	text-indent:-3px;
+	color:white;
+	text-shadow: 0px 1px 3px #333;
+	background-color:rgba(255,255,255,.2);
+/*	opacity:.2;*/
+}
+.line spam{
+	opacity:.7;
 }
