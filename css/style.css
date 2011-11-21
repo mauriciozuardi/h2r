@@ -52,11 +52,13 @@ body p{
 }
 #aboutInfo{
 	background-color:rgba(0,0,0,.6);
-}
-#aboutInfo p{
 	color:rgba(255,255,255,.6);
 }
-#aboutInfo p :hover{
+#aboutInfo a{
+	text-decoration:none;
+	color:rgba(255,255,255,.6);
+}
+#aboutInfo a:hover{
 	color:rgba(255,255,255,1);
 }
 #aboutInfo img{
@@ -77,24 +79,34 @@ body p{
 	background-size: cover;
 }
 /*input*/
+button, input, select {
+	font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+	font-size:11px;
+	margin-top:15px;
+	margin-bottom:15px;
+}
 input {
+	vertical-align:middle;
 	border-radius:4px;
 	font-size:11px;
-	padding-left:3px;
-	font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
-	padding-top:0px;
-	padding-bottom:2px;
-}
-button, input, select {
-font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
-font-size:11px;
-margin-top:15px;
-margin-bottom:15px;
+	padding-left:4px;
+	height:14px;
 }
 button, input[type="radio"]{
 	margin-left:15px;
-	vertical-align:middle;
+}
+input[type="radio"]{
+	height:14px;
 }
 input[type="text"], select{
 	width:12em;
+}
+input[type="text"]{
+	border-style:solid;
+	border-width:1px;
+	border-color:#666;
+	padding-bottom:1px;
+}
+button{
+	height:20px;
 }
