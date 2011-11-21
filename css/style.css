@@ -23,6 +23,10 @@ body p{
 #headerElements{
 	text-align:right;
 }
+#headerElements img{
+	margin-top:4px;
+	float:left;
+}
 #footer{
 	position:absolute;
   bottom:0;

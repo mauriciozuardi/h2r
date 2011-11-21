@@ -2,13 +2,23 @@ $(init);
 
 function init(){
 	//ajusta a altura do body no onload
-	updateSizeAndPosition();
+	resizedBg();
+	drawEvents();
 	//ajusta a altura do body no resize
 	$(window).resize(function (event){
-		updateSizeAndPosition();
-	});	
+		resizedBg();
+		resizedEvents();
+	});
 }
 
-function updateSizeAndPosition(){
+function resizedBg(){
 	$('.bgPhoto').css('height', $(window).height());
+}
+
+function drawEvents(){
+	
+}
+
+function resizedEvents(){
+	
 }
