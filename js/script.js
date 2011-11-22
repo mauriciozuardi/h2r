@@ -16,16 +16,6 @@ function init(){
 		initDate = new Date();
 	}
 	
-	console.log(initDate.toDateString());
-	// console.log(initDate.getFullYear());
-	// console.log(initDate.getMonth());
-	// console.log(initDate.getDate());
-	// console.log(initDate.getHours());
-	// console.log(initDate.getMinutes());
-	// console.log(initDate.getSeconds());
-	// console.log(initNow);
-	// console.log(initDate.getDay());
-	
 	//ajusta a altura do body no onload
 	drawTimeline();
 	resizeBg();
@@ -102,11 +92,11 @@ function ajustaLinhas(){
 function updateTimelineDates(){
 	var year		= initDate.getFullYear();
 	var month		= initDate.getMonth();
-	var date		= initDate.getDate();
+	// var date		= initDate.getDate();
 	var weekday = initDate.getDay();
-	var hours		= initDate.getHours();
-	var minutes	= initDate.getMinutes();
-	var seconds	= initDate.getSeconds();
+	// var hours		= initDate.getHours();
+	// var minutes	= initDate.getMinutes();
+	// var seconds	= initDate.getSeconds();
 	
 	//cola (em milissegundos)
 	//um segundo:	1000
@@ -135,15 +125,12 @@ function updateTimelineDates(){
 				}
 				//armazena data
 				timeline[i].date = new Date (year, month, 1, 0, 0, 0);
-				//zera o relógio
-				timeline[i].date.setHours(0);
-				timeline[i].date.setMinutes(0);
-				timeline[i].date.setSeconds(0);
 				break;
 			case "último finde":
-				//se não está no final de semana
+				//calcula a quantidade de dias até o próximo final de semana e define a data
 				if(weekday > 0 && weekday < 6){
-					timeline[i].date = new Date (initNow - (oneDayInMs*(weekday+1)));
+						//se não está no final de semana
+						timeline[i].date = new Date (initNow - (oneDayInMs*(weekday+1)));
 					} else if (weekday == 0){
 						//se é domingo
 						timeline[i].date = new Date (initNow - (oneDayInMs*7));
@@ -178,18 +165,7 @@ function updateTimelineDates(){
 				timeline[i].date.setSeconds(0);
 				break;
 			case "próximo finde":
-				// if(weekday > 0 && weekday < 6){
-				// 	//se não está no final de semana
-				// 	timeline[i].date = new Date (initNow + (oneDayInMs*(6-weekday)));
-				// } else if (weekday == 0){
-				// 	//se é domingo
-				// 	timeline[i].date = new Date (initNow + (oneDayInMs*6));
-				// } else if(weekday == 6){
-				// 	//se é sábado
-				// 	timeline[i].date = new Date (initNow + (oneDayInMs*7));
-				// }
-				
-				//simplificação do código comentado acima
+				//calcula a quantidade de dias até o próximo final de semana e define a data
 				if(weekday == 6){
 					timeline[i].date = new Date (initNow + (oneDayInMs*7));
 				} else {
@@ -210,10 +186,6 @@ function updateTimelineDates(){
 				}
 				//armazena
 				timeline[i].date = new Date (year, month+1, 1, 0, 0, 0);
-				//zera o relógio
-				timeline[i].date.setHours(0);
-				timeline[i].date.setMinutes(0);
-				timeline[i].date.setSeconds(0);
 				break;
 			default:
 				//parte do princípio que a string refere-se a uma data (e está corretamente formatada) e substitui de volta os &nbsp; por espaço.			
