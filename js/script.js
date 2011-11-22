@@ -58,7 +58,7 @@ function drawTimeline(){
 		// var html = "<div class='line l" + i + "'><spam><spam class='bullet'>•</spam>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + "</spam></div>";
 		
 		//debug
-		var html = "<div class='line l" + i + "'><spam><spam class='bullet'>•</spam>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + " " + timeline[i].date.toDateString() + "</br></br>" + timeline[i].date.toTimeString() + "</spam></div>";
+		var html = "<div class='line l" + i + "'><spam><spam class='bullet'>|</spam>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + " " + timeline[i].date.toDateString() + "</br></br>" + timeline[i].date.toTimeString() + "</spam></div>";
 		$(html).appendTo('#timelineGrid');
 	}
 	

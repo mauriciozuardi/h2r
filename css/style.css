@@ -164,7 +164,7 @@ button{
 }
 .bullet{
 	font-size:14px;
-	vertical-align:-2px;
+	vertical-align:-1px;
 	margin-right:5px;
 	line-height:150px;
 }
@@ -173,7 +173,7 @@ button{
 	width:1px;
 	height:100px;
 	font-size:11px;
-	text-indent:-3px;
+	text-indent:-1px;
 	color:white;
 	text-shadow: 0px 1px 3px #333;
 	background-color:rgba(255,255,255,.2);
