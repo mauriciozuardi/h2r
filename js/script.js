@@ -19,6 +19,7 @@ function init(){
 	//ajusta a altura do body no onload
 	drawTimeline();
 	resizeBg();
+	incluiLogo();
 	
 	//ajusta a altura do body no resize
 	$(window).resize(function (event){
@@ -26,6 +27,11 @@ function init(){
 		resizeEvents();
 		resizeTimeline()
 	});
+}
+
+function incluiLogo(){
+	//considerando receber imgName do helena.js
+	$("<img src='./img/" + imgName + "' alt='Logo Agenda de Fotografia'/>").appendTo('#header');
 }
 
 function resizeBg(){
@@ -37,7 +43,6 @@ function drawTimeline(){
 	//trata os nomes e datas
 	
 	//considerando q recebo essa string do helena.js (futuramente do php)
-	//timeMarksStr = 'mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem';
 	//timeMarksStr = 'mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem|fim do mundo=December 21, 2012 00:00:00';
 	
 	timeline = timeMarksStr.split('|');
@@ -54,11 +59,15 @@ function drawTimeline(){
 	
 	//cria os elementos
 	for(var i in timeline){
-		//produção
-		// var html = "<div class='line l" + i + "'><spam><spam class='bullet'>•</spam>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + "</spam></div>";
-		
-		//debug
-		var html = "<div class='line l" + i + "'><spam><spam class='bullet'>|</spam>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + " " + timeline[i].date.toDateString() + "</br></br>" + timeline[i].date.toTimeString() + "</spam></div>";
+		//considerando receber showDateDetails do helena.js (futuramente: sempre false)
+		if(showDateDetails){
+			//debug
+			var html = "<div class='line l" + i + "'><spam><spam class='bullet'>|</spam>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + " " + timeline[i].date.toDateString() + "</br></br>" + timeline[i].date.toTimeString() + "</spam></div>";
+		} else {
+			//produção
+			var html = "<div class='line l" + i + "'><spam><spam class='bullet'>|</spam>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + "</spam></div>";
+		}
+		//inclui o elemento no html, dentro do div #timelineGrid
 		$(html).appendTo('#timelineGrid');
 	}
 	

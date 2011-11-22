@@ -12,10 +12,6 @@ h1{
 	width:100%;
 	float:left;
 }
-/*.colunaCentral{
-	width:960px;
-	margin:auto;
-}*/
 #interface{
 	min-width:960px;
 	z-index:100;
@@ -26,7 +22,6 @@ h1{
 	text-align:right;
 }
 #header img{
-	margin-top:4px;
 	float:left;
 	margin-left:30px;
 }
