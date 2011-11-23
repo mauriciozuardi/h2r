@@ -21,7 +21,7 @@ function criaEventos(){
 	new EventDot(e);
 	
 	e.dataInicial			= "November 21, 2011 21:30:00";
-	e.dataFinal				= "November 27, 2011 19:00:00";
+	e.dataFinal				= "January 1, 2012 19:00:00";
 	e.visual					= "p";
 	e.onde						= "Centro Cultural São Paulo";
 	e.quem						= "Carlos Dadoorian Jr.";

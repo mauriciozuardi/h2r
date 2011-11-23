@@ -11,7 +11,7 @@ $(init);
 
 function init(){
 	//que dia/hora são?
-	//considerando receber aDay do helena.js (futuramente usaremos só o else)
+	//considerando receber aDay do db.js (futuramente usaremos só o else)
 	if(aDay != 'hoje'){
 		initDate = new Date(aDay);
 		initNow = initDate.getTime();
@@ -22,21 +22,22 @@ function init(){
 	
 	//
 	incluiLogo();
-	drawTimeline();
 	resizeBg();
-	resizeEvents();
+	drawTimeline();
 	drawHomeEvents();
+	resizeEventWindow();
 	
 	//ajusta a altura do body no resize
 	$(window).resize(function (event){
 		resizeBg();
+		resizeTimeline();
+		resizeEventWindow();
 		resizeEvents();
-		resizeTimeline()
 	});
 }
 
 function incluiLogo(){
-	//considerando receber imgName do helena.js
+	//considerando receber imgName do db.js
 	$("<img src='./img/" + imgName + "' alt='Logo Agenda de Fotografia'/>").appendTo('#header');
 }
 
@@ -47,7 +48,7 @@ function resizeBg(){
 function drawTimeline(){
 	//trata os nomes e datas
 	
-	//considerando q recebo essa string do helena.js (futuramente do php)
+	//considerando q recebo essa string do db.js (futuramente do php)
 	//timeMarksStr = 'mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem|fim do mundo=December 21, 2012 00:00:00';
 	
 	timeline = timeMarksStr.split('|');
@@ -64,10 +65,10 @@ function drawTimeline(){
 	
 	//cria os elementos
 	for(var i in timeline){
-		//considerando receber showDateDetails do helena.js (futuramente: sempre false)
+		//considerando receber showDateDetails do db.js (futuramente: sempre false)
 		if(showDateDetails){
 			//debug
-			var html = "<div class='line l" + i + "'><spam><spam class='bullet'>|</spam>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + " " + timeline[i].date.toDateString() + "</br></br>" + timeline[i].date.toTimeString() + "</spam></div>";
+			var html = "<div class='line l" + i + "'><spam><spam class='bullet'>|</spam>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + " " + "</br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br>" + timeline[i].date.toDateString() + "</br></br>" + timeline[i].date.toTimeString() + "</spam></div>";
 		} else {
 			//produção
 			var html = "<div class='line l" + i + "'><spam><spam class='bullet'>|</spam>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + "</spam></div>";
@@ -94,11 +95,15 @@ function resizeTimeline(){
 function ajustaLinhas(){
 	safeMargin = 30;
 	for(var i in timeline){
+		//define
 		var str = '.line.l' + i;
 		var element = $(str);
 		var w = Math.max(960, $(window).width());
 		var step = ((w - (2*safeMargin))/timeline.length);
 		var position = Math.floor(safeMargin + i * step + (step/2));
+		//armazena
+		timeline[i].position = position;
+		//aplica na tela
 		element.css('left', position);
 	}
 }
@@ -228,10 +233,6 @@ function EventDot(eventData){
 	eventDotInstances.push(this);
 }
 
-EventDot.resizeThemAll = function(){
-	
-}
-
 EventDot.killThemAll = function(){
 	//remove os elemento do HTML
 	//reseta a lista de instâncias
@@ -249,7 +250,7 @@ EventDot.drawThemAll = function(){
 		e.updateVisual();
 		
 		//debug
-		console.log(eventDotInstances[i]);
+		// console.log(eventDotInstances[i]);
 	}
 }
 
@@ -289,12 +290,12 @@ EventDot.prototype.updateVisual = function(){
 			if(range.hasClass('hidden'))		range.removeClass('hidden');
 			if(range.hasClass('mini'))			range.removeClass('mini');
 			if(label.hasClass('hidden'))		label.removeClass('hidden');
-			//centraliza texto em relação a bola
-			ml = 15-((parseInt(label.css('width'))+20)/2); //15 = meia bola grande; 20 = 10+10 de padding lateral do label
-			//considera o deslocamento da bola
-			ml += parseInt(dot.css('margin-left'));
-			//aplica
-			label.css('margin-left', ml);
+			// //centraliza texto em relação a bola
+			// ml = (dot.outerWidth(false)/2)-(label.outerWidth(false)/2);
+			// //considera o deslocamento da bola
+			// ml += parseInt(dot.css('margin-left'));
+			// //aplica
+			// label.css('margin-left', ml);
 		break;
 		
 		//selecionado
@@ -305,12 +306,12 @@ EventDot.prototype.updateVisual = function(){
 			if(range.hasClass('hidden'))		range.removeClass('hidden');
 			if(range.hasClass('mini'))			range.removeClass('mini');
 			if(label.hasClass('hidden'))		label.removeClass('hidden');
-			//centraliza texto em relação a bola
-			ml = 15-((parseInt(label.css('width'))+20)/2); //15 = meia bola grande; 20 = 10+10 de padding lateral do label
-			//considera o deslocamento da bola
-			ml += parseInt(dot.css('margin-left'));
-			//aplica
-			label.css('margin-left', ml);
+			// //centraliza texto em relação a bola
+			// ml = (dot.outerWidth(false)/2)-(label.outerWidth(false)/2);
+			// //considera o deslocamento da bola
+			// ml += parseInt(dot.css('margin-left'));
+			// //aplica
+			// label.css('margin-left', ml);
 		break;
 		
 		//balloon
@@ -323,6 +324,76 @@ EventDot.prototype.updateVisual = function(){
 							// ** preencher **
 		break;
 	}
+	
+	this.posicionar();
+}
+
+EventDot.prototype.posicionar = function(){
+	var div = $('div.e' + this.id);
+	var dot = $('div.e' + this.id + ' .dot');
+	var range = $('div.e' + this.id + ' .range');
+	var label = $('div.e' + this.id + ' .label');
+	
+	var t = Date.now();
+	var t0 = this.dataInicial.getTime();
+	var t1 = this.dataFinal.getTime();
+	
+	// //posiciona o começo do evento
+	var x0 = this.dateToPosition(t0);
+	x0 -= dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
+	div.css('margin-left', x0);
+	
+	//posiciona o fim do evento
+	var x1 = this.dateToPosition(t1);
+	var rangeEnd = x1-x0;
+	rangeEnd += dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
+	range.css('width', rangeEnd);
+	
+	//posiciona a bolinha, representando o progresso geral do evento
+	t = (t < t0) ? t0 : t;
+	t = (t > t1) ? t1 : t;
+	var x = this.dateToPosition(t) - x0;
+	x -= dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
+	dot.css('margin-left', x);
+	
+	//posiciona o label
+	//centraliza texto em relação a bola
+	ml = (dot.outerWidth(false)/2)-(label.outerWidth(false)/2);
+	//considera o deslocamento da bola
+	ml += parseInt(dot.css('margin-left'));
+	//aplica
+	label.css('margin-left', ml);
+}
+
+EventDot.prototype.dateToPosition = function(t){
+	if(t >= timeline[timeline.length-1].date.getTime()){
+		//se t for maior que a última marca da timeline
+		return ($(window).width() + 50);
+	} else if(t < timeline[0].date.getTime()){
+		//se t for menor que a primeira marca da timeline
+		return ($(window).width() - 50);
+	} else {
+		//t está entre alguma das marcas
+		//identifica o intervalo
+		var t0, t1, index;
+		for(var i=0; i < timeline.length-1; i++){
+			t0 = timeline[i].date.getTime();
+			t1 = timeline[i+1].date.getTime();
+			if(t >= t0 && t < t1){
+				index = i;
+				break;
+			}
+		}
+		//posiciona t
+		var x0 = timeline[index].position;
+		var x1 = timeline[index+1].position - 1;
+		var xRange = x1 - x0;
+		var timeRange = t1 - t0;
+		var t0a1 = (t-t0)/timeRange;
+		var ml = x0 + (xRange * t0a1);
+		//retorna
+		return Math.round(ml);
+	}
 }
 
 EventDot.prototype.die = function(){
@@ -331,16 +402,20 @@ EventDot.prototype.die = function(){
 }
 
 function drawHomeEvents(){
-	criaEventos();
+	criaEventos();//vem do db.js
 	EventDot.drawThemAll();
 }
 
-function resizeEvents(){
+function resizeEventWindow(){
 	//ajusta o tamanho do div q contém as instâncias de EventDot
 	var marginTop = 50;
 	$('#events').css('top', $('#header').height() + marginTop);
 	$('#events').css('height', $(window).height() - $('#header').height() - $('#aboutInfo').height() - marginTop);
-	
+}
+
+function resizeEvents(){
 	//resize em todos
-	
+	for(var i in eventDotInstances){
+		eventDotInstances[i].posicionar();
+	}
 }
