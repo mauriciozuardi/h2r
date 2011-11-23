@@ -140,15 +140,16 @@ button{
 	border-style:solid;
 	border-color:white;
 	background-color:white;
-	box-shadow: 0 1px 2px 0px rgba(0,0,0,.5);
+	box-shadow: 0 1px 2px 0px rgba(0,0,0,.3);
 }
 .dot.big{
 	border-radius:15px;
-	border-width:15px;
+	border-width:12px;
+	box-shadow: 0 1px 7px 0px rgba(0,0,0,.5);
 }
 .dot.big.unselected{
-	width:23px;
-	height:23px;
+	width:18px;
+	height:18px;
 	border-width:4px;
 	background-color:rgba(255,255,255,0);
 }
@@ -159,10 +160,10 @@ button{
 .range{
 	display:block;
 	width:100px;
-	height:31px;
+	height:26px;
 	border-width:0px;
 	border-radius:30px;
-	background-color:rgba(255,255,255,.4);
+	background-color:rgba(255,255,255,.3);
 }
 .range.mini{
 	width:100px;
@@ -176,10 +177,10 @@ button{
 .label{
 	display:inline-block;
 	clear:both;
-	margin-top:1px;
-	padding: 3px 10px 5px 10px;
+	margin-top:2px;
+	padding: 0px 7px 2px 7px;
 	border-radius: 10px;
-	background-color: rgba(255, 255, 255, .2);
+	background-color: rgba(255, 255, 255, .15);
 }
 .label.hidden{
 	display:none;
