@@ -1,8 +1,12 @@
 //globals
+//timeline
 initDate = 0;
 timeline = [];
-timeTable = []; //relacionada à tabela acima
+//eventos
+createdEvents = 0;
+eventDotInstances = [];
 
+//começa qdo carregar o DOM
 $(init);
 
 function init(){
@@ -16,10 +20,12 @@ function init(){
 		initDate = new Date();
 	}
 	
-	//ajusta a altura do body no onload
+	//
+	incluiLogo();
 	drawTimeline();
 	resizeBg();
-	incluiLogo();
+	resizeEvents();
+	drawHomeEvents();
 	
 	//ajusta a altura do body no resize
 	$(window).resize(function (event){
@@ -36,7 +42,6 @@ function incluiLogo(){
 
 function resizeBg(){
 	$('#bgPhoto').css('height', $(window).height());
-	$('#photoCover').css('height', $(window).height());
 }
 
 function drawTimeline(){
@@ -205,14 +210,137 @@ function updateTimelineDates(){
 	}
 }
 
-function placeObj(element, startDate, endDate){	
-	 
+function EventDot(eventData){
+	//init values
+	//Legenda Visual  :   a:apagado; p:pequeno; g:grande; s:selecionado; b:balloon; d:desaparecendo; 
+	this.id							= createdEvents; createdEvents++;
+	this.dataInicial		= (eventData.dataInicial) ? new Date(eventData.dataInicial) : new Date();
+	this.dataFinal			= (eventData.dataFinal) ? new Date(eventData.dataFinal) : new Date();
+	this.visual					= (eventData.visual) ? eventData.visual : "p"; //refere-se ao visual da bolinha na timeline.
+	this.onde						= (eventData.onde) ? eventData.onde : "lugar sem nome";
+	this.quem						= (eventData.quem) ? eventData.quem : "pessoa sem nome";
+	this.oque						= (eventData.oque) ? eventData.oque : "atividade sem nome";
+	// this.oqueTipo				= (eventData.oqueTipo) ? eventData.oqueTipo : "atividade indefinida";
+	this.separador			= (eventData.separador) ? eventData.separador : " // ";
+	this.textoHome			= (eventData.textoHome) ? eventData.textoHome : "Lorem ipsum ..";
+			
+	//check-in
+	eventDotInstances.push(this);
 }
 
-function drawEvents(){
+EventDot.resizeThemAll = function(){
+	
+}
 
+EventDot.killThemAll = function(){
+	//remove os elemento do HTML
+	//reseta a lista de instâncias
+}
+
+EventDot.drawThemAll = function(){
+	for(var i in eventDotInstances){
+		var e = eventDotInstances[i];
+		
+		//cria o DIV com id com a bolinha, range e label dentro
+		var html = "<div class='event e" + e.id + "'><spam class='range'><spam class='dot'></spam></spam><spam class='label'>" + e.onde + "</spam></div>";
+		$(html).appendTo('#events');
+		
+		//aplica as classes baseado no status
+		e.updateVisual();
+		
+		//debug
+		console.log(eventDotInstances[i]);
+	}
+}
+
+EventDot.prototype.updateVisual = function(){
+	var div = $('div.e' + this.id);
+	var dot = $('div.e' + this.id + ' .dot');
+	var range = $('div.e' + this.id + ' .range');
+	var label = $('div.e' + this.id + ' .label');
+	var ml = 0;
+	
+	switch (this.visual){
+		//apagado
+		case "a":
+			if(dot.hasClass('unselected'))	dot.removeClass('unselected');
+			if(dot.hasClass('big'))					dot.removeClass('big');
+			if(!dot.hasClass('disabled'))		dot.addClass('disabled');
+			if(!range.hasClass('hidden'))		range.addClass('hidden');
+			if(!range.hasClass('mini'))			range.addClass('mini');
+			if(!label.hasClass('hidden'))		label.addClass('hidden');
+		break;
+		
+		//pequeno
+		case "p":
+			if(dot.hasClass('unselected'))	dot.removeClass('unselected');
+			if(dot.hasClass('big'))					dot.removeClass('big');
+			if(dot.hasClass('disabled'))		dot.removeClass('disabled');
+			if(range.hasClass('hidden'))		range.removeClass('hidden');
+			if(!range.hasClass('mini'))			range.addClass('mini');
+			if(!label.hasClass('hidden'))		label.addClass('hidden');
+		break;
+		
+		//grande
+		case "g":
+			if(dot.hasClass('unselected'))	dot.removeClass('unselected');
+			if(!dot.hasClass('big'))				dot.addClass('big');
+			if(dot.hasClass('disabled'))		dot.removeClass('disabled');
+			if(range.hasClass('hidden'))		range.removeClass('hidden');
+			if(range.hasClass('mini'))			range.removeClass('mini');
+			if(label.hasClass('hidden'))		label.removeClass('hidden');
+			//centraliza texto em relação a bola
+			ml = 15-((parseInt(label.css('width'))+20)/2); //15 = meia bola grande; 20 = 10+10 de padding lateral do label
+			//considera o deslocamento da bola
+			ml += parseInt(dot.css('margin-left'));
+			//aplica
+			label.css('margin-left', ml);
+		break;
+		
+		//selecionado
+		case "s":
+			if(!dot.hasClass('unselected'))	dot.addClass('unselected');
+			if(!dot.hasClass('big'))				dot.addClass('big');
+			if(dot.hasClass('disabled'))		dot.removeClass('disabled');
+			if(range.hasClass('hidden'))		range.removeClass('hidden');
+			if(range.hasClass('mini'))			range.removeClass('mini');
+			if(label.hasClass('hidden'))		label.removeClass('hidden');
+			//centraliza texto em relação a bola
+			ml = 15-((parseInt(label.css('width'))+20)/2); //15 = meia bola grande; 20 = 10+10 de padding lateral do label
+			//considera o deslocamento da bola
+			ml += parseInt(dot.css('margin-left'));
+			//aplica
+			label.css('margin-left', ml);
+		break;
+		
+		//balloon
+		case "b":
+							// ** preencher **
+		break;
+		
+		//desaparecendo
+		case "d":
+							// ** preencher **
+		break;
+	}
+}
+
+EventDot.prototype.die = function(){
+	//remove o elemento do HTML
+	//se remove da lista (check-out)
+}
+
+function drawHomeEvents(){
+	criaEventos();
+	EventDot.drawThemAll();
 }
 
 function resizeEvents(){
+	//ajusta o tamanho do div q contém as instâncias de EventDot
+	var marginTop = 50;
+	$('#events').css('top', $('#header').height() + marginTop);
+	$('#events').css('height', $(window).height() - $('#header').height() - $('#aboutInfo').height() - marginTop);
+	
+	//resize em todos
 	
 }

@@ -1,11 +1,12 @@
 /*bg*/
 body{
 	background-color: black;
-	font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
 	color:white;
 	font-size:11px;
 }
 h1{
+	font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 	font-size:24px;
 }
 .float{
@@ -40,7 +41,7 @@ h1{
 	width:490px;
 	line-height:1.2em;
 	margin-bottom:15px;
-	margin-left:30px;
+	margin-left:31px;
 }
 #selectedInfo h1{
 	margin-top:15px;
@@ -118,6 +119,16 @@ button{
 /*=========== timeline ============*/
 #events{
 	position:absolute;
+	width:100%;
+	height:100px;
+	overflow:hidden;
+/*	background-color:rgba(255,0,0,.5);*/
+}
+.event{
+	display:block;
+	clear:both;
+	margin-bottom:5px;
+	margin-left:90px;
 }
 .dot{
 	display:block;
@@ -130,8 +141,6 @@ button{
 	border-color:white;
 	background-color:white;
 	box-shadow: 0 1px 2px 0px rgba(0,0,0,.5);
-	margin-top:5px;
-	margin-bottom:5px;
 }
 .dot.big{
 	border-radius:15px;
@@ -147,12 +156,33 @@ button{
 	box-shadow:none;
 	opacity:.6;
 }
-.dot.range{
+.range{
+	display:block;
 	width:100px;
 	height:31px;
 	border-width:0px;
 	border-radius:30px;
-	background-color:rgba(255,255,255,.5);
+	background-color:rgba(255,255,255,.4);
+}
+.range.mini{
+	width:100px;
+	height:5px;
+	background-color:rgba(255,255,255,.2);
+}
+.range.hidden{
+	width:0px;
+	height:5px;
+}
+.label{
+	display:inline-block;
+	clear:both;
+	margin-top:1px;
+	padding: 3px 10px 5px 10px;
+	border-radius: 10px;
+	background-color: rgba(255, 255, 255, .2);
+}
+.label.hidden{
+	display:none;
 }
 #timelineGrid{
 	position:absolute;
@@ -168,7 +198,7 @@ button{
 	width:1px;
 	height:100px;
 	font-size:11px;
-	text-indent:-1px;
+	text-indent:-2px;
 	color:white;
 	text-shadow: 0px 1px 3px #333;
 	background-color:rgba(255,255,255,.2);
