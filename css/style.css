@@ -38,9 +38,9 @@ h1{
 	margin-bottom:1px;
 }
 #selectedInfo p{
-	width:490px;
+	width:700px;
 	line-height:1.2em;
-	margin-bottom:15px;
+/*	margin-bottom:5px;*/
 	margin-left:31px;
 }
 #selectedInfo h1{
@@ -51,6 +51,14 @@ h1{
 #selectedInfo h1 em{
 	font-style:normal;
 	color:rgba(255,255,255,.6);
+}
+#selectedInfo h4{
+	display:block;
+	text-align:right;
+	margin-top:-2em;
+	margin-right:30px;
+	font-weight:normal;
+	color:rgba(255,255,255,.3);
 }
 #aboutInfo{
 	background-color:rgba(0,0,0,.6);
@@ -91,7 +99,6 @@ button, input, select {
 	margin-bottom:15px;
 }
 input {
-	vertical-align:middle;
 	border-radius:4px;
 	font-size:11px;
 	padding-left:4px;
@@ -100,17 +107,28 @@ input {
 button, input[type="radio"]{
 	margin-left:5px;
 }
+.quem{
+	margin-left:5px;
+}
+.quando{
+	margin-left:5px;
+	width:13em !important;
+}
 input[type="radio"]{
+	vertical-align:middle;
 	height:14px;
 }
-input[type="text"], select{
-	width:12em;
+input[type="text"]{
+	width:17em;
+}
+select{
+	width:10em;
 }
 input[type="text"]{
 	border-style:solid;
 	border-width:1px;
 	border-color:#666;
-	padding-bottom:1px;
+	height:15px;
 }
 button{
 	height:20px;
@@ -127,7 +145,7 @@ button{
 .event{
 	display:block;
 	clear:both;
-	margin-bottom:5px;
+	margin-bottom:2px;
 	margin-left:90px;
 }
 .dot{
@@ -163,7 +181,7 @@ button{
 	height:26px;
 	border-width:0px;
 	border-radius:30px;
-	background-color:rgba(255,255,255,.3);
+	background-color:rgba(255,255,255,.15);
 }
 .range.mini{
 	width:100px;
@@ -175,12 +193,15 @@ button{
 	height:5px;
 }
 .label{
-	display:inline-block;
-	clear:both;
-	margin-top:2px;
+/*	display:inline;*/
+	position:relative;
+	top:-20px;
+	text-shadow: 0px 1px 3px #333;
+/*	clear:both;*/
+/*	margin-top:2px;
 	padding: 0px 7px 2px 7px;
 	border-radius: 10px;
-	background-color: rgba(255, 255, 255, .15);
+	background-color: rgba(255, 255, 255, .15);*/
 }
 .label.hidden{
 	display:none;
@@ -205,6 +226,11 @@ button{
 	background-color:rgba(255,255,255,.2);
 /*	opacity:.2;*/
 }
-.line spam{
+.line span{
 	opacity:.7;
+}
+
+.line.t{
+	background-image: url(../img/linha-tracejada.gif);
+	opacity:.2;
 }

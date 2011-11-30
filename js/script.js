@@ -68,14 +68,19 @@ function drawTimeline(){
 		//considerando receber showDateDetails do db.js (futuramente: sempre false)
 		if(showDateDetails){
 			//debug
-			var html = "<div class='line l" + i + "'><spam><spam class='bullet'>|</spam>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + " " + "</br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br>" + timeline[i].date.toDateString() + "</br></br>" + timeline[i].date.toTimeString() + "</spam></div>";
+			var html = "<div class='line l" + i + "'><span><span class='bullet'>|</span>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + " " + "</br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br>" + timeline[i].date.toDateString() + "</br></br>" + timeline[i].date.toTimeString() + "</span></div>";
 		} else {
 			//produção
-			var html = "<div class='line l" + i + "'><spam><spam class='bullet'>|</spam>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + "</spam></div>";
+			var html = "<div class='line l" + i + "'><span><span class='bullet'>|</span>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + "</span></div>";
 		}
 		//inclui o elemento no html, dentro do div #timelineGrid
 		$(html).appendTo('#timelineGrid');
 	}
+	
+	//inclui a linha tracejada
+	var html = "<div class='line t'></div>";
+	//inclui o elemento no html, dentro do div #timelineGrid
+	$(html).appendTo('#timelineNow');
 	
 	//ajusta a altura das linhas
 	$('.line').css('height', $(window).height());
@@ -93,6 +98,7 @@ function resizeTimeline(){
 }
 
 function ajustaLinhas(){
+	//ajusta linhas normais
 	safeMargin = 30;
 	for(var i in timeline){
 		//define
@@ -106,6 +112,9 @@ function ajustaLinhas(){
 		//aplica na tela
 		element.css('left', position);
 	}
+	
+	//ajusta a linha tracejada
+	$('.line.t').css('left', dateToPosition(Date.now()))
 }
 
 function updateTimelineDates(){
@@ -243,7 +252,7 @@ EventDot.drawThemAll = function(){
 		var e = eventDotInstances[i];
 		
 		//cria o DIV com id com a bolinha, range e label dentro
-		var html = "<div class='event e" + e.id + "'><spam class='range'><spam class='dot'></spam></spam><spam class='label'>" + e.onde + "</spam></div>";
+		var html = "<div class='event e" + e.id + "'><span class='range'><span class='dot'></span></span><span class='label'>" + e.onde + "</span></div>";
 		$(html).appendTo('#events');
 		
 		//aplica as classes baseado no status
@@ -267,6 +276,8 @@ EventDot.prototype.updateVisual = function(){
 			if(!range.hasClass('hidden'))		range.addClass('hidden');
 			if(!range.hasClass('mini'))			range.addClass('mini');
 			if(!label.hasClass('hidden'))		label.addClass('hidden');
+			//força o tamanho do div
+			div.css('height', dot.outerHeight('false'));
 		break;
 		
 		//pequeno
@@ -277,6 +288,8 @@ EventDot.prototype.updateVisual = function(){
 			if(range.hasClass('hidden'))		range.removeClass('hidden');
 			if(!range.hasClass('mini'))			range.addClass('mini');
 			if(!label.hasClass('hidden'))		label.addClass('hidden');
+			//força o tamanho do div
+			div.css('height', dot.outerHeight('false'));
 		break;
 		
 		//grande
@@ -287,12 +300,8 @@ EventDot.prototype.updateVisual = function(){
 			if(range.hasClass('hidden'))		range.removeClass('hidden');
 			if(range.hasClass('mini'))			range.removeClass('mini');
 			if(label.hasClass('hidden'))		label.removeClass('hidden');
-			// //centraliza texto em relação a bola
-			// ml = (dot.outerWidth(false)/2)-(label.outerWidth(false)/2);
-			// //considera o deslocamento da bola
-			// ml += parseInt(dot.css('margin-left'));
-			// //aplica
-			// label.css('margin-left', ml);
+			//força o tamanho do div
+			div.css('height', (dot.outerHeight('false')+1));
 		break;
 		
 		//selecionado
@@ -303,12 +312,8 @@ EventDot.prototype.updateVisual = function(){
 			if(range.hasClass('hidden'))		range.removeClass('hidden');
 			if(range.hasClass('mini'))			range.removeClass('mini');
 			if(label.hasClass('hidden'))		label.removeClass('hidden');
-			// //centraliza texto em relação a bola
-			// ml = (dot.outerWidth(false)/2)-(label.outerWidth(false)/2);
-			// //considera o deslocamento da bola
-			// ml += parseInt(dot.css('margin-left'));
-			// //aplica
-			// label.css('margin-left', ml);
+			//força o tamanho do div
+			div.css('height', dot.outerHeight('false'));
 		break;
 		
 		//balloon
@@ -336,12 +341,12 @@ EventDot.prototype.posicionar = function(){
 	var t1 = this.dataFinal.getTime();
 	
 	// //posiciona o começo do evento
-	var x0 = this.dateToPosition(t0);
+	var x0 = dateToPosition(t0);
 	x0 -= dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
 	div.css('margin-left', x0);
 	
 	//posiciona o fim do evento
-	var x1 = this.dateToPosition(t1);
+	var x1 = dateToPosition(t1);
 	var rangeEnd = x1-x0;
 	var length = rangeEnd += dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
 	range.css('width', length);
@@ -349,26 +354,32 @@ EventDot.prototype.posicionar = function(){
 	//posiciona a bolinha, representando o progresso geral do evento
 	t = (t < t0) ? t0 : t;
 	t = (t > t1) ? t1 : t;
-	var x = this.dateToPosition(t) - x0;
-	x -= dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
+	var x = dateToPosition(t) - x0;
+	if(dot.hasClass('big')){
+		x -= dot.outerWidth(false)/2;	//compensa o tamanho da bolinha grande
+	} else {
+		x -= (dot.outerWidth(false)/2) - 1;	//compensa o tamanho da bolinha pequena
+	}
 	dot.css('margin-left', x);
 	
 	//posiciona o label
 	//centraliza texto em relação a bola
-	ml = (dot.outerWidth(false)/2)-(label.outerWidth(false)/2);
+	// ml = (dot.outerWidth(false)/2)-(label.outerWidth(false)/2);
 	//considera o deslocamento da bola
-	ml += parseInt(dot.css('margin-left'));
+	// ml += parseInt(dot.css('margin-left'));
+	ml = parseInt(dot.css('margin-left')) + dot.outerWidth(false) + 7;
 	//aplica
 	label.css('margin-left', ml);
 }
 
-EventDot.prototype.dateToPosition = function(t){
+// EventDot.prototype.dateToPosition = function(t){
+function dateToPosition(t){	
 	if(t >= timeline[timeline.length-1].date.getTime()){
 		//se t for maior que a última marca da timeline
-		return $(window).width();
+		return $(window).width() + 50;
 	} else if(t < timeline[0].date.getTime()){
 		//se t for menor que a primeira marca da timeline
-		return 0;
+		return -50;
 	} else {
 		//t está entre alguma das marcas
 		//identifica o intervalo
