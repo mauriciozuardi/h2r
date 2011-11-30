@@ -228,7 +228,10 @@ function EventDot(eventData){
 	// this.oqueTipo				= (eventData.oqueTipo) ? eventData.oqueTipo : "atividade indefinida";
 	this.separador			= (eventData.separador) ? eventData.separador : " // ";
 	this.textoHome			= (eventData.textoHome) ? eventData.textoHome : "Lorem ipsum ..";
-			
+	
+	//console
+	// console.log(this.onde + " : " + this.dataInicial.toDateString() + " ~ " + this.dataFinal.toDateString());
+	
 	//check-in
 	eventDotInstances.push(this);
 }
@@ -338,16 +341,20 @@ EventDot.prototype.posicionar = function(){
 	var t0 = this.dataInicial.getTime();
 	var t1 = this.dataFinal.getTime();
 	
+	console.log(this.onde);
+	
 	// //posiciona o começo do evento
 	var x0 = this.dateToPosition(t0);
 	x0 -= dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
 	div.css('margin-left', x0);
+	console.log('rangeStart : margin-left: ' + x0);
 	
 	//posiciona o fim do evento
 	var x1 = this.dateToPosition(t1);
 	var rangeEnd = x1-x0;
-	rangeEnd += dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
-	range.css('width', rangeEnd);
+	var length = rangeEnd += dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
+	range.css('width', length);
+	console.log('length : width: ' + length);
 	
 	//posiciona a bolinha, representando o progresso geral do evento
 	t = (t < t0) ? t0 : t;
@@ -355,6 +362,7 @@ EventDot.prototype.posicionar = function(){
 	var x = this.dateToPosition(t) - x0;
 	x -= dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
 	dot.css('margin-left', x);
+	console.log('dot : margin-left: ' + x);
 	
 	//posiciona o label
 	//centraliza texto em relação a bola
@@ -363,15 +371,18 @@ EventDot.prototype.posicionar = function(){
 	ml += parseInt(dot.css('margin-left'));
 	//aplica
 	label.css('margin-left', ml);
+	console.log('label : margin-left: ' + ml);
+	
+	console.log('-');
 }
 
 EventDot.prototype.dateToPosition = function(t){
 	if(t >= timeline[timeline.length-1].date.getTime()){
 		//se t for maior que a última marca da timeline
-		return ($(window).width() + 50);
+		return $(window).width();
 	} else if(t < timeline[0].date.getTime()){
 		//se t for menor que a primeira marca da timeline
-		return ($(window).width() - 50);
+		return 0;
 	} else {
 		//t está entre alguma das marcas
 		//identifica o intervalo
