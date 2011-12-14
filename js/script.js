@@ -3,7 +3,7 @@
 initDate = 0;
 timeline = [];
 //eventos
-createdEvents = 0;
+createdDots = 0;
 eventDotInstances = [];
 
 //começa qdo carregar o DOM
@@ -29,7 +29,7 @@ function init(){
 	incluiLogo();
 	resizeBg();
 	drawTimeline();
-	drawHomeEvents();
+	// drawHomeEvents();  //<-- vai desenhar qdo acabar de carregar tudo (JSONFromSpreadsheetToJSObjects.js cuida disso)
 	resizeEventWindow();
 	
 	//ajusta a altura do body no resize
@@ -46,7 +46,7 @@ function init(){
 
 function incluiLogo(){
 	//vem do config/debug (acima)
-	$("<img src='./img/" + imgName + "' alt='Logo Agenda de Fotografia'/>").appendTo('#header');
+	$("<img src='./img/" + imgName + "' alt=''/>").appendTo('#header');
 }
 
 function resizeBg(){
@@ -228,22 +228,71 @@ function updateTimelineDates(){
 	}
 }
 
-function EventDot(eventData){
-	//init values
-	//Legenda Visual  :   a:apagado; p:pequeno; g:grande; s:selecionado; b:balloon; d:desaparecendo; 
-	this.id							= createdEvents; createdEvents++;
-	this.dataInicial		= (eventData.dataInicial) ? new Date(eventData.dataInicial) : new Date();
-	this.dataFinal			= (eventData.dataFinal) ? new Date(eventData.dataFinal) : new Date();
-	this.visual					= (eventData.visual) ? eventData.visual : "p"; //refere-se ao visual da bolinha na timeline.
-	this.onde						= (eventData.onde) ? eventData.onde : "lugar sem nome";
-	this.quem						= (eventData.quem) ? eventData.quem : "pessoa sem nome";
-	this.oque						= (eventData.oque) ? eventData.oque : "atividade sem nome";
-	// this.oqueTipo				= (eventData.oqueTipo) ? eventData.oqueTipo : "atividade indefinida";
-	this.separador			= (eventData.separador) ? eventData.separador : " // ";
-	this.textoHome			= (eventData.textoHome) ? eventData.textoHome : "Lorem ipsum ..";
+function EventDot(ca){
+	//ca = id, nome, atalho, tipo, visual, onde, titulomanual, tituloempixels, sinopse, sobre, credito, site, imagens e atividades
+	
+	//DEFAULTS
+	
+	// this.id							= createdDots; createdDots++;
+	this.id = ca.siteId + "-" + ca.id;
+	
+	// this.visual					= (eventData.visual) ? eventData.visual : "p"; //refere-se ao visual da bolinha na timeline.
+	this.visual = (ca.visual) ? ca.visual : "p";
+	// this.visual = "g";
+	
+	// this.onde						= (eventData.onde) ? eventData.onde : "lugar sem nome";
+	if(ca.onde){
+		//se cadastrou o nome do local (para o caso de acontecer em todas as Starbucks, por exemplo)
+		var nomeLocal = ca.onde;
+	} else if(ca.atalho){
+		//senão, procura o atalho para a atividade em questão (para o caso de ser um grupo de uma atividade só)
+		var nomeLocal = ca.atalho;
+	} else {
+		//senão, assume que não foi cadastrado
+		var nomeLocal = "CADASTRAR LOCAL";
+	}
+	this.onde = nomeLocal;
+	
+	// this.quem						= (eventData.quem) ? eventData.quem : "pessoa sem nome";
+	// this.oque						= (eventData.oque) ? eventData.oque : "atividade sem nome";
+	// // this.oqueTipo				= (eventData.oqueTipo) ? eventData.oqueTipo : "atividade indefinida";
+	// this.separador			= (eventData.separador) ? eventData.separador : " // ";
+	// this.textoHome			= (eventData.textoHome) ? eventData.textoHome : "Lorem ipsum ..";
+	
+	//descobre o range
+	console.log(ca.atividades);
+	var arrAtividades = ca.atividades.split(', ');
+	for (var i in arrAtividades){
+		// console.log(i);
+		// console.log(a[ca.siteId][arrAtividades[i]]);
+		console.log(a[ca.siteId][arrAtividades[i]].datainicial);
+		this.dataInicial	= googleDateToDate(a[ca.siteId][arrAtividades[i]].datainicial);
+		console.log(a[ca.siteId][arrAtividades[i]].datafinal);
+		this.dataFinal		= googleDateToDate(a[ca.siteId][arrAtividades[i]].datafinal);
+	}
 	
 	//check-in
 	eventDotInstances.push(this);
+}
+
+function googleDateToDate(gDate){
+	//fatia a string de data do Google
+	var a = gDate.split(" "); //separa 0:data 1:hora
+	a[0] = a[0].split("/"); //separa 0:mês 1:dia 2:ano
+	if(a.length == 2){
+		a[1] = a[1].split(":"); //separa 0:horas 1:minutos 2:segundos
+		var h = a[1][0];
+		var m = a[1][1];
+		var s = a[1][2];
+	} else {
+		var h = 0;
+		var m = 0;
+		var s = 0;
+	}
+	
+	var date = new Date(parseInt(a[0][2]), parseInt(a[0][0])-1, parseInt(a[0][1]), parseInt(h), parseInt(m), parseInt(s), 0);
+	console.log(date.toDateString());
+	return date;
 }
 
 EventDot.killThemAll = function(){
@@ -414,8 +463,22 @@ EventDot.prototype.die = function(){
 }
 
 function drawHomeEvents(){
-	criaEventos();//vem do db.js
+	//criaEventos();//vem do db.js
+	criaEventosHome();
 	EventDot.drawThemAll();
+}
+
+function criaEventosHome(){
+	//varre todos os CAs
+	for (var i in s){
+		for(var j in ca[s[i].id]){
+			//cria uma bolinha para cada
+			// console.log(["ca." + i + "." + j, ca[s[i].id][j]]);
+			var obj = ca[s[i].id][j];
+			obj.siteId = i;
+			new EventDot(obj);
+		}
+	}
 }
 
 function resizeEventWindow(){

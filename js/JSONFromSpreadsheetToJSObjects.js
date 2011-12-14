@@ -22,16 +22,21 @@ function cellsToObjects(json){
 function listaEspacos(root) {
 	e = cellsToObjects(root);
 	console.log(["Espaços", e]);
+	finishedRequests ++;
+	drawDotsIfYouCan();
 }
 
 function listaPessoas(root) {
 	p = cellsToObjects(root);
 	console.log(["Pessoas", p]);
+	finishedRequests ++;
+	drawDotsIfYouCan();
 }
 
 function listaSites(root) {
 	s = cellsToObjects(root);
 	console.log(["Sites", s]);
+	finishedRequests ++;
 	
 	//carrega as outras tabelas (listadas em sites)
 	for(var i in s){
@@ -41,14 +46,20 @@ function listaSites(root) {
 		//chama o jason
 		$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[i].key + "/1/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
 		$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[i].key + "/2/public/basic?alt=json", $.proxy(listaAtividadesPrePreenchida, context));
+		//avisa qtos JSON requests devemos esperar
+		totalRequests += 2;
 	}
 }
 
 function listaConjuntosPrePreenchida(json){
-  listaConjuntos(json, this.id);
+	listaConjuntos(json, this.id);
+	finishedRequests ++;
+	drawDotsIfYouCan();
 }
 function listaAtividadesPrePreenchida(json){
-  listaAtividades(json, this.id);
+	listaAtividades(json, this.id);
+	finishedRequests ++;
+	drawDotsIfYouCan();
 }
 
 function listaConjuntos(root, parentId) {
@@ -67,12 +78,30 @@ function listaAtividades(root, parentId) {
 		]);
 }
 
+function allJSONLoaded(){
+	if(finishedRequests == totalRequests){
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function drawDotsIfYouCan(){
+	// console.log("..deixa eu ver: ("+ finishedRequests +"/"+totalRequests+")");
+	if(allJSONLoaded()){
+		// console.log("YES, I CAN! - (" + finishedRequests + ")");
+		drawHomeEvents();
+	}
+}
+
 //globals
 e  = {};
 p  = {};
 s	 = {};
 ca = {};
 a  = {};
+totalRequests = 0;
+finishedRequests = 0;
 
 function init(){	
 	//carrega os dados da tabela Geral e depois, baseado nos "sites", carrega Atividades e Conjuntos de Atividades.
@@ -80,7 +109,7 @@ function init(){
 	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + key + "/1/public/basic?alt=json", function(json){listaEspacos(json)});
 	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + key + "/2/public/basic?alt=json", function(json){listaPessoas(json)});
 	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + key + "/3/public/basic?alt=json", function(json){listaSites(json)});
-	
+	totalRequests += 3;
 }
 
 $(init);
