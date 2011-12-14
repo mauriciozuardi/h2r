@@ -9,9 +9,14 @@ eventDotInstances = [];
 //começa qdo carregar o DOM
 $(init);
 
+//config e debug
+showDateDetails = false;
+imgName = "logo-agenda-de-fotografia.png"; //<-- virá do Google.
+timeMarksStr = "mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem"; //timeMarksStr = 'mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem|fim do mundo=December 21, 2012 00:00:00';
+aDay = "hoje";
+
 function init(){
 	//que dia/hora são?
-	//considerando receber aDay do db.js (futuramente usaremos só o else)
 	if(aDay != 'hoje'){
 		initDate = new Date(aDay);
 		initNow = initDate.getTime();
@@ -34,10 +39,13 @@ function init(){
 		resizeEventWindow();
 		resizeEvents();
 	});
+	
+	//prepara o clique
+	$('.dot').click(function (event){dotClicked(event);});
 }
 
 function incluiLogo(){
-	//considerando receber imgName do db.js
+	//vem do config/debug (acima)
 	$("<img src='./img/" + imgName + "' alt='Logo Agenda de Fotografia'/>").appendTo('#header');
 }
 
@@ -47,10 +55,6 @@ function resizeBg(){
 
 function drawTimeline(){
 	//trata os nomes e datas
-	
-	//considerando q recebo essa string do db.js (futuramente do php)
-	//timeMarksStr = 'mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem|fim do mundo=December 21, 2012 00:00:00';
-	
 	timeline = timeMarksStr.split('|');
 	for (var i in timeline){
 		timeline[i] = timeline[i].split('=');		
@@ -65,7 +69,7 @@ function drawTimeline(){
 	
 	//cria os elementos
 	for(var i in timeline){
-		//considerando receber showDateDetails do db.js (futuramente: sempre false)
+		//showDateDetails vem do config/debug (acima)
 		if(showDateDetails){
 			//debug
 			var html = "<div class='line l" + i + "'><span><span class='bullet'>|</span>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + " " + "</br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br>" + timeline[i].date.toDateString() + "</br></br>" + timeline[i].date.toTimeString() + "</span></div>";
@@ -252,7 +256,7 @@ EventDot.drawThemAll = function(){
 		var e = eventDotInstances[i];
 		
 		//cria o DIV com id com a bolinha, range e label dentro
-		var html = "<div class='event e" + e.id + "'><span class='range'><span class='dot'></span></span><span class='label'>" + e.onde + "</span></div>";
+		var html = "<div class='event e" + e.id + "'><span class='range'><span data-id='" + e.id + "' class='dot'></span></span><span class='label'>" + e.onde + "</span></div>";
 		$(html).appendTo('#events');
 		
 		//aplica as classes baseado no status
@@ -426,4 +430,11 @@ function resizeEvents(){
 	for(var i in eventDotInstances){
 		eventDotInstances[i].posicionar();
 	}
+}
+
+function dotClicked(event){
+		//pega o elemento
+		element = $(event.target);
+		// console.log(element);
+		console.log(element.data('id'));
 }
