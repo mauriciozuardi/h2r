@@ -304,7 +304,7 @@ EventDot.drawThemAll = function(){
 		var e = eventDotInstances[i];
 		
 		//cria o DIV com id com a bolinha, range e label dentro
-		var html = "<div onclick='dotClicked' class='event e" + e.id + "'><span class='range'><span data-id='" + e.id + "' class='dot'></span></span><span class='label'>" + e.onde + "</span></div>";
+		var html = "<div class='event " + e.id + "'><span class='range'><span data-id='" + e.id + "' class='dot'></span></span><span class='label'>" + e.onde + "</span></div>";
 		$(html).appendTo('#events');
 		
 		//aplica as classes baseado no status
@@ -313,10 +313,10 @@ EventDot.drawThemAll = function(){
 }
 
 EventDot.prototype.updateVisual = function(){
-	var div = $('div.e' + this.id);
-	var dot = $('div.e' + this.id + ' .dot');
-	var range = $('div.e' + this.id + ' .range');
-	var label = $('div.e' + this.id + ' .label');
+	var div = $('div.' + this.id);
+	var dot = $('div.' + this.id + ' .dot');
+	var range = $('div.' + this.id + ' .range');
+	var label = $('div.' + this.id + ' .label');
 	var ml = 0;
 	
 	switch (this.visual){
@@ -383,10 +383,10 @@ EventDot.prototype.updateVisual = function(){
 }
 
 EventDot.prototype.posicionar = function(){
-	var div = $('div.e' + this.id);
-	var dot = $('div.e' + this.id + ' .dot');
-	var range = $('div.e' + this.id + ' .range');
-	var label = $('div.e' + this.id + ' .label');
+	var div = $('div.' + this.id);
+	var dot = $('div.' + this.id + ' .dot');
+	var range = $('div.' + this.id + ' .range');
+	var label = $('div.' + this.id + ' .label');
 	
 	var t = Date.now();
 	var t0 = this.dataInicial.getTime();
@@ -422,6 +422,9 @@ EventDot.prototype.posicionar = function(){
 	ml = parseInt(dot.css('margin-left')) + dot.outerWidth(false) + 7;
 	//aplica
 	label.css('margin-left', ml);
+	
+	//anexa a função de clique
+	range.click(function (event){dotClicked(event);});
 }
 
 // EventDot.prototype.dateToPosition = function(t){
@@ -490,9 +493,6 @@ function criaEventosHome(){
 			}
 		}
 	}
-	
-	//prepara o clique
-	// $('.dot').click(function (event){dotClicked(event);});
 }
 
 function resizeEventWindow(){
