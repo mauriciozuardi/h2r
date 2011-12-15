@@ -38,18 +38,73 @@ function listaSites(root) {
 	console.log(["Sites", s]);
 	finishedRequests ++;
 	
-	//carrega as outras tabelas (listadas em sites)
-	for(var i in s){
-		//define o contexto - info "hardcoded" (diferente para cada loop)
-		var context = {};
-		context.id = s[i].id;
+	//decide se vai carregar os JSONS de um 'site' ou de todos
+	var context = {};
+	if(sID){
+		// console.log("CHAMANDO " + sID.toUpperCase());
+		//define o contexto
+		context.id = s[sID].id;
 		//chama o jason
-		$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[i].key + "/1/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
-		$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[i].key + "/2/public/basic?alt=json", $.proxy(listaAtividadesPrePreenchida, context));
-		//avisa qtos JSON requests devemos esperar
+		$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[sID].key + "/1/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
+		$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[sID].key + "/2/public/basic?alt=json", $.proxy(listaAtividadesPrePreenchida, context));
+		//avisa qtos JSON requests devemos esperar (2)
 		totalRequests += 2;
+	} else {
+		// console.log("CHAMANDO TODAS");
+		//carrega as outras tabelas (listadas em sites) CARREGA TUDO
+		for(var i in s){
+			//define o contexto - info "hardcoded" (diferente para cada loop)
+			context.id = s[i].id;
+			//define os parametros da URL (para restringir a quantidade de dados pela data)
+			var paramURL = "https://spreadsheets.google.com/feeds/cells/" + s[i].key + "/2/public/basic?";
+			// paramURL += encodeURI("(datafinal>" + firstTimemark() + "&&");
+			// paramURL += encodeURI("datainicial<" + lastTimemark() + ")&");
+			paramURL += "alt=json";
+			//chama o jason
+			$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[i].key + "/1/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
+			$.getJSON( paramURL, $.proxy(listaAtividadesPrePreenchida, context));
+			//avisa qtos JSON requests devemos esperar (2 pra cada loop)
+			totalRequests += 2;
+		}
 	}
+	
+	//define a timeline seguindo o modelo abaixo
+	//timeMarksStr = 'mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem|fim do mundo=December 21, 2012 00:00:00';
+	if(sID){
+		imgName = s[sID].logo;
+		timeMarksStr = s[sID].timeline;
+	} else {
+		imgName = "logo-agenda-de-fotografia.png";
+		timeMarksStr = "mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem";
+	}
+		
+	//desenha a timeline
+	try {drawTimeline()}
+	catch(err){}
 }
+
+function firstTimemark(){
+	return dateToGoogleStr(timeline[0].date);
+}
+
+function lastTimemark(){
+	return dateToGoogleStr(timeline[timeline.length-1].date);
+}
+
+function dateToGoogleStr(date){
+	var googleString = "";
+	googleString += parseInt(date.getMonth()) + 1;
+	googleString += "/" + date.getDate();
+	googleString += "/" + date.getFullYear();	// 
+		// googleString += " " + horaComZero(date.getHours());
+		// googleString += ":" + horaComZero(date.getMinutes());
+		// googleString += ":" + horaComZero(date.getSeconds());
+	return googleString;
+}
+
+// function horaComZero(n){
+// 	return (n<10) ? "0" + n : n;
+// }
 
 function listaConjuntosPrePreenchida(json){
 	listaConjuntos(json, this.id);
@@ -87,10 +142,11 @@ function allJSONLoaded(){
 }
 
 function drawDotsIfYouCan(){
-	// console.log("..deixa eu ver: ("+ finishedRequests +"/"+totalRequests+")");
+	// console.log(finishedRequests + "/" + totalRequests);
 	if(allJSONLoaded()){
-		// console.log("YES, I CAN! - (" + finishedRequests + ")");
-		drawHomeEvents();
+		// console.log("YES, I CAN!");
+		try {drawHomeEvents()}
+		catch(err){}
 	}
 }
 

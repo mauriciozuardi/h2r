@@ -9,10 +9,14 @@ eventDotInstances = [];
 //começa qdo carregar o DOM
 $(init);
 
+//confere se tem algo na URL
+URLvars = getUrlVars();
+sID = URLvars.sID;
+
 //config e debug
 showDateDetails = false;
-imgName = "logo-agenda-de-fotografia.png"; //<-- virá do Google.
-timeMarksStr = "mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem"; //timeMarksStr = 'mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem|fim do mundo=December 21, 2012 00:00:00';
+imgName = "";
+timeMarksStr = "";
 aDay = "hoje";
 
 function init(){
@@ -28,8 +32,8 @@ function init(){
 	//
 	incluiLogo();
 	resizeBg();
-	drawTimeline();
-	// drawHomeEvents();  //<-- vai desenhar qdo acabar de carregar tudo (JSONFromSpreadsheetToJSObjects.js cuida disso)
+	// drawTimeline();		//<-- vai desenhar qdo carregar a planilha "Sites"
+	// drawHomeEvents();	//<-- vai desenhar qdo acabar de carregar tudo (JSONFromSpreadsheetToJSObjects.js cuida disso)
 	resizeEventWindow();
 	
 	//ajusta a altura do body no resize
@@ -39,9 +43,6 @@ function init(){
 		resizeEventWindow();
 		resizeEvents();
 	});
-	
-	//prepara o clique
-	$('.dot').click(function (event){dotClicked(event);});
 }
 
 function incluiLogo(){
@@ -220,7 +221,7 @@ function updateTimelineDates(){
 				timeline[i].date = new Date (year, month+1, 1, 0, 0, 0);
 				break;
 			default:
-				//parte do princípio que a string refere-se a uma data (e está corretamente formatada) e substitui de volta os &nbsp; por espaço.			
+				//parte do princípio que a string refere-se a uma data (corretamente formatada) e substitui de volta os &nbsp; por espaço.
 				timeline[i].date = new Date (timeline[i].dateStr); // "January 6, 1972 16:05:00"
 				break;
 		}
@@ -246,7 +247,7 @@ function EventDot(ca){
 		var nomeLocal = ca.onde;
 	} else if(ca.atalho){
 		//senão, procura o atalho para a atividade em questão (para o caso de ser um grupo de uma atividade só)
-		var nomeLocal = ca.atalho;
+		var nomeLocal = ca.atalho; //< se existir, confere se tem um espaço só e usa o nome
 	} else {
 		//senão, assume que não foi cadastrado
 		var nomeLocal = "CADASTRAR LOCAL";
@@ -255,19 +256,17 @@ function EventDot(ca){
 	
 	// this.quem						= (eventData.quem) ? eventData.quem : "pessoa sem nome";
 	// this.oque						= (eventData.oque) ? eventData.oque : "atividade sem nome";
-	// // this.oqueTipo				= (eventData.oqueTipo) ? eventData.oqueTipo : "atividade indefinida";
+	// this.oqueTipo				= (eventData.oqueTipo) ? eventData.oqueTipo : "atividade indefinida";
 	// this.separador			= (eventData.separador) ? eventData.separador : " // ";
 	// this.textoHome			= (eventData.textoHome) ? eventData.textoHome : "Lorem ipsum ..";
 	
 	//descobre o range
-	console.log(ca.atividades);
+	// console.log(ca.atividades);
 	var arrAtividades = ca.atividades.split(', ');
 	for (var i in arrAtividades){
 		// console.log(i);
 		// console.log(a[ca.siteId][arrAtividades[i]]);
-		console.log(a[ca.siteId][arrAtividades[i]].datainicial);
 		this.dataInicial	= googleDateToDate(a[ca.siteId][arrAtividades[i]].datainicial);
-		console.log(a[ca.siteId][arrAtividades[i]].datafinal);
 		this.dataFinal		= googleDateToDate(a[ca.siteId][arrAtividades[i]].datafinal);
 	}
 	
@@ -291,7 +290,7 @@ function googleDateToDate(gDate){
 	}
 	
 	var date = new Date(parseInt(a[0][2]), parseInt(a[0][0])-1, parseInt(a[0][1]), parseInt(h), parseInt(m), parseInt(s), 0);
-	console.log(date.toDateString());
+	// console.log(date.toDateString());
 	return date;
 }
 
@@ -305,7 +304,7 @@ EventDot.drawThemAll = function(){
 		var e = eventDotInstances[i];
 		
 		//cria o DIV com id com a bolinha, range e label dentro
-		var html = "<div class='event e" + e.id + "'><span class='range'><span data-id='" + e.id + "' class='dot'></span></span><span class='label'>" + e.onde + "</span></div>";
+		var html = "<div onclick='dotClicked' class='event e" + e.id + "'><span class='range'><span data-id='" + e.id + "' class='dot'></span></span><span class='label'>" + e.onde + "</span></div>";
 		$(html).appendTo('#events');
 		
 		//aplica as classes baseado no status
@@ -469,16 +468,31 @@ function drawHomeEvents(){
 }
 
 function criaEventosHome(){
-	//varre todos os CAs
-	for (var i in s){
-		for(var j in ca[s[i].id]){
+	//cria os elementos HTML
+	if(sID){
+		//varre os CAs do 'site' em questão
+		for(var j in ca[sID]){
 			//cria uma bolinha para cada
-			// console.log(["ca." + i + "." + j, ca[s[i].id][j]]);
-			var obj = ca[s[i].id][j];
-			obj.siteId = i;
+			// console.log(["ca." + sID + "." + j, ca[sID][j]]);
+			var obj = ca[sID][j];
+			obj.siteId = sID;
 			new EventDot(obj);
+		}		
+	} else {
+		//varre todos os CAs
+		for (var i in s){
+			for(var j in ca[s[i].id]){
+				//cria uma bolinha para cada
+				// console.log(["ca." + i + "." + j, ca[s[i].id][j]]);
+				var obj = ca[s[i].id][j];
+				obj.siteId = i;
+				new EventDot(obj);
+			}
 		}
 	}
+	
+	//prepara o clique
+	// $('.dot').click(function (event){dotClicked(event);});
 }
 
 function resizeEventWindow(){
@@ -496,8 +510,19 @@ function resizeEvents(){
 }
 
 function dotClicked(event){
-		//pega o elemento
-		element = $(event.target);
-		// console.log(element);
-		console.log(element.data('id'));
+	//pega o elemento
+	element = $(event.target);
+	console.log(element);
+	// console.log(element.data('id'));
+}
+
+function getUrlVars(){
+	var vars = [], hash;
+	var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+	for(var i = 0; i < hashes.length; i++){
+	  hash = hashes[i].split('=');
+	  vars.push(hash[0]);
+	  vars[hash[0]] = hash[1];
+	}
+	return vars;
 }
