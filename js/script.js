@@ -595,7 +595,7 @@ function dotClicked(event){
 function labelClicked(event){
 	//pega o elemento
 	element = $(event.target);
-	alert("Eu sou um baloon!\n(brincadeirinha)" + element.text());
+	alert("Eu sou um baloon!\n" + element.text());
 }
 
 function getUrlVars(){
