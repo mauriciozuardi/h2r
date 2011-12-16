@@ -240,9 +240,16 @@ function EventDot(ca){
 	//console.log(this.i + " : " + this.id);
 	
 	//VISUAL
-	this.visual = (ca.visual) ? ca.visual : "p";
+	if(ca.visual){
+		var visual = ca.visual;
+	} else if(ca.atalho && a[ca.siteId][ca.atalho].visual){
+		var visual = a[ca.siteId][ca.atalho].visual;
+	} else {
+		var visual = "p";
+	}
+	this.visual = visual;
 	
-	//ONDE
+	//ONDE < default para Agenda
 	if(ca.onde){
 		//se cadastrou o nome do local (para o caso de acontecer em todas as Starbucks, por exemplo)
 		var nomeLocal = ca.onde;
@@ -254,10 +261,10 @@ function EventDot(ca){
 			if (espacos.length == 1){
 				var nomeLocal = e[espacos[0]].nome;
 			} else {
-				var nomeLocal = "MAIS DE UM ESPAÇO na ATIVIDADE indicada pelo ATALHO, cadastre NOME no CA";
+				var nomeLocal = "MAIS DE UM ESPAÇO na ATIVIDADE indicada pelo ATALHO, cadastre ONDE no CA";
 			}
 		} else {
-			var nomeLocal = "NENHUM ESPAÇO na ATIVIDADE indicada pelo ATALHO, cadastre NOME no CA";
+			var nomeLocal = "NENHUM ESPAÇO na ATIVIDADE indicada pelo ATALHO, cadastre ONDE no CA";
 		}
 
 	} else {
@@ -266,7 +273,7 @@ function EventDot(ca){
 	}
 	this.onde = nomeLocal;
 	
-	//O QUÊ
+	//O QUÊ < default para os sites
 	if(ca.nome){
 		//se cadastrou o nome do CA, entenda que é o nome da atividade
 		var nomeAtividade = ca.nome;
@@ -324,9 +331,9 @@ function EventDot(ca){
 	this.dataInicial	= new Date(menorDataMs);
 	this.dataFinal		= new Date(maiorDataMs);
 	
-	//avisa que ainda não recebeu a função de clique (para não evitar 2x)
+	//OUTROS
+	//avisa que ainda não recebeu a função de clique (para não anexar 2x)
 	this.semClique = true;
-	
 	//check-in
 	eventDotInstances.push(this);
 }
@@ -360,8 +367,14 @@ EventDot.drawThemAll = function(){
 	for(var i in eventDotInstances){
 		var e = eventDotInstances[i];
 		
+		if(sID){
+			var labelTxt = e.oque;
+		} else {
+			var labelTxt = e.onde;
+		}
+		
 		//cria o DIV com id com a bolinha, range e label dentro
-		var html = "<div data-id='" + e.id + "' class='event " + e.id + "'><span data-id='" + e.id + "' class='range'><span data-id='" + e.id + "' data-i='" + e.i + "' class='dot'></span></span><span data-i='" + e.i + "' class='label'>" + e.onde + "</span></div>";
+		var html = "<div data-id='" + e.id + "' class='event " + e.id + "'><span data-id='" + e.id + "' class='range'><span data-id='" + e.id + "' data-i='" + e.i + "' class='dot'></span></span><span data-i='" + e.i + "' class='label'>" + labelTxt + "</span></div>";
 		$(html).appendTo('#events');
 		
 		//aplica as classes baseado no status
@@ -402,7 +415,7 @@ EventDot.prototype.updateVisual = function(){
 		break;
 		
 		//grande
-		case "g":
+		case "s":
 			if(dot.hasClass('unselected'))	dot.removeClass('unselected');
 			if(!dot.hasClass('big'))				dot.addClass('big');
 			if(dot.hasClass('disabled'))		dot.removeClass('disabled');
@@ -414,7 +427,7 @@ EventDot.prototype.updateVisual = function(){
 		break;
 		
 		//selecionado
-		case "s":
+		case "g":
 			if(!dot.hasClass('unselected'))	dot.addClass('unselected');
 			if(!dot.hasClass('big'))				dot.addClass('big');
 			if(dot.hasClass('disabled'))		dot.removeClass('disabled');
@@ -572,18 +585,17 @@ function resizeEvents(){
 
 function dotClicked(event){
 	//pega o elemento
-	element = $(event.target);
+	var element = $(event.target);
 	
 	//altera o apontamento para dot se tiver clicado em range
 	if(element.hasClass('range')){
 		element = $('div.' + element.data('id') + ' .dot');
 	}
-		
-	console.log(element);
+	
+	//descobre quem é no array de EventDots
+	var eventDot = eventDotInstances[element.data('i')];
 	
 	//cresce ou diminui
-	// console.log(element.data('i'));
-	var eventDot = eventDotInstances[element.data('i')];
 	if(eventDot.visual == 'p') {
 		 eventDot.visual = 'g' 
 	} else if(eventDot.visual == 'g') {
@@ -594,8 +606,9 @@ function dotClicked(event){
 
 function labelClicked(event){
 	//pega o elemento
-	element = $(event.target);
-	alert("Eu sou um baloon!\n" + element.text());
+	var element = $(event.target);
+	var eventDot = eventDotInstances[element.data('i')];
+	alert("Eu sou um baloon!\n" + eventDot.oque);
 }
 
 function getUrlVars(){
