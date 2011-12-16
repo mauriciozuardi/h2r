@@ -250,9 +250,9 @@ function EventDot(ca){
 	this.visual = visual;
 	
 	//ONDE < default para Agenda
-	if(ca.onde){
+	if(ca.maisdeumonde){
 		//se cadastrou o nome do local (para o caso de acontecer em todas as Starbucks, por exemplo)
-		var nomeLocal = ca.onde;
+		var nomeLocal = ca.maisdeumonde;
 	} else if(ca.atalho){
 		//senão, procura o atalho para a atividade em questão e confere quantos espaços tem
 		var espacos = a[ca.siteId][ca.atalho].onde
