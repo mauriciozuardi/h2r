@@ -230,14 +230,10 @@ function updateTimelineDates(){
 }
 
 function EventDot(ca){
-	//ca = id, nome, atalho, tipo, visual, onde, titulomanual, tituloempixels, sinopse, sobre, credito, site, imagens e atividades
-	
-	//DEFAULTS
-	
 	//ID
 	this.id = ca.siteId + "-" + ca.id;
 	this.i = eventDotInstances.length; //posição no array
-	//console.log(this.i + " : " + this.id);
+	console.log(this.i + " : " + this.id);
 	
 	//VISUAL
 	if(ca.visual){
@@ -248,16 +244,17 @@ function EventDot(ca){
 		var visual = "p";
 	}
 	this.visual = visual;
+	console.log(this.visual);
 	
 	//ONDE < default para Agenda
-	if(ca.maisdeumonde){
+	if(ca.maisDeUmOnde){
 		//se cadastrou o nome do local (para o caso de acontecer em todas as Starbucks, por exemplo)
-		var nomeLocal = ca.maisdeumonde;
+		var nomeLocal = ca.maisDeUmOnde;
 	} else if(ca.atalho){
 		//senão, procura o atalho para a atividade em questão e confere quantos espaços tem
 		var espacos = a[ca.siteId][ca.atalho].onde
 		if(espacos){
-			espacos.split(", ");
+			espacos = espacos.split(", ");
 			if (espacos.length == 1){
 				var nomeLocal = e[espacos[0]].nome;
 			} else {
@@ -266,12 +263,12 @@ function EventDot(ca){
 		} else {
 			var nomeLocal = "NENHUM ESPAÇO na ATIVIDADE indicada pelo ATALHO, cadastre ONDE no CA";
 		}
-
 	} else {
 		//senão, assume que não foi cadastrado
 		var nomeLocal = "Cadastrar ONDE no CA ou indicar o ATALHO";
 	}
 	this.onde = nomeLocal;
+	console.log(this.onde);
 	
 	//O QUÊ < default para os sites
 	if(ca.nome){
@@ -285,6 +282,7 @@ function EventDot(ca){
 		var nomeAtividade = "Cadastrar NOME no CA ou na Atividade";
 	}
 	this.oque = nomeAtividade;
+	console.log(this.oque);
 
 	//QUEM
 	if(ca.quem){
@@ -294,11 +292,11 @@ function EventDot(ca){
 		//senão, procura o atalho para a atividade em questão e confere quantas pessoas tem listadas
 		var pessoas = a[ca.siteId][ca.atalho].quem;
 		if(pessoas){
-			pessoas.split(", ");
+			pessoas = pessoas.split(", ");
 			if (pessoas.length == 1){
 				var nomePessoa = pessoas[0]; //pessoas não tem ID, o ID é o próprio nome (pedido da Helena)
 			} else {
-				var nomePessoa = "MAIS DE UMA PESSOA na ATIVIDADE indicada pelo ATALHO, cadastre QUEM no CA";
+				var nomePessoa = "MAIS DE UMA PESSOA na ATIVIDADE indicada pelo ATALHO ("+ca.atalho+"), cadastre QUEM no CA";
 			}
 		} else {
 			var nomePessoa = "NENHUMA PESSOA na ATIVIDADE indicada pelo ATALHO, cadastre QUEM no CA ou na ATIVIDADE"
@@ -309,6 +307,7 @@ function EventDot(ca){
 		var nomePessoa = "Cadastrar QUEM no CA ou indicar o ATALHO";
 	}
 	this.quem = nomePessoa;
+	console.log(this.quem);
 	
 	//DATAS
 	//descobre o range de datas entre as atividades listadas
@@ -316,9 +315,10 @@ function EventDot(ca){
 	var arrAtividades = ca.atividades.split(', ');
 	var menorDataMs = 1.7976931348623157E+10308; //infinito
 	var maiorDataMs = 0;
+	console.log(arrAtividades);
 	for (var i in arrAtividades){
 		// console.log(i);
-		// console.log(a[ca.siteId][arrAtividades[i]]);
+		console.log(a[ca.siteId][arrAtividades[i]]);
 		//descobre os candidatos
 		var candidatoInicial	= googleDateToDate(a[ca.siteId][arrAtividades[i]].datainicial);
 		var candidatoFinal		= googleDateToDate(a[ca.siteId][arrAtividades[i]].datafinal);
@@ -330,6 +330,9 @@ function EventDot(ca){
 	//armazena as datas escolhidas
 	this.dataInicial	= new Date(menorDataMs);
 	this.dataFinal		= new Date(maiorDataMs);
+	
+	console.log(this.dataInicial.toString());
+	console.log(this.dataFinal.toString());
 	
 	//OUTROS
 	//avisa que ainda não recebeu a função de clique (para não anexar 2x)
@@ -539,28 +542,30 @@ function dateToPosition(t){
 // }
 
 function drawHomeEvents(){
-	//criaEventos();//vem do db.js
-	criaEventosHome();
+	criaEventDotsHome();
 	EventDot.drawThemAll();
 }
 
-function criaEventosHome(){
+function criaEventDotsHome(){
+	console.log("criaEventDotsHome()");
 	//cria os elementos HTML
 	if(sID){
+		console.log("sID = " + sID);
 		//varre os CAs do 'site' em questão
 		for(var j in ca[sID]){
 			//cria uma bolinha para cada
-			// console.log(["ca." + sID + "." + j, ca[sID][j]]);
+			console.log(["ca." + sID + "." + j, ca[sID][j]]);
 			var obj = ca[sID][j];
 			obj.siteId = sID;
 			new EventDot(obj);
 		}		
 	} else {
+		console.log("sem sID");
 		//varre todos os CAs
 		for (var i in s){
 			for(var j in ca[s[i].id]){
 				//cria uma bolinha para cada
-				// console.log(["ca." + i + "." + j, ca[s[i].id][j]]);
+				console.log(["ca." + i + "." + j, ca[s[i].id][j]]);
 				var obj = ca[s[i].id][j];
 				obj.siteId = i;
 				new EventDot(obj);

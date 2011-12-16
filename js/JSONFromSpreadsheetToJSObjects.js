@@ -19,9 +19,9 @@ function cellsToObjects(json){
 			dados[linha.id] = linha;
 		} else if(linha.nome){
 			//senão usa o nome como id
-			var nomeID = string_to_slug(linha.nome);
-			dados[nomeID] = linha;
-			dados[nomeID].id = nomeID;
+			var slug = string_to_slug(linha.nome);
+			dados[slug] = linha;
+			dados[slug].id = slug;
 		}
 	});	
 	return dados;
