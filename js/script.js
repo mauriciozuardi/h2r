@@ -234,41 +234,98 @@ function EventDot(ca){
 	
 	//DEFAULTS
 	
-	// this.id							= createdDots; createdDots++;
+	//ID
 	this.id = ca.siteId + "-" + ca.id;
+	this.i = eventDotInstances.length; //posição no array
+	//console.log(this.i + " : " + this.id);
 	
-	// this.visual					= (eventData.visual) ? eventData.visual : "p"; //refere-se ao visual da bolinha na timeline.
+	//VISUAL
 	this.visual = (ca.visual) ? ca.visual : "p";
-	// this.visual = "g";
 	
-	// this.onde						= (eventData.onde) ? eventData.onde : "lugar sem nome";
+	//ONDE
 	if(ca.onde){
 		//se cadastrou o nome do local (para o caso de acontecer em todas as Starbucks, por exemplo)
 		var nomeLocal = ca.onde;
 	} else if(ca.atalho){
-		//senão, procura o atalho para a atividade em questão (para o caso de ser um grupo de uma atividade só)
-		var nomeLocal = ca.atalho; //< se existir, confere se tem um espaço só e usa o nome
+		//senão, procura o atalho para a atividade em questão e confere quantos espaços tem
+		var espacos = a[ca.siteId][ca.atalho].onde
+		if(espacos){
+			espacos.split(", ");
+			if (espacos.length == 1){
+				var nomeLocal = e[espacos[0]].nome;
+			} else {
+				var nomeLocal = "MAIS DE UM ESPAÇO na ATIVIDADE indicada pelo ATALHO, cadastre NOME no CA";
+			}
+		} else {
+			var nomeLocal = "NENHUM ESPAÇO na ATIVIDADE indicada pelo ATALHO, cadastre NOME no CA";
+		}
+
 	} else {
 		//senão, assume que não foi cadastrado
-		var nomeLocal = "CADASTRAR LOCAL";
+		var nomeLocal = "Cadastrar ONDE no CA ou indicar o ATALHO";
 	}
 	this.onde = nomeLocal;
 	
-	// this.quem						= (eventData.quem) ? eventData.quem : "pessoa sem nome";
-	// this.oque						= (eventData.oque) ? eventData.oque : "atividade sem nome";
-	// this.oqueTipo				= (eventData.oqueTipo) ? eventData.oqueTipo : "atividade indefinida";
-	// this.separador			= (eventData.separador) ? eventData.separador : " // ";
-	// this.textoHome			= (eventData.textoHome) ? eventData.textoHome : "Lorem ipsum ..";
+	//O QUÊ
+	if(ca.nome){
+		//se cadastrou o nome do CA, entenda que é o nome da atividade
+		var nomeAtividade = ca.nome;
+	} else if(ca.atalho){
+		//senão, procura o atalho para a atividade em questão e usa o nome dela
+		var nomeAtividade = a[ca.siteId][ca.atalho].nome;
+	} else {
+		//senão, assume que não foi cadastrado
+		var nomeAtividade = "Cadastrar NOME no CA ou na Atividade";
+	}
+	this.oque = nomeAtividade;
+
+	//QUEM
+	if(ca.quem){
+		//se cadastrou o nome da pessoa (para o caso de ter mais de uma pessoa envolvida)
+		var nomePessoa = ca.quem;
+	} else if(ca.atalho){
+		//senão, procura o atalho para a atividade em questão e confere quantas pessoas tem listadas
+		var pessoas = a[ca.siteId][ca.atalho].quem;
+		if(pessoas){
+			pessoas.split(", ");
+			if (pessoas.length == 1){
+				var nomePessoa = pessoas[0]; //pessoas não tem ID, o ID é o próprio nome (pedido da Helena)
+			} else {
+				var nomePessoa = "MAIS DE UMA PESSOA na ATIVIDADE indicada pelo ATALHO, cadastre QUEM no CA";
+			}
+		} else {
+			var nomePessoa = "NENHUMA PESSOA na ATIVIDADE indicada pelo ATALHO, cadastre QUEM no CA ou na ATIVIDADE"
+		}
+
+	} else {
+		//senão, assume que não foi cadastrado
+		var nomePessoa = "Cadastrar QUEM no CA ou indicar o ATALHO";
+	}
+	this.quem = nomePessoa;
 	
-	//descobre o range
+	//DATAS
+	//descobre o range de datas entre as atividades listadas
 	// console.log(ca.atividades);
 	var arrAtividades = ca.atividades.split(', ');
+	var menorDataMs = 1.7976931348623157E+10308; //infinito
+	var maiorDataMs = 0;
 	for (var i in arrAtividades){
 		// console.log(i);
 		// console.log(a[ca.siteId][arrAtividades[i]]);
-		this.dataInicial	= googleDateToDate(a[ca.siteId][arrAtividades[i]].datainicial);
-		this.dataFinal		= googleDateToDate(a[ca.siteId][arrAtividades[i]].datafinal);
+		//descobre os candidatos
+		var candidatoInicial	= googleDateToDate(a[ca.siteId][arrAtividades[i]].datainicial);
+		var candidatoFinal		= googleDateToDate(a[ca.siteId][arrAtividades[i]].datafinal);
+		//vê se o candidato é maior ou menor que os anteriores
+		menorDataMs = Math.min(candidatoInicial.getTime(), menorDataMs);
+		maiorDataMs = Math.max(candidatoFinal.getTime(), maiorDataMs);
 	}
+	
+	//armazena as datas escolhidas
+	this.dataInicial	= new Date(menorDataMs);
+	this.dataFinal		= new Date(maiorDataMs);
+	
+	//avisa que ainda não recebeu a função de clique (para não evitar 2x)
+	this.semClique = true;
 	
 	//check-in
 	eventDotInstances.push(this);
@@ -304,7 +361,7 @@ EventDot.drawThemAll = function(){
 		var e = eventDotInstances[i];
 		
 		//cria o DIV com id com a bolinha, range e label dentro
-		var html = "<div class='event " + e.id + "'><span class='range'><span data-id='" + e.id + "' class='dot'></span></span><span class='label'>" + e.onde + "</span></div>";
+		var html = "<div data-id='" + e.id + "' class='event " + e.id + "'><span data-id='" + e.id + "' class='range'><span data-id='" + e.id + "' data-i='" + e.i + "' class='dot'></span></span><span data-i='" + e.i + "' class='label'>" + e.onde + "</span></div>";
 		$(html).appendTo('#events');
 		
 		//aplica as classes baseado no status
@@ -423,8 +480,12 @@ EventDot.prototype.posicionar = function(){
 	//aplica
 	label.css('margin-left', ml);
 	
-	//anexa a função de clique
-	range.click(function (event){dotClicked(event);});
+	//anexa a função de clique (uma vez só!)
+	if(this.semClique){
+		range.click(function (event){dotClicked(event);});
+		label.click(function (event){labelClicked(event);});
+		this.semClique = false;
+	}
 }
 
 // EventDot.prototype.dateToPosition = function(t){
@@ -459,10 +520,10 @@ function dateToPosition(t){
 	}
 }
 
-EventDot.prototype.die = function(){
-	//remove o elemento do HTML
-	//se remove da lista (check-out)
-}
+// EventDot.prototype.die = function(){
+// 	//remove o elemento do HTML
+// 	//se remove da lista (check-out)
+// }
 
 function drawHomeEvents(){
 	//criaEventos();//vem do db.js
@@ -512,8 +573,29 @@ function resizeEvents(){
 function dotClicked(event){
 	//pega o elemento
 	element = $(event.target);
+	
+	//altera o apontamento para dot se tiver clicado em range
+	if(element.hasClass('range')){
+		element = $('div.' + element.data('id') + ' .dot');
+	}
+		
 	console.log(element);
-	// console.log(element.data('id'));
+	
+	//cresce ou diminui
+	// console.log(element.data('i'));
+	var eventDot = eventDotInstances[element.data('i')];
+	if(eventDot.visual == 'p') {
+		 eventDot.visual = 'g' 
+	} else if(eventDot.visual == 'g') {
+		 eventDot.visual = 'p' 
+	}
+	eventDot.updateVisual();
+}
+
+function labelClicked(event){
+	//pega o elemento
+	element = $(event.target);
+	alert("Eu sou um baloon!\n(brincadeirinha)" + element.text());
 }
 
 function getUrlVars(){
