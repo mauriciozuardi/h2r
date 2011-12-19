@@ -656,11 +656,11 @@ function dotClicked(element, eventDot){
 
 function rangeClicked(element, eventDot){
 	if(eventDot.visual == 's'){
-		// eventDot.visual = 'p';
+		//
 	} else if(eventDot.visual == 'g'){
 		eventDot.visual = 'p';
 	} else {
-		eventDot.visual == 'g'
+		eventDot.visual = 'g';
 	}
 	eventDot.updateVisual();
 }
