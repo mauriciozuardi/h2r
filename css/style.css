@@ -147,8 +147,10 @@ button{
 	clear:both;
 	margin-bottom:2px;
 	margin-left:90px;
+	height:26px;
 }
 .dot{
+	position:relative;
 	display:block;
 	clear:both;
 	width:6px;
@@ -178,6 +180,7 @@ button{
 	opacity:.6;
 }
 .range{
+	position:relative;
 	display:block;
 	width:100px;
 	height:26px;
@@ -189,6 +192,7 @@ button{
 	width:100px;
 	height:10px;
 	background-color:rgba(255,255,255,.2);
+	top:9px;
 }
 .range.hidden{
 	width:0px;

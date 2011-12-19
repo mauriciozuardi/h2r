@@ -230,6 +230,9 @@ function updateTimelineDates(){
 }
 
 function EventDot(ca){
+	//escondo?
+	if(ca.esconder || a[ca.siteId][ca.atalho].esconder){ return true }
+	
 	//ID
 	this.id = ca.siteId + "-" + ca.id;
 	this.i = eventDotInstances.length; //posição no array
@@ -366,7 +369,17 @@ EventDot.killThemAll = function(){
 	//reseta a lista de instâncias
 }
 
-EventDot.drawThemAll = function(){
+EventDot.drawThemAll = function(sorting){
+	//sort alfabético
+	if(sorting){
+		if(sID){
+			eventDotInstances.sort(compareOqueStrings);
+		} else {
+			eventDotInstances.sort(compareOndeStrings);
+		}		
+	}
+	
+	//percorre o array criando o HTML
 	for(var i in eventDotInstances){
 		var e = eventDotInstances[i];
 		
@@ -383,6 +396,33 @@ EventDot.drawThemAll = function(){
 		//aplica as classes baseado no status
 		e.updateVisual();
 	}
+	
+	//resort Array
+	eventDotInstances.sort(compareIdStrings)
+}
+
+function compareOqueStrings(a,b){
+	var sA = a.oque.toLowerCase();
+	var sB = b.oque.toLowerCase();
+	if (sA < sB) {return -1}
+	if (sA > sB) {return 1}
+	return 0;
+}
+
+function compareOndeStrings(a,b){
+	var sA = a.onde.toLowerCase();
+	var sB = b.onde.toLowerCase();
+	if (sA < sB) {return -1}
+	if (sA > sB) {return 1}
+	return 0;
+}
+
+function compareIdStrings(a,b){
+	var sA = a.id.toLowerCase();
+	var sB = b.id.toLowerCase();
+	if (sA < sB) {return -1}
+	if (sA > sB) {return 1}
+	return 0;
 }
 
 EventDot.prototype.updateVisual = function(){
@@ -402,7 +442,7 @@ EventDot.prototype.updateVisual = function(){
 			if(!range.hasClass('mini'))			range.addClass('mini');
 			if(!label.hasClass('hidden'))		label.addClass('hidden');
 			//força o tamanho do div
-			div.css('height', dot.outerHeight('false'));
+			// div.css('height', dot.outerHeight('false'));
 		break;
 		
 		//pequeno
@@ -414,7 +454,7 @@ EventDot.prototype.updateVisual = function(){
 			if(!range.hasClass('mini'))			range.addClass('mini');
 			if(!label.hasClass('hidden'))		label.addClass('hidden');
 			//força o tamanho do div
-			div.css('height', dot.outerHeight('false'));
+			// div.css('height', dot.outerHeight('false'));
 		break;
 		
 		//grande
@@ -426,7 +466,7 @@ EventDot.prototype.updateVisual = function(){
 			if(range.hasClass('mini'))			range.removeClass('mini');
 			if(label.hasClass('hidden'))		label.removeClass('hidden');
 			//força o tamanho do div
-			div.css('height', (dot.outerHeight('false')+1));
+			// div.css('height', (dot.outerHeight('false')+1));
 		break;
 		
 		//selecionado
@@ -438,7 +478,7 @@ EventDot.prototype.updateVisual = function(){
 			if(range.hasClass('mini'))			range.removeClass('mini');
 			if(label.hasClass('hidden'))		label.removeClass('hidden');
 			//força o tamanho do div
-			div.css('height', dot.outerHeight('false'));
+			// div.css('height', dot.outerHeight('false'));
 		break;
 		
 		//balloon
@@ -543,7 +583,7 @@ function dateToPosition(t){
 
 function drawHomeEvents(){
 	criaEventDotsHome();
-	EventDot.drawThemAll();
+	EventDot.drawThemAll(true); //true or false -> sort or not.
 }
 
 function criaEventDotsHome(){
