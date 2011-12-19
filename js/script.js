@@ -336,6 +336,9 @@ function EventDot(ca){
 	console.log(this.dataInicial.toString());
 	console.log(this.dataFinal.toString());
 	
+	//IMAGENS
+	
+	
 	//OUTROS
 	//avisa que ainda não recebeu a função de clique (para não anexar 2x)
 	this.semClique = true;
@@ -652,7 +655,13 @@ function dotClicked(element, eventDot){
 }
 
 function rangeClicked(element, eventDot){
-	eventDot.visual = 'p';
+	if(eventDot.visual == 's'){
+		// eventDot.visual = 'p';
+	} else if(eventDot.visual == 'g'){
+		eventDot.visual = 'p';
+	} else {
+		eventDot.visual == 'g'
+	}
 	eventDot.updateVisual();
 }
 
@@ -672,25 +681,59 @@ function selectDot(eventDotId){
 
 function mudaFundo(eventDotId){
 	var id = eventDotId.split('-');
-	var _ca = ca[id[0]][id[1]];
-	console.log(_ca);
+	var ed = ca[id[0]][id[1]]; //eventDot
 	
 	//MUDA O BG
 	//encontra o nome da imagem (sempre a primeira se tiver mais de uma cadastrada)
-	if(_ca.imagens){
-		var imgs = _ca.imagens.split('\n');
-	} else if(_ca.atalho && a[_ca.siteId][_ca.atalho].imagens){
-		var imgs = a[_ca.siteId][_ca.atalho].imagens.split('\n');
+	if(ed.imagens){
+		var imgs = ed.imagens.split('\n');
+	} else if(ed.atalho && a[ed.siteId][ed.atalho].imagens){
+		var imgs = a[ed.siteId][ed.atalho].imagens.split('\n');
 	} else {
 		var imgs = ["default-bg.gif"];
 	}
 	
-	console.log(imgs[0] + " : " + encodeURI(imgs[0]));
-	// var imgName = "2963605039_0cb5a92626_o.jpeg";
-	// var imgURL = "url(./img/" + imgName + ")";
-	// $('#bgPhoto').css('background-image', imgURL);
+	// console.log(imgs[0] + " : " + encodeURI(imgs[0]));
+	var imgURL = "url(./img/" + encodeURI(imgs[0]) + ")";
+	$('#bgPhoto').css('background-image', imgURL);
 	
-	//muda o nome
+	//MUDA O NOME E O TEXTO
+	//encontra o nome da atividade
+	if(ed.nome){
+		var nomeArr = ed.nome.split(' // ');
+	} else if(ed.atalho && a[ed.siteId][ed.atalho].nome){
+		var nomeArr = a[ed.siteId][ed.atalho].nome.split(' // ');
+	} else {
+		var nomeArr = ["sem nome"];
+	}
+	
+	//encontra a sinopse
+	if(ed.sinopse){
+		var sinopse = ed.sinopse;
+	} else if(ed.atalho && a[ed.siteId][ed.atalho].sinopse){
+		var sinopse = a[ed.siteId][ed.atalho].sinopse;
+	} else {
+		var sinopse = ["-"];
+	}
+	
+	//encontra o crédito
+	if(ed.credito){
+		var credito = ed.credito;
+	} else if(ed.atalho && a[ed.siteId][ed.atalho].credito){
+		var credito = a[ed.siteId][ed.atalho].credito;
+	} else {
+		var credito = ["sem sinopse"];
+	}
+
+	//escreve o HTML
+	var html = "<h1>" + nomeArr[0].capitalize();
+	if(nomeArr.length > 1){
+		html += "<em>" + nomeArr[1] + "</em>";
+	}
+	html += "</h1>";
+	html += "<p>" + sinopse + "</p>";
+	html += "<h4>" + credito + "</h4>";
+	$('#selectedInfo').html(html);
 	
 	//muda o texto
 	
@@ -714,3 +757,7 @@ function getUrlVars(){
 	}
 	return vars;
 }
+
+String.prototype.capitalize = function(){
+	return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
+};
