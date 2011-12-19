@@ -728,7 +728,7 @@ function mudaFundo(eventDotId){
 	//escreve o HTML
 	var html = "<h1>" + nomeArr[0].capitalize();
 	if(nomeArr.length > 1){
-		html += "<em>" + nomeArr[1] + "</em>";
+		html += "<em> // " + nomeArr[1] + "</em>";
 	}
 	html += "</h1>";
 	html += "<p>" + sinopse + "</p>";

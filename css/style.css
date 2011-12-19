@@ -159,16 +159,22 @@ button{
 	border-width:2px;
 	border-style:solid;
 	border-color:white;
-/*	background-color:white;*/
 	box-shadow: 0 1px 2px 0px rgba(0,0,0,.3);
+	transition-property: border-width, width;
+	transition-duration: 1s;
+/*	transition-timing-function: ease-out;*/
+	-webkit-transition-property: border-width, width;
+	-webkit-transition-duration: 1s;
+	-o-transition-property: border-width, width;
+	-o-transition-duration: 1s;
 }
 .dot.big{
-	border-radius:15px;
+	border-radius:30px;
 	border-width: 12px;
-	width: 2px;
-	height: 2px;
+	width: 0px;
+	height: 0px;
 	box-shadow: 0 1px 7px 0px rgba(0,0,0,.5);
-	background-color: white;
+	background-color:rgba(255,255,255,0);
 }
 .dot.big.unselected{
 	width:18px;
