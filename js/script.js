@@ -397,29 +397,29 @@ EventDot.drawThemAll = function(sorting){
 		e.updateVisual();
 	}
 	
-	//resort Array
-	eventDotInstances.sort(compareIdStrings)
+	//volta o array para a ordem esperada (ordem de inclusão – que é a ordem crescente dos IDs)
+	if(sorting){ eventDotInstances.sort(compareIdStrings) }
 }
 
 function compareOqueStrings(a,b){
-	var sA = a.oque.toLowerCase();
-	var sB = b.oque.toLowerCase();
+	var sA = string_to_slug(a.oque);
+	var sB = string_to_slug(b.oque);
 	if (sA < sB) {return -1}
 	if (sA > sB) {return 1}
 	return 0;
 }
 
 function compareOndeStrings(a,b){
-	var sA = a.onde.toLowerCase();
-	var sB = b.onde.toLowerCase();
+	var sA = string_to_slug(a.onde);
+	var sB = string_to_slug(b.onde);
 	if (sA < sB) {return -1}
 	if (sA > sB) {return 1}
 	return 0;
 }
 
 function compareIdStrings(a,b){
-	var sA = a.id.toLowerCase();
-	var sB = b.id.toLowerCase();
+	var sA = string_to_slug(a.id);
+	var sB = string_to_slug(b.id);
 	if (sA < sB) {return -1}
 	if (sA > sB) {return 1}
 	return 0;
@@ -583,7 +583,7 @@ function dateToPosition(t){
 
 function drawHomeEvents(){
 	criaEventDotsHome();
-	EventDot.drawThemAll(true); //true or false -> sort or not.
+	EventDot.drawThemAll(false); //true or false -> sort or not.
 }
 
 function criaEventDotsHome(){
