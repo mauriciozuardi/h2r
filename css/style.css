@@ -1,6 +1,6 @@
 /*bg*/
 body{
-	background-color: black;
+	background-color: #2a2a2a;
 	font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
 	color:white;
 	font-size:11px;
@@ -164,10 +164,11 @@ button{
 }
 .dot.big{
 	border-radius:15px;
-	border-width:2px;
-	width:22px;
-	height:22px;
+	border-width: 12px;
+	width: 2px;
+	height: 2px;
 	box-shadow: 0 1px 7px 0px rgba(0,0,0,.5);
+	background-color: white;
 }
 .dot.big.unselected{
 	width:18px;

@@ -466,6 +466,7 @@ EventDot.prototype.updateVisual = function(){
 			if(label.hasClass('hidden'))		label.removeClass('hidden');
 			//força o tamanho do div
 			// div.css('height', (dot.outerHeight('false')+1));
+			mudaFundo(this.id);
 		break;
 		
 		//selecionado
@@ -537,7 +538,7 @@ EventDot.prototype.posicionar = function(){
 	
 	//anexa a função de clique (uma vez só!)
 	if(this.semClique){
-		range.click(function (event){dotClicked(event);});
+		range.click(function (event){dotOrRangeClicked(event);});
 		label.click(function (event){labelClicked(event);});
 		this.semClique = false;
 	}
@@ -627,25 +628,73 @@ function resizeEvents(){
 	}
 }
 
-function dotClicked(event){
+function dotOrRangeClicked(event){
 	//pega o elemento
 	var element = $(event.target);
+	var eventDot = eventDotInstances[element.data('i')];
 	
 	//altera o apontamento para dot se tiver clicado em range
 	if(element.hasClass('range')){
 		element = $('div.' + element.data('id') + ' .dot');
+		eventDot = eventDotInstances[element.data('i')];
+		rangeClicked(element, eventDot)
+	} else {
+		dotClicked(element, eventDot);
 	}
-	
-	//descobre quem é no array de EventDots
-	var eventDot = eventDotInstances[element.data('i')];
-	
-	//cresce ou diminui
-	if(eventDot.visual == 'p') {
-		 eventDot.visual = 'g' 
-	} else if(eventDot.visual == 'g') {
-		 eventDot.visual = 'p' 
+}
+
+function dotClicked(element, eventDot){
+	if(eventDot.visual == 's'){
+		rangeClicked(element, eventDot);
+	} else {
+		selectDot(element.data('i'));
 	}
+}
+
+function rangeClicked(element, eventDot){
+	eventDot.visual = 'p';
 	eventDot.updateVisual();
+}
+
+function selectDot(eventDotId){
+	//atualiza o visual no modelo de dados
+	for(var i in eventDotInstances){
+		var eventDot = eventDotInstances[i];
+		if(eventDotId == i){
+			eventDot.visual = 's';
+		} else if(eventDot.visual == 's'){
+			eventDot.visual = 'g';
+		}
+		//atualiza o visual na tela
+		eventDot.updateVisual();
+	}
+}
+
+function mudaFundo(eventDotId){
+	var id = eventDotId.split('-');
+	var _ca = ca[id[0]][id[1]];
+	console.log(_ca);
+	
+	//MUDA O BG
+	//encontra o nome da imagem (sempre a primeira se tiver mais de uma cadastrada)
+	if(_ca.imagens){
+		var imgs = _ca.imagens.split('\n');
+	} else if(_ca.atalho && a[_ca.siteId][_ca.atalho].imagens){
+		var imgs = a[_ca.siteId][_ca.atalho].imagens.split('\n');
+	} else {
+		var imgs = ["default-bg.gif"];
+	}
+	
+	console.log(imgs[0] + " : " + encodeURI(imgs[0]));
+	// var imgName = "2963605039_0cb5a92626_o.jpeg";
+	// var imgURL = "url(./img/" + imgName + ")";
+	// $('#bgPhoto').css('background-image', imgURL);
+	
+	//muda o nome
+	
+	//muda o texto
+	
+	//muda o crédito
 }
 
 function labelClicked(event){
