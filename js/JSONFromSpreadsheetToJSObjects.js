@@ -94,7 +94,7 @@ function listaSites(root) {
 		}
 	}
 	
-	//define a timeline seguindo o modelo abaixo
+	//define logo e a timeline seguindo o modelo abaixo
 	//timeMarksStr = 'mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem|fim do mundo=December 21, 2012 00:00:00';
 	if(sID){
 		imgName = s[sID].logo;
@@ -103,6 +103,10 @@ function listaSites(root) {
 		imgName = "logo-agenda-de-fotografia.png";
 		timeMarksStr = "mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem";
 	}
+	
+	//inclui o logo
+	try {incluiLogo()}
+	catch(err){}
 		
 	//desenha a timeline
 	try {drawTimeline()}
@@ -184,8 +188,9 @@ ca = {};
 a  = {};
 totalRequests = 0;
 finishedRequests = 0;
+imgName = "";
 
-function init(){	
+function init(){
 	//carrega os dados da tabela Geral e depois, baseado nos "sites", carrega Atividades e Conjuntos de Atividades.
 	var key = "0AnLIuvvW8l93dGR4OEtlNFlXT0VYOG44UExyQXd5N2c"; //Geral
 	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + key + "/1/public/basic?alt=json", function(json){listaEspacos(json)});

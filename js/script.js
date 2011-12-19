@@ -15,7 +15,6 @@ sID = URLvars.sID;
 
 //config e debug
 showDateDetails = false;
-imgName = "";
 timeMarksStr = "";
 aDay = "hoje";
 
@@ -30,7 +29,7 @@ function init(){
 	}
 	
 	//
-	incluiLogo();
+	// incluiLogo();
 	resizeBg();
 	// drawTimeline();		//<-- vai desenhar qdo carregar a planilha "Sites"
 	// drawHomeEvents();	//<-- vai desenhar qdo acabar de carregar tudo (JSONFromSpreadsheetToJSObjects.js cuida disso)
