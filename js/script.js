@@ -2,6 +2,7 @@
 //timeline
 initDate = 0;
 timeline = [];
+dotSelected = {};
 //eventos
 createdDots = 0;
 eventDotInstances = [];
@@ -581,6 +582,7 @@ function drawHomeEvents(){
 	criaEventDotsHome();
 	EventDot.drawThemAll(false); //true or false -> sort or not.
 	selectDot(0);
+	$('#selectedInfo').click(function (event){infoClicked(event);});
 }
 
 function criaEventDotsHome(){
@@ -657,12 +659,16 @@ function selectDot(eventDotId){
 				//se tem só uma letra
 				eventDot.visual += 's';
 			}
+			//atualiza a variável global
+			dotSelected = eventDotInstances[i];
+			// console.log(dotSelected);
 		} else {
 			if(eventDot.visual.length > 1){
 				//tem mais que uma letra, pega só a primeira
 				eventDot.visual = eventDot.visual.substr(0,1);
 			}
 		}
+		
 		//atualiza o visual na tela
 		eventDot.updateVisual();
 	}
@@ -715,32 +721,38 @@ function mudaFundo(eventDotId){
 	}
 
 	//escreve o HTML
+	var remendo = "";
 	var html = "<h1>" + nomeArr[0].capitalize();
 	if(nomeArr.length > 1){
 		html += "<em> // " + nomeArr[1] + "</em>";
+		remendo = "style='opacity:.6'"
 	}
 	html += "</h1>";
+	html += "<image src='./img/micro-balloon.png'" + remendo + "/>"
 	html += "<p>" + sinopse + "</p>";
 	html += "<h4>" + credito + "</h4>";
 	$('#selectedInfo').html(html);
-	
-	//muda o texto
-	
-	//muda o crédito
 }
 
 function labelClicked(event){
+	console.log('labelClicked');
 	//pega o elemento
 	var element = $(event.target);
 	var eventDot = eventDotInstances[element.data('i')];
 	//seleciona a bolinha
 	selectDot(element.data('i'));
 	//abre baloon
-	abreBaloon(eventDot);
+	abreBaloon();
 }
 
-function abreBaloon(eventDot){
-	alert("Eu sou um baloon!\n" + eventDot.oque);
+function infoClicked(event){
+	console.log('infoClicked');
+	abreBaloon();
+}
+
+function abreBaloon(){
+	console.log('abreBaloon');
+	alert("Eu sou um baloon!\n" + dotSelected.oque);
 }
 
 function getUrlVars(){
