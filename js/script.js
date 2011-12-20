@@ -750,6 +750,10 @@ function infoClicked(event){
 	abreBaloon();
 }
 
+function infoHard(){
+	console.log('infoHard');
+}
+
 function abreBaloon(){
 	console.log('abreBaloon');
 	alert("Eu sou um baloon!\n" + dotSelected.oque);

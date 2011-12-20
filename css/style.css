@@ -15,7 +15,7 @@ h1{
 }
 #interface{
 	min-width:960px;
-	z-index:100;
+/*	z-index:100;*/
 }
 #header{
 	background-color:rgba(255,255,255,.3);
@@ -90,7 +90,7 @@ h1{
 }
 /*============= BG ==============*/
 #bg{
-	z-index:1;
+/*	z-index:1;*/
 }
 #bgPhoto{
 	background-image: url(../img/default-bg.gif);
@@ -146,11 +146,12 @@ button{
 }
 /*=========== timeline ============*/
 #events{
-	position:absolute;
+/*	position:absolute;*/
 	float:right;
 	width:100%;
 	overflow:hidden;
 	padding:5px;
+	margin-top:45px;
 /*	background-color:rgba(255,0,0,.5);*/
 }
 .event{
