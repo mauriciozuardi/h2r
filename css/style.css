@@ -84,7 +84,7 @@ h1{
 	z-index:1;
 }
 #bgPhoto{
-	background-image: url(../img/5807793226_9a80841d61_b.jpeg);
+	background-image: url(../img/default-bg.gif);
 	background-repeat: no-repeat;
 	background-position: center;
 	-moz-background-size: cover;

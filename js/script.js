@@ -580,6 +580,7 @@ function dateToPosition(t){
 function drawHomeEvents(){
 	criaEventDotsHome();
 	EventDot.drawThemAll(false); //true or false -> sort or not.
+	selectDot(0);
 }
 
 function criaEventDotsHome(){
