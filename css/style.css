@@ -141,6 +141,7 @@ button{
 	float:right;
 	width:100%;
 	overflow:hidden;
+	padding:5px;
 /*	background-color:rgba(255,0,0,.5);*/
 }
 .event{
@@ -156,7 +157,7 @@ button{
 	clear:both;
 	width:6px;
 	height:6px;
-	border-radius:10px;
+	border-radius:30px;
 	border-width:2px;
 	border-style:solid;
 	border-color:white;
@@ -171,7 +172,20 @@ button{
 	-o-transition-property: border-width, width, height;
 	-o-transition-duration: .5s;*/
 }
+.dot.selected{
+	background-color:white;
+}
 .dot.big{
+	width:18px;
+	height:18px;
+	border-width:4px;
+	background-color:rgba(255,255,255,0);
+/*	-webkit-transition-duration: .5s;
+	-moz-transition-duration: .5s;
+	-o-transition-duration: .5s;
+	transition-duration: .5s;*/
+}
+.dot.big.selected{
 	border-radius:30px;
 	border-width: 13px;
 	width: 0px;
@@ -182,20 +196,6 @@ button{
 	-moz-transition-duration: .5s;
 	-o-transition-duration: .5s;
 	transition-duration: .5s;*/
-}
-.dot.big.unselected{
-	width:18px;
-	height:18px;
-	border-width:4px;
-	background-color:rgba(255,255,255,0);
-/*	-webkit-transition-duration: .5s;
-	-moz-transition-duration: .5s;
-	-o-transition-duration: .5s;
-	transition-duration: .5s;*/
-}
-.dot.disabled{
-	box-shadow:none;
-	opacity:.6;
 }
 .range{
 	position:relative;
@@ -226,23 +226,12 @@ button{
 	height:5px;
 }
 .label{
-/*	display:inline;*/
 	position:relative;
 	top:-20px;
 	text-shadow: 0px 1px 3px #333;
-/*	clear:both;*/
-/*	margin-top:2px;
-	padding: 0px 7px 2px 7px;
-	border-radius: 10px;
-	background-color: rgba(255, 255, 255, .15);*/
 }
-.label.hidden{
-	display:none;
-/*	position:relative;
-	top:-11px;
-	text-shadow: 0px 1px 3px #333;
-	opacity:.5;
-	font-size:8px;*/
+.label.mini{
+	top:-3px;
 }
 #timelineGrid{
 	position:absolute;

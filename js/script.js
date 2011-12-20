@@ -453,63 +453,38 @@ EventDot.prototype.updateVisual = function(){
 	var ml = 0;
 	
 	switch (this.visual){
-		//apagado
-		case "a":
-			if(dot.hasClass('unselected'))	dot.removeClass('unselected');
-			if(dot.hasClass('big'))					dot.removeClass('big');
-			if(!dot.hasClass('disabled'))		dot.addClass('disabled');
-			if(!range.hasClass('hidden'))		range.addClass('hidden');
-			if(!range.hasClass('mini'))			range.addClass('mini');
-			if(!label.hasClass('hidden'))		label.addClass('hidden');
-			//força o tamanho do div
-			// div.css('height', dot.outerHeight('false'));
-		break;
-		
 		//pequeno
 		case "p":
-			if(dot.hasClass('unselected'))	dot.removeClass('unselected');
+			if(dot.hasClass('selected'))		dot.removeClass('selected');
 			if(dot.hasClass('big'))					dot.removeClass('big');
-			if(dot.hasClass('disabled'))		dot.removeClass('disabled');
-			if(range.hasClass('hidden'))		range.removeClass('hidden');
 			if(!range.hasClass('mini'))			range.addClass('mini');
-			if(!label.hasClass('hidden'))		label.addClass('hidden');
-			//força o tamanho do div
-			// div.css('height', dot.outerHeight('false'));
+			if(!label.hasClass('mini'))			label.addClass('mini');
 		break;
 		
-		//grande
-		case "s":
-			if(dot.hasClass('unselected'))	dot.removeClass('unselected');
-			if(!dot.hasClass('big'))				dot.addClass('big');
-			if(dot.hasClass('disabled'))		dot.removeClass('disabled');
-			if(range.hasClass('hidden'))		range.removeClass('hidden');
-			if(range.hasClass('mini'))			range.removeClass('mini');
-			if(label.hasClass('hidden'))		label.removeClass('hidden');
-			//força o tamanho do div
-			// div.css('height', (dot.outerHeight('false')+1));
+		//pequeno e selecionado
+		case "ps":
+			if(!dot.hasClass('selected'))		dot.addClass('selected');
+			if(dot.hasClass('big'))					dot.removeClass('big');
+			if(!range.hasClass('mini'))			range.addClass('mini');
+			if(!label.hasClass('mini'))			label.addClass('mini');
 			mudaFundo(this.id);
 		break;
 		
-		//selecionado
+		//grande
 		case "g":
-			if(!dot.hasClass('unselected'))	dot.addClass('unselected');
+			if(dot.hasClass('selected'))		dot.removeClass('selected');
 			if(!dot.hasClass('big'))				dot.addClass('big');
-			if(dot.hasClass('disabled'))		dot.removeClass('disabled');
-			if(range.hasClass('hidden'))		range.removeClass('hidden');
 			if(range.hasClass('mini'))			range.removeClass('mini');
-			if(label.hasClass('hidden'))		label.removeClass('hidden');
-			//força o tamanho do div
-			// div.css('height', dot.outerHeight('false'));
+			if(label.hasClass('mini'))			label.removeClass('mini');
 		break;
 		
-		//balloon
-		case "b":
-							// ** preencher **
-		break;
-		
-		//desaparecendo
-		case "d":
-							// ** preencher **
+		//grande e selecionado
+		case "gs":
+			if(!dot.hasClass('selected'))		dot.addClass('selected');
+			if(!dot.hasClass('big'))				dot.addClass('big');
+			if(range.hasClass('mini'))			range.removeClass('mini');
+			if(label.hasClass('mini'))			label.removeClass('mini');
+			mudaFundo(this.id);
 		break;
 	}
 	
@@ -677,9 +652,15 @@ function selectDot(eventDotId){
 	for(var i in eventDotInstances){
 		var eventDot = eventDotInstances[i];
 		if(eventDotId == i){
-			eventDot.visual = 's';
-		} else if(eventDot.visual == 's'){
-			eventDot.visual = 'g';
+			if(eventDot.visual.length == 1){
+				//se tem só uma letra
+				eventDot.visual += 's';
+			}
+		} else {
+			if(eventDot.visual.length > 1){
+				//tem mais que uma letra, pega só a primeira
+				eventDot.visual = eventDot.visual.substr(0,1);
+			}
 		}
 		//atualiza o visual na tela
 		eventDot.updateVisual();
