@@ -23,7 +23,7 @@ function cellsToObjects(json){
 			dados[slug] = linha;
 			dados[slug].id = slug;
 		}
-	});	
+	});
 	return dados;
 }
 

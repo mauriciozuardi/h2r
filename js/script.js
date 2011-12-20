@@ -6,6 +6,7 @@ dotSelected = {};
 //eventos
 createdDots = 0;
 eventDotInstances = [];
+destaques = [];
 
 //começa qdo carregar o DOM
 $(init);
@@ -323,7 +324,7 @@ function EventDot(ca){
 	
 	// console.log(arrAtividades);
 	if(arrAtividades){
-		var datas = comparaDatas(ca, arrAtividades);
+		var datas = comparaDatasDasAtividades(ca, arrAtividades);
 	} else {
 		var datas = {};
 		datas.menor = Date.now();
@@ -347,7 +348,7 @@ function EventDot(ca){
 	eventDotInstances.push(this);
 }
 
-function comparaDatas(ca, arrAtividades){
+function comparaDatasDasAtividades(ca, arrAtividades){
 	var datas = {};
 	datas.menor = 1.7976931348623157E+10308; //infinito
 	datas.maior = 0;
@@ -390,9 +391,11 @@ EventDot.killThemAll = function(){
 	//reseta a lista de instâncias
 }
 
-EventDot.drawThemAll = function(sorting){
-	//sort alfabético
-	if(sorting){
+EventDot.drawThemAll = function(sortBy){
+	//sort
+	if(sortBy == undefined){
+		eventDotInstances.sort(compareDates);
+	} else if(sortBy == "alfabetico"){
 		if(sID){
 			eventDotInstances.sort(compareOqueStrings);
 		} else {
@@ -416,10 +419,22 @@ EventDot.drawThemAll = function(sorting){
 		
 		//aplica as classes baseado no status
 		e.updateVisual();
+		
+		//inclui na lista de destaques se for o caso
+		if(e.visual == 'g'){
+			destaques.push(e);			
+		}
 	}
 	
 	//volta o array para a ordem esperada (ordem de inclusão – que é a ordem crescente dos IDs)
-	if(sorting){ eventDotInstances.sort(compareIdStrings) }
+	eventDotInstances.sort(compareIdStrings)
+	
+	console.log(destaques);
+}
+
+function compareDates(a,b){
+	// console.log(a.dataInicial + " : " + b.dataInicial);
+	return b.dataInicial - a.dataInicial;
 }
 
 function compareOqueStrings(a,b){
@@ -580,9 +595,14 @@ function dateToPosition(t){
 
 function drawHomeEvents(){
 	criaEventDotsHome();
-	EventDot.drawThemAll(false); //true or false -> sort or not.
-	selectDot(0);
-	$('#selectedInfo').click(function (event){infoClicked(event);});
+	EventDot.drawThemAll();
+	selecionaDestaqueRandomico();
+}
+
+function selecionaDestaqueRandomico(){
+	var r = Math.floor(destaques.length * Math.random());
+	// console.log(destaques[r].i);
+	selectDot(destaques[r].i);
 }
 
 function criaEventDotsHome(){
@@ -644,10 +664,12 @@ function dotOrRangeClicked(event){
 
 function dotClicked(element, eventDot){
 	selectDot(element.data('i'));
+	mostraInfo();
 }
 
 function rangeClicked(element, eventDot){
 	selectDot(element.data('i'));
+	mostraInfo();
 }
 
 function selectDot(eventDotId){
@@ -668,7 +690,6 @@ function selectDot(eventDotId){
 				eventDot.visual = eventDot.visual.substr(0,1);
 			}
 		}
-		
 		//atualiza o visual na tela
 		eventDot.updateVisual();
 	}
@@ -728,10 +749,17 @@ function mudaFundo(eventDotId){
 		remendo = "style='opacity:.6'"
 	}
 	html += "</h1>";
-	html += "<image src='./img/micro-balloon.png'" + remendo + "/>"
+	html += "<image class='icon' src='./img/micro-balloon.png'" + remendo + "/>"
+	html += "<image class='fechar' src='./img/fechar.png'" + remendo + "/>"
 	html += "<p>" + sinopse + "</p>";
 	html += "<h4>" + credito + "</h4>";
 	$('#selectedInfo').html(html);
+	
+	//ativa os cliques da area de info
+	$('#selectedInfo h1').click(function (event){infoClicked(event);});
+	$('#selectedInfo .icon').click(function (event){infoClicked(event);});
+	$('#selectedInfo p').click(function (event){infoClicked(event);});
+	$('#selectedInfo .fechar').click(function (event){fechaInfo(event);});
 }
 
 function labelClicked(event){
@@ -750,8 +778,12 @@ function infoClicked(event){
 	abreBaloon();
 }
 
-function infoHard(){
-	console.log('infoHard');
+function fechaInfo(){
+	$('#selectedInfo').addClass('closed');
+}
+
+function mostraInfo(){
+	$('#selectedInfo').removeClass('closed');
 }
 
 function abreBaloon(){
