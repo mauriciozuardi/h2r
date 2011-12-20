@@ -95,6 +95,7 @@ h1{
 button, input, select {
 	font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
 	font-size:11px;
+	margin:4px;
 	margin-top:15px;
 	margin-bottom:15px;
 }
@@ -104,20 +105,20 @@ input {
 	padding-left:4px;
 	height:14px;
 }
-button, input[type="radio"]{
+/*button, input[type="radio"]{
 	margin-left:5px;
-}
+}*/
 .quem{
-	margin-left:5px;
+/*	margin-left:5px;*/
 }
 .quando{
-	margin-left:5px;
+/*	margin-left:5px;*/
 	width:13em !important;
 }
-input[type="radio"]{
+/*input[type="radio"]{
 	vertical-align:middle;
 	height:14px;
-}
+}*/
 input[type="text"]{
 	width:17em;
 }
@@ -127,7 +128,7 @@ select{
 input[type="text"]{
 	border-style:solid;
 	border-width:1px;
-	border-color:#666;
+	border-color:#555;
 	height:15px;
 }
 button{

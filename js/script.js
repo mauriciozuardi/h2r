@@ -235,7 +235,7 @@ function EventDot(ca){
 	//ID
 	this.id = ca.siteId + "-" + ca.id;
 	this.i = eventDotInstances.length; //posição no array
-	console.log(this.i + " : " + this.id);
+	// console.log(this.i + " : " + this.id);
 	
 	//VISUAL
 	if(ca.visual){
@@ -246,7 +246,7 @@ function EventDot(ca){
 		var visual = "p";
 	}
 	this.visual = visual;
-	console.log(this.visual);
+	// console.log(this.visual);
 	
 	//ONDE < default para Agenda
 	if(ca.maisDeUmOnde){
@@ -270,7 +270,7 @@ function EventDot(ca){
 		var nomeLocal = "Cadastrar ONDE no CA ou indicar o ATALHO";
 	}
 	this.onde = nomeLocal;
-	console.log(this.onde);
+	// console.log(this.onde);
 	
 	//O QUÊ < default para os sites
 	if(ca.nome){
@@ -284,7 +284,7 @@ function EventDot(ca){
 		var nomeAtividade = "Cadastrar NOME no CA ou na Atividade";
 	}
 	this.oque = nomeAtividade;
-	console.log(this.oque);
+	// console.log(this.oque);
 
 	//QUEM
 	if(ca.quem){
@@ -309,32 +309,32 @@ function EventDot(ca){
 		var nomePessoa = "Cadastrar QUEM no CA ou indicar o ATALHO";
 	}
 	this.quem = nomePessoa;
-	console.log(this.quem);
+	// console.log(this.quem);
 	
 	//DATAS
 	//descobre o range de datas entre as atividades listadas
 	// console.log(ca.atividades);
-	var arrAtividades = ca.atividades.split(', ');
-	var menorDataMs = 1.7976931348623157E+10308; //infinito
-	var maiorDataMs = 0;
-	console.log(arrAtividades);
-	for (var i in arrAtividades){
-		// console.log(i);
-		console.log(a[ca.siteId][arrAtividades[i]]);
-		//descobre os candidatos
-		var candidatoInicial	= googleDateToDate(a[ca.siteId][arrAtividades[i]].datainicial);
-		var candidatoFinal		= googleDateToDate(a[ca.siteId][arrAtividades[i]].datafinal);
-		//vê se o candidato é maior ou menor que os anteriores
-		menorDataMs = Math.min(candidatoInicial.getTime(), menorDataMs);
-		maiorDataMs = Math.max(candidatoFinal.getTime(), maiorDataMs);
+	if(ca.atividades){
+		var arrAtividades = ca.atividades.split(', ');
+	} else if (ca.atalho){
+		var arrAtividades = [ca.atalho];
+	}
+	
+	// console.log(arrAtividades);
+	if(arrAtividades){
+		var datas = comparaDatas(ca, arrAtividades);
+	} else {
+		var datas = {};
+		datas.menor = Date.now();
+		datas.maior = Date.now();
 	}
 	
 	//armazena as datas escolhidas
-	this.dataInicial	= new Date(menorDataMs);
-	this.dataFinal		= new Date(maiorDataMs);
+	this.dataInicial	= new Date(datas.menor);
+	this.dataFinal		= new Date(datas.maior);
 	
-	console.log(this.dataInicial.toString());
-	console.log(this.dataFinal.toString());
+	// console.log(this.dataInicial.toString());
+	// console.log(this.dataFinal.toString());
 	
 	//IMAGENS
 	
@@ -344,6 +344,24 @@ function EventDot(ca){
 	this.semClique = true;
 	//check-in
 	eventDotInstances.push(this);
+}
+
+function comparaDatas(ca, arrAtividades){
+	var datas = {};
+	datas.menor = 1.7976931348623157E+10308; //infinito
+	datas.maior = 0;
+	// console.log(arrAtividades);
+	for (var i in arrAtividades){
+		// console.log(i);
+		// console.log(a[ca.siteId][arrAtividades[i]]);
+		//descobre os candidatos
+		var candidatoInicial	= googleDateToDate(a[ca.siteId][arrAtividades[i]].datainicial);
+		var candidatoFinal		= googleDateToDate(a[ca.siteId][arrAtividades[i]].datafinal);
+		//vê se o candidato é maior ou menor que os anteriores
+		datas.menor = Math.min(candidatoInicial.getTime(), datas.menor);
+		datas.maior = Math.max(candidatoFinal.getTime(), datas.maior);
+	}
+	return datas;
 }
 
 function googleDateToDate(gDate){
@@ -590,25 +608,25 @@ function drawHomeEvents(){
 }
 
 function criaEventDotsHome(){
-	console.log("criaEventDotsHome()");
+	// console.log("criaEventDotsHome()");
 	//cria os elementos HTML
 	if(sID){
-		console.log("sID = " + sID);
+		// console.log("sID = " + sID);
 		//varre os CAs do 'site' em questão
 		for(var j in ca[sID]){
 			//cria uma bolinha para cada
-			console.log(["ca." + sID + "." + j, ca[sID][j]]);
+			// console.log(["ca." + sID + "." + j, ca[sID][j]]);
 			var obj = ca[sID][j];
 			obj.siteId = sID;
 			new EventDot(obj);
 		}		
 	} else {
-		console.log("sem sID");
+		// console.log("sem sID");
 		//varre todos os CAs
 		for (var i in s){
 			for(var j in ca[s[i].id]){
 				//cria uma bolinha para cada
-				console.log(["ca." + i + "." + j, ca[s[i].id][j]]);
+				// console.log(["ca." + i + "." + j, ca[s[i].id][j]]);
 				var obj = ca[s[i].id][j];
 				obj.siteId = i;
 				new EventDot(obj);
@@ -647,22 +665,11 @@ function dotOrRangeClicked(event){
 }
 
 function dotClicked(element, eventDot){
-	if(eventDot.visual == 's'){
-		rangeClicked(element, eventDot);
-	} else {
-		selectDot(element.data('i'));
-	}
+	selectDot(element.data('i'));
 }
 
 function rangeClicked(element, eventDot){
-	if(eventDot.visual == 's'){
-		//
-	} else if(eventDot.visual == 'g'){
-		eventDot.visual = 'p';
-	} else {
-		eventDot.visual = 'g';
-	}
-	eventDot.updateVisual();
+	selectDot(element.data('i'));
 }
 
 function selectDot(eventDotId){
@@ -744,6 +751,13 @@ function labelClicked(event){
 	//pega o elemento
 	var element = $(event.target);
 	var eventDot = eventDotInstances[element.data('i')];
+	//seleciona a bolinha
+	selectDot(element.data('i'));
+	//abre baloon
+	abreBaloon(eventDot);
+}
+
+function abreBaloon(eventDot){
 	alert("Eu sou um baloon!\n" + eventDot.oque);
 }
 
