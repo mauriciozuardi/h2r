@@ -161,6 +161,19 @@ em{
 	float:right;
 	margin-top:-10px;
 }
+#opine{
+	position:absolute;
+	float:right;
+	left:268px;
+	top:12px;
+}
+#estrelas-opine{
+	position:absolute;
+	float:right;
+	left:40px;
+	top:12px;
+	width:60px;
+}
 #mini-balloon-body h1{
 	font-size:20px;
 	margin:0px;
@@ -173,7 +186,7 @@ em{
 	position:relative;
 	float:right;
 	width:342px;
-	height:100px;
+/*	height:100px;*/
 	padding:20px;
 	background-color:rgba(255,255,255,.5);
 }
@@ -445,6 +458,19 @@ button{
 .line.t{
 	background-image: url(../img/linha-tracejada.gif);
 	opacity:.2;
+}
+/*============ Facebook =============*/
+#facebook{
+	float: right;
+	position: absolute;
+	top:20px;
+	left:80px;
+	width:50px;
+	height:20px;
+	overflow:hidden;
+}
+#twitter iframe{
+	width:56px;
 }
 /*============ D E B U G =============*/
 #ref{
