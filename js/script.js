@@ -7,6 +7,7 @@ dotSelected = {};
 createdDots = 0;
 eventDotInstances = [];
 destaques = [];
+MIN_WIDTH = 960;
 
 //começa qdo carregar o DOM
 $(init);
@@ -36,6 +37,7 @@ function init(){
 	// drawTimeline();		//<-- vai desenhar qdo carregar a planilha "Sites"
 	// drawHomeEvents();	//<-- vai desenhar qdo acabar de carregar tudo (JSONFromSpreadsheetToJSObjects.js cuida disso)
 	resizeEventWindow();
+	recenterBalloon();
 	
 	//ajusta a altura do body no resize
 	$(window).resize(function (event){
@@ -43,6 +45,7 @@ function init(){
 		resizeTimeline();
 		resizeEventWindow();
 		resizeEvents();
+		recenterBalloon();
 	});
 }
 
@@ -52,7 +55,21 @@ function incluiLogo(){
 }
 
 function resizeBg(){
-	$('#bgPhoto').css('height', $(window).height());
+	$('#bg-photo').css('height', $(window).height());
+}
+
+function recenterBalloon(){
+	var balloon = $('#balloon');
+	var minTop = $('#header').outerHeight(true);
+	var top = Math.max(minTop, ($(window).height()-balloon.outerHeight(true))/2);
+	var left = (Math.max(MIN_WIDTH, $(window).width()) - balloon.outerWidth(true))/2;
+	balloon.css('top', top);
+	balloon.css('left', left);
+	
+	//DEVELOP
+	var ref = $('#ref');
+	ref.css('top', top);
+	ref.css('left', left);
 }
 
 function drawTimeline(){
@@ -79,14 +96,14 @@ function drawTimeline(){
 			//produção
 			var html = "<div class='line l" + i + "'><span><span class='bullet'>|</span>" + timeline[i].htmlLabel.replace(/ /g, '&nbsp;') + "</span></div>";
 		}
-		//inclui o elemento no html, dentro do div #timelineGrid
-		$(html).appendTo('#timelineGrid');
+		//inclui o elemento no html, dentro do div #timeline-grid
+		$(html).appendTo('#timeline-grid');
 	}
 	
 	//inclui a linha tracejada
 	var html = "<div class='line t'></div>";
-	//inclui o elemento no html, dentro do div #timelineGrid
-	$(html).appendTo('#timelineNow');
+	//inclui o elemento no html, dentro do div #timeline-grid
+	$(html).appendTo('#timeline-now');
 	
 	//ajusta a altura das linhas
 	$('.line').css('height', $(window).height());
@@ -110,7 +127,7 @@ function ajustaLinhas(){
 		//define
 		var str = '.line.l' + i;
 		var element = $(str);
-		var w = Math.max(960, $(window).width());
+		var w = Math.max(MIN_WIDTH, $(window).width());
 		var step = ((w - (2*safeMargin))/timeline.length);
 		var position = Math.floor(safeMargin + i * step + (step/2));
 		//armazena
@@ -637,7 +654,7 @@ function resizeEventWindow(){
 	//ajusta o tamanho do div q contém as instâncias de EventDot
 	var marginTop = 50;
 	$('#events').css('top', $('#header').height() + marginTop);
-	$('#events').css('height', $(window).height() - $('#header').height() - $('#aboutInfo').height() - marginTop);
+	$('#events').css('height', $(window).height() - $('#header').height() - $('#about-info').height() - marginTop);
 }
 
 function resizeEvents(){
@@ -709,9 +726,10 @@ function mudaFundo(eventDotId){
 		var imgs = ["default-bg.gif"];
 	}
 	
+	
 	// console.log(imgs[0] + " : " + encodeURI(imgs[0]));
 	var imgURL = "url(./img/" + encodeURI(imgs[0]) + ")";
-	$('#bgPhoto').css('background-image', imgURL);
+	$('#bg-photo').css('background-image', imgURL);
 	
 	//MUDA O NOME E O TEXTO
 	//encontra o nome da atividade
@@ -753,37 +771,38 @@ function mudaFundo(eventDotId){
 	html += "<image class='fechar' src='./img/fechar.png'" + remendo + "/>"
 	html += "<p>" + sinopse + "</p>";
 	html += "<h4>" + credito + "</h4>";
-	$('#selectedInfo').html(html);
+	$('#selected-info').html(html);
 	
 	//ativa os cliques da area de info
-	$('#selectedInfo h1').click(function (event){infoClicked(event);});
-	$('#selectedInfo .icon').click(function (event){infoClicked(event);});
-	$('#selectedInfo p').click(function (event){infoClicked(event);});
-	$('#selectedInfo .fechar').click(function (event){fechaInfo(event);});
+	$('#selected-info h1').click(function (event){infoClicked(event);});
+	$('#selected-info .icon').click(function (event){infoClicked(event);});
+	$('#selected-info p').click(function (event){infoClicked(event);});
+	$('#selected-info .fechar').click(function (event){fechaInfo(event);});
 }
 
 function labelClicked(event){
-	console.log('labelClicked');
+	// console.log('labelClicked');
 	//pega o elemento
 	var element = $(event.target);
 	var eventDot = eventDotInstances[element.data('i')];
-	//seleciona a bolinha
+	//
 	selectDot(element.data('i'));
-	//abre baloon
+	fechaInfo();
 	abreBaloon();
 }
 
 function infoClicked(event){
-	console.log('infoClicked');
+	// console.log('infoClicked');
+	fechaInfo();
 	abreBaloon();
 }
 
 function fechaInfo(){
-	$('#selectedInfo').addClass('closed');
+	$('#selected-info').addClass('closed');
 }
 
 function mostraInfo(){
-	$('#selectedInfo').removeClass('closed');
+	$('#selected-info').removeClass('closed');
 }
 
 function abreBaloon(){

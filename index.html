@@ -1,7 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
-
-<html lang="en">
+<html xmlns:fb="http://ogp.me/ns/fb#">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>h2r</title>
@@ -14,6 +13,59 @@
 	<script type="text/javascript" charset="utf-8" src="js/script.js"></script>
 </head>
 <body>
+	<!-- Facebook Code Start -->
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
+	<!-- Fecebook Code End -->
+	<div id="ref"></div>
+	<div id="balloon">
+		<div id="balloon-tip" class="balloon tip"></div>
+		<div id="balloon-top" class="balloon top">
+			<img src="./img/thumb-e0001.png"/><img src="./img/fechar.png" class="fechar"/>
+			<div id="txt-block">
+				<h1>Fauna Galeria</h1>
+				<p>Al. Gabriel Monteiro da Silva, 470 // Jardim América // São Paulo</p>
+				<p>+55 (11) 3668.6572 // <a href="#">contato@faunagaleria.com.br</a> // www.faunagaleria.com.br</p>
+			</div>
+		</div>
+		<div id="balloon-body">
+			<div id="slideshow">
+				<img src="./img/slideshow-1.png"/><img src="./img/slideshow-1.png"/>
+			</div>
+			<div id="mini-balloon">
+				<div id="mini-ballon-tip" class="mini balloon tip"></div>
+				<div id="mini-balloon-body">
+					<h2>Expo</h2>
+					<div id="estrelas">
+						<img src="./img/estrela-amarela.png"/><img src="./img/estrela-amarela.png"/><img src="./img/estrela-amarela.png"/><img src="./img/estrela-cinza.png"/><img src="./img/estrela-cinza.png"/>
+					</div>
+					<h1>Carlos Dadoorian<em> // Pele Nua</em></h1>
+					<p>André não assina a autoria das fotografias apresentadas, se apropria das imagens, das lembranças e dos documentos de outro tempo e, com interferências, trabalha o conceito da memória e o apagamento que ela carrega com o tempo. André não assina a autoria das fotografias apresentadas, se apropria das imagens, das lembranças e dos documentos de outro tempo e, com interferências, trabalha o conceito da memória e o apagamento que ela carrega com o tempo. André não assina a autoria das fotografias apresentadas, se apropria das imagens, das lembranças e dos documentos.
+					</p>
+					<p><a href="#">Biografia</a> // <a href="#">Site</a></p>
+				</div>
+			</div>
+			<div id="mini-balloon-footer">
+					<fb:like href="http://www.google.com" send="false" layout="button_count" width="450" show_faces="false"></fb:like>
+			</div>
+			<div id="c1" class="balloon cross">
+				<h2>Workshop</h2>
+				<h1>Felipe Russo<em> // Pensando a Fotografia</em></h1>
+				<img src="./img/slideshow-1.png"/>
+				</div>
+			<div id="c2" class="balloon cross">
+				<h2>Expo</h2>
+				<h1>Eduardo Muylaert<em>  // Photo-ilustrações</em></h1>
+				<img src="./img/slideshow-1.png"/>
+			</div>
+		</div>
+	</div>
 	<div id="interface">
 		<div id="header" class="float">
 			<select>
@@ -27,24 +79,17 @@
 			<button type="submit">filtrar</button>
 		</div>
 		<div id="footer" class="float">
-			<div id="selectedInfo" class="float">
-				<!-- <h1>Carlos Dadoorian<em> // Pele Nua</em></h1>
-				<p>André não assina a autoria das fotografias apresentadas, se apropria das imagens, das lembranças e dos documentos de outro tempo e, com interferências, trabalha o conceito da memória e o apagamento que ela carrega com o tempo.</p>
-				<h4>® Carlos Dadoorian 2011</h4> -->
-			</div>
-			<div id="aboutInfo" class="float">
+			<div id="selected-info" class="float"></div>
+			<div id="about-info" class="float">
 				<p><a href"#">sobre</a> // <a href="#">equipe</a> // <a href="#">contato@agendadefotografia.com.br</a> // <a href="#">+55 (11) 9934.0987</a><img src="./img/logo-h2r.png" alt="Logo h2r" /></p>
 			</div>
 		</div>
 	</div>
 	<div id="bg">
-		<div id="timelineNow">
-		</div>
-		<div id="timelineGrid">
-		</div>
-		<div id="events">
-		</div>
-		<div id="bgPhoto"></div>
+		<div id="timeline-now"></div>
+		<div id="timeline-grid"></div>
+		<div id="events"></div>
+		<div id="bg-photo"></div>
 	</div>
 </body>
 </html>
