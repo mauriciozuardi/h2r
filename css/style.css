@@ -34,7 +34,7 @@ em{
 }
 
 /*============ balloon =============*/
-#ref{
+/*#ref{
 	position:absolute;
 	width:774px;
 	height:506px;
@@ -42,7 +42,7 @@ em{
 	background-repeat:no-repeat;
 	z-index:2;
 	opacity:.3;
-}
+}*/
 #balloon{
 	position:absolute;
 	width:774px;
@@ -70,6 +70,7 @@ em{
 .balloon.top .fechar{
 	float:right;
 	opacity:.4;
+	cursor:pointer;
 }
 #txt-block{
 	position:relative;
@@ -249,6 +250,7 @@ em{
 	float: right;
 	margin-right: 10px;
 	margin-top: 10px;
+	cursor:pointer;
 }
 #selected-info h4{
 	display:block;
@@ -473,9 +475,9 @@ button{
 	width:56px;
 }
 /*============ D E B U G =============*/
-#ref{
+/*#ref{
 	display:none;
-}
+}*/
 #bg{
 	display:none;
 }

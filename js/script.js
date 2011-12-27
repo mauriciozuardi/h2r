@@ -39,6 +39,9 @@ function init(){
 	resizeEventWindow();
 	recenterBalloon();
 	
+	//aplica o clique no balloon
+	$('.balloon.top .fechar').click(function (event){fechaBalloon(event);});
+	
 	//ajusta a altura do body no resize
 	$(window).resize(function (event){
 		resizeBg();
@@ -801,6 +804,10 @@ function fechaInfo(){
 	$('#selected-info').addClass('closed');
 }
 
+function fechaBalloon(){
+	$('#balloon').css('display', 'none');
+}
+
 function mostraInfo(){
 	$('#selected-info').removeClass('closed');
 }
@@ -808,6 +815,9 @@ function mostraInfo(){
 function abreBaloon(){
 	console.log('abreBaloon');
 	alert("Eu sou um baloon!\n" + dotSelected.oque);
+	
+	//popula o HTML do balloon
+	
 }
 
 function getUrlVars(){
