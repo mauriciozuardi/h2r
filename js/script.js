@@ -814,7 +814,49 @@ function mostraInfo(){
 
 function abreBaloon(){
 	//popula o HTML do balloon
+	console.log(["dotSelected", dotSelected]);
+	var cID = dotSelected.id.split('-');
+	ca_ = ca[cID[0]][cID[1]];
+	console.log(["ca_", ca_]);
+	a_ = a[ca_.siteId][ca_.atalho];
+	console.log(["a_", a_]);
+	e_ = e[a_.onde.split(', ')[0]];
+	console.log(["e_", e_]);
 	
+	//BALLOON TOP
+	if(e_){
+		var imgEspaco = e_.imagens.split('\n')[0];
+	} else {
+		var imgEspaco = "default-thumb.png";
+	}
+	
+	var nomeEspaco = e_.site ? "<a href='" + e_.site + "'>" + dotSelected.onde + "</a>" : dotSelected.onde;
+	
+	var linha1 = ""; //rua, bairro, cidade e mapa
+	linha1 += e_.mapa ? "<a href='" + e_.mapa + "'>" : "";
+	linha1 += e_.endereco;
+	linha1 += e_.bairro ? " // " + e_.bairro.split(', ')[0] : "";
+	linha1 += e_.cidade ? " // " + e_.cidade : "";
+	linha1 += e_.mapa ? "</a>" : "";
+	
+	
+	var linha2 = ""; //fone, email e site
+	if(e_.fone){
+		var fone = e_.fone.replace(/\./g, ''); //exclui "."
+		fone = fone.split(" "); //depois divide entre código de pais, área e telefone
+		linha2 += "<a href='tel:+" + fone[0] + "-" + fone[1] + "-" + fone[2] + "'>" + e_.fone + "</a>";
+	}
+	linha2 += e_.email ? " // " + e_.email : "";
+	linha2 += e_.site ? " // " + e_.site : "";
+
+	var linha3 = ""; //horário de funcionamento (opcional?)
+	linha3 += e_.horario ? e_.horario.replace(/\n/g, ' // ') : "";
+	
+	var html = "";
+	html += "<img src='./img/" + imgEspaco + "' width='86' height='86'/><img src='./img/fechar.png' class='fechar'/>";
+	html += "<div id='txt-block'><h1>" + nomeEspaco + "</h1><p>" + linha1 + "</p><p>" + linha2 + "</p>";
+	html += linha3;
+	$('#balloon-top').html(html);
 	
 	//atualiza os cliques
 	// $('#myimage').click(function() { return false; });
