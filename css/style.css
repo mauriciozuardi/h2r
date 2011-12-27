@@ -49,6 +49,7 @@ em{
 	height:506px;
 	z-index:1;
 	color:#444;
+	display:none;
 }
 .balloon.tip{
 	float:left;
@@ -107,6 +108,44 @@ em{
 	height:216px;
 	overflow:hidden;
 }
+#slideshow-controls{
+	width:324px;
+	height:216px;
+	position:absolute;
+	top:22px;
+	left:20px;
+/*	display:none;*/
+}
+#slideshow-controls .previous{
+	float:left;
+	opacity:.4;
+/*	margin-left:10px;*/
+	width:144px;
+	height:216px;
+	opacity:0;
+	background-image:url(../img/previous.png);
+	background-repeat:no-repeat;
+	background-position:7%;
+	cursor:pointer;
+}
+#slideshow-controls .previous:hover{
+	opacity:.5;
+}
+#slideshow-controls .next{
+	float:right;
+	opacity:.4;
+/*	margin-right:10px;*/
+	width:144px;
+	height:216px;
+	opacity:0;
+	background-image:url(../img/next.png);
+	background-repeat:no-repeat;
+	background-position:93%;
+	cursor:pointer;
+}
+#slideshow-controls .next:hover{
+	opacity:.5;
+}
 .balloon.cross{
 	width:324px;
 	height:48px;
@@ -114,7 +153,8 @@ em{
 	background-color:black;
 	text-align:right;
 	overflow:hidden;
-/*	padding:10px;*/
+/*	padding:10px;*/	
+	cursor:pointer;
 }
 .balloon.cross h2{
 	float:right;
@@ -174,6 +214,13 @@ em{
 	left:40px;
 	top:12px;
 	width:60px;
+}
+.estrela{
+	display:inline-block;
+	width:11px;
+	height:11px;
+	background-image:url(../img/estrela-cinza.png);
+	cursor:pointer;
 }
 #mini-balloon-body h1{
 	font-size:20px;
@@ -475,9 +522,9 @@ button{
 	width:56px;
 }
 /*============ D E B U G =============*/
-/*#ref{
-	display:none;
-}*/
+#balloon{
+	display:block;
+}
 #bg{
 	display:none;
 }

@@ -69,10 +69,10 @@ function recenterBalloon(){
 	balloon.css('top', top);
 	balloon.css('left', left);
 	
-	//DEVELOP
-	var ref = $('#ref');
-	ref.css('top', top);
-	ref.css('left', left);
+	// //DEVELOP
+	// var ref = $('#ref');
+	// ref.css('top', top);
+	// ref.css('left', left);
 }
 
 function drawTimeline(){
@@ -813,11 +813,15 @@ function mostraInfo(){
 }
 
 function abreBaloon(){
-	console.log('abreBaloon');
-	alert("Eu sou um baloon!\n" + dotSelected.oque);
-	
 	//popula o HTML do balloon
 	
+	
+	//atualiza os cliques
+	// $('#myimage').click(function() { return false; });
+	// $('#myimage').off('click');
+	
+	//mostra
+	$('#balloon').css('display', 'block');
 }
 
 function getUrlVars(){
