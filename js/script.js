@@ -8,6 +8,9 @@ createdDots = 0;
 eventDotInstances = [];
 destaques = [];
 MIN_WIDTH = 960;
+//balloon
+nSlideImgs = 0;
+selectedSlideImgIndex = 0;
 
 //começa qdo carregar o DOM
 $(init);
@@ -812,7 +815,7 @@ function mostraInfo(){
 	$('#selected-info').removeClass('closed');
 }
 
-function abreBaloon(){
+function abreBaloon(){	
 	//popula o HTML do balloon
 	console.log(["dotSelected", dotSelected]);
 	var cID = dotSelected.id.split('-');
@@ -823,7 +826,7 @@ function abreBaloon(){
 	e_ = e[a_.onde.split(', ')[0]];
 	console.log(["e_", e_]);
 	
-	//BALLOON TOP
+	//BALLOON TOP - INFO ESPAÇO
 	if(e_){
 		var imgEspaco = e_.imagens.split('\n')[0];
 	} else {
@@ -857,13 +860,77 @@ function abreBaloon(){
 	html += "<div id='txt-block'><h1>" + nomeEspaco + "</h1><p>" + linha1 + "</p><p>" + linha2 + "</p>";
 	html += linha3;
 	$('#balloon-top').html(html);
+	$('#balloon-top .fechar').click(function (event){fechaBalloon(event);});
 	
-	//atualiza os cliques
-	// $('#myimage').click(function() { return false; });
-	// $('#myimage').off('click');
+	//SLIDESHOW - imgs não podem conter espaço no nome
+	html = "";
+	if(ca_.imagens){
+		var imgs = ca_.imagens.split('\n');
+	} else if(a_.imagens){
+		var imgs = a_.imagens.split('\n');
+	} else {
+		var imgs = ["img-default.png"];
+	}
+	//atualiza as globais e os controles
+	selectedSlideImgIndex = 0;
+	nSlideImgs = imgs.length;
+	hideOrShowSlideshowControls();
+	//escreve o HTML
+	html += "<div id='slideshow-imgs'>";
+	for(var i in imgs){
+		html += "<div class='bg-cover slideshow-img' style='background-image: url(./img/" + encodeURI(imgs[i]) + ")'></div>";
+	}
+	html += "</div>";
+	
+	$('#slideshow').html(html);
+	$('#slideshow-controls .previous').off('click');
+	$('#slideshow-controls .previous').click(function (event){prevSlideImg(event)});
+	$('#slideshow-controls .next').off('click');
+	$('#slideshow-controls .next').click(function (event){nextSlideImg(event)});
+	
+	//CROSS
+	
+	//MINI-BALLOON - INFO DA ATIVIDADE
 	
 	//mostra
 	$('#balloon').css('display', 'block');
+}
+
+function nextSlideImg(){
+	if(selectedSlideImgIndex < nSlideImgs-1){
+		var element = $('#slideshow-imgs');
+		var ml = parseInt(element.css('margin-left'));
+		ml -= 324;
+		element.css('margin-left', ml);
+		selectedSlideImgIndex ++;
+		hideOrShowSlideshowControls();
+	}
+	console.log("next " + selectedSlideImgIndex + "/" + nSlideImgs);
+}
+
+function prevSlideImg(){
+	if(selectedSlideImgIndex > 0){
+		var element = $('#slideshow-imgs');
+		var ml = parseInt(element.css('margin-left'));
+		ml += 324;
+		element.css('margin-left', ml);
+		selectedSlideImgIndex --;
+		hideOrShowSlideshowControls();
+	}
+	console.log("prev " + selectedSlideImgIndex + "/" + nSlideImgs);
+}
+
+function hideOrShowSlideshowControls(){
+	if(selectedSlideImgIndex == 0){
+		$('#slideshow-controls .next').css('display', 'block');
+		$('#slideshow-controls .previous').css('display', 'none');
+	} else if(selectedSlideImgIndex == nSlideImgs-1){
+		$('#slideshow-controls .next').css('display', 'none');
+		$('#slideshow-controls .previous').css('display', 'block');
+	} else {
+		$('#slideshow-controls .next').css('display', 'block');
+		$('#slideshow-controls .previous').css('display', 'block');	
+	}
 }
 
 function getUrlVars(){

@@ -146,6 +146,11 @@ em{
 #slideshow-controls .next:hover{
 	opacity:.5;
 }
+.slideshow-img{
+	width:324px;
+	height:216px;
+	display:inline-block;
+}
 .balloon.cross{
 	width:324px;
 	height:48px;
@@ -332,6 +337,8 @@ em{
 }
 #bg-photo{
 	background-image: url(../img/default-bg.gif);
+}
+.bg-cover{
 	background-repeat: no-repeat;
 	background-position: center;
 	-moz-background-size: cover;
@@ -398,7 +405,6 @@ button{
 	margin-bottom:2px;
 	margin-left:90px;
 	height:26px;
-	cursor:pointer;
 }
 .dot{
 	position:relative;
@@ -454,6 +460,7 @@ button{
 	border-width:0px;
 	border-radius:30px;
 	background-color:rgba(255,255,255,.15);
+	cursor:pointer;
 /*	transition-property: border-width, width, height;
 	transition-duration: .5s;
 	transition-timing-function: ease-out;
@@ -478,6 +485,7 @@ button{
 	position:relative;
 	top:-20px;
 	text-shadow: 0px 1px 3px #333;
+	cursor:pointer;
 }
 .label.mini{
 	top:-3px;
