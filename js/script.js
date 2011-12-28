@@ -884,7 +884,7 @@ function abreBaloon(){
 	var quem = p[string_to_slug(a_.quem)];
 	html = "";
 	html += "<h2>" + a_.tipo + "</h2>";
-	html += desenhaEstrelas();
+	html += desenhaEstrelas(a_.estrelas);
 	html += "<h1>" + a_.nome + "</h1>";
 	html += a_.horario ? "<p><b>" + a_.horario + "</b></p>" : "";
 	html += "<div id='sinopse'>";
@@ -969,8 +969,19 @@ function updateMiniBalloonFooterPosition(){
 	$('#balloon-body').css('min-height', minHeight);
 }
 
-function desenhaEstrelas(){
-	return "<div id='estrelas'><img src='./img/estrela-amarela.png'/><img src='./img/estrela-amarela.png'/><img src='./img/estrela-amarela.png'/><img src='./img/estrela-cinza.png'/><img src='./img/estrela-cinza.png'/></div>";
+function desenhaEstrelas(nEstrelas){
+	console.log(nEstrelas);
+	if(nEstrelas){
+		var n = Math.round(parseFloat(nEstrelas));
+		var str = "<div id='estrelas'>";
+		for(var i=1; i<=5; i++){
+			str += i <= n ? "<img src='./img/estrela-amarela.png'/>" : "<img src='./img/estrela-cinza.png'/>"
+		}
+		str += "</div>";
+	} else {
+		var str = "";
+	}
+	return str;
 }
 
 function crossClicked(event){
