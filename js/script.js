@@ -11,6 +11,7 @@ MIN_WIDTH = 960;
 //balloon
 nSlideImgs = 0;
 selectedSlideImgIndex = 0;
+SLIDESHOW_IMG_W = 324;
 
 //começa qdo carregar o DOM
 $(init);
@@ -43,10 +44,10 @@ function init(){
 	recenterBalloon();
 	
 	//aplica o clique no balloon
-	$('.balloon.top .fechar').click(function (event){fechaBalloon(event);});
+	$('.balloon.top .fechar').click(function(event){fechaBalloon(event);});
 	
 	//ajusta a altura do body no resize
-	$(window).resize(function (event){
+	$(window).resize(function(event){
 		resizeBg();
 		resizeTimeline();
 		resizeEventWindow();
@@ -67,15 +68,10 @@ function resizeBg(){
 function recenterBalloon(){
 	var balloon = $('#balloon');
 	var minTop = $('#header').outerHeight(true);
-	var top = Math.max(minTop, ($(window).height()-balloon.outerHeight(true))/2);
-	var left = (Math.max(MIN_WIDTH, $(window).width()) - balloon.outerWidth(true))/2;
+	var top = Math.floor(Math.max(minTop, ($(window).height()-balloon.outerHeight(true))/2));
+	var left = Math.floor((Math.max(MIN_WIDTH, $(window).width()) - balloon.outerWidth(true))/2);
 	balloon.css('top', top);
 	balloon.css('left', left);
-	
-	// //DEVELOP
-	// var ref = $('#ref');
-	// ref.css('top', top);
-	// ref.css('left', left);
 }
 
 function drawTimeline(){
@@ -573,8 +569,8 @@ EventDot.prototype.posicionar = function(){
 	
 	//anexa a função de clique (uma vez só!)
 	if(this.semClique){
-		range.click(function (event){dotOrRangeClicked(event);});
-		label.click(function (event){labelClicked(event);});
+		range.click(function(event){dotOrRangeClicked(event);});
+		label.click(function(event){labelClicked(event);});
 		this.semClique = false;
 	}
 }
@@ -780,10 +776,10 @@ function mudaFundo(eventDotId){
 	$('#selected-info').html(html);
 	
 	//ativa os cliques da area de info
-	$('#selected-info h1').click(function (event){infoClicked(event);});
-	$('#selected-info .icon').click(function (event){infoClicked(event);});
-	$('#selected-info p').click(function (event){infoClicked(event);});
-	$('#selected-info .fechar').click(function (event){fechaInfo(event);});
+	$('#selected-info h1').click(function(event){infoClicked(event);});
+	$('#selected-info .icon').click(function(event){infoClicked(event);});
+	$('#selected-info p').click(function(event){infoClicked(event);});
+	$('#selected-info .fechar').click(function(event){fechaInfo(event);});
 }
 
 function labelClicked(event){
@@ -860,7 +856,7 @@ function abreBaloon(){
 	html += "<div id='txt-block'><h1>" + nomeEspaco + "</h1><p>" + linha1 + "</p><p>" + linha2 + "</p>";
 	html += linha3;
 	$('#balloon-top').html(html);
-	$('#balloon-top .fechar').click(function (event){fechaBalloon(event);});
+	$('#balloon-top .fechar').click(function(event){fechaBalloon(event);});
 	
 	//SLIDESHOW - imgs não podem conter espaço no nome
 	html = "";
@@ -869,7 +865,7 @@ function abreBaloon(){
 	} else if(a_.imagens){
 		var imgs = a_.imagens.split('\n');
 	} else {
-		var imgs = ["img-default.png"];
+		var imgs = ["default-img.png"];
 	}
 	//atualiza as globais e os controles
 	selectedSlideImgIndex = 0;
@@ -884,40 +880,73 @@ function abreBaloon(){
 	
 	$('#slideshow').html(html);
 	$('#slideshow-controls .previous').off('click');
-	$('#slideshow-controls .previous').click(function (event){prevSlideImg(event)});
+	$('#slideshow-controls .previous').click(function(event){prevSlideImg(event)});
 	$('#slideshow-controls .next').off('click');
-	$('#slideshow-controls .next').click(function (event){nextSlideImg(event)});
-	
-	//CROSS
+	$('#slideshow-controls .next').click(function(event){nextSlideImg(event)});
 	
 	//MINI-BALLOON - INFO DA ATIVIDADE
 	
+	//CROSS
+	if(ca_.atividades){
+		var atividades = ca_.atividades.split(', ');
+		var atividade = {};
+		var nameParts = [];
+		var imgs = ["default-img.png"];
+		var str = "";
+		var context = {};
+		
+		//reseta o HTML do cross
+		$('#cross').html("");
+		
+		//recria o HTML
+		for (i in atividades){
+			atividade = a[ca_.siteId][atividades[i]];
+			nameParts = atividade.nome.split(' // ');
+			imgs = atividade.imagens ? atividade.imagens.split('\n') : ["default-img.png"];
+			
+			html = "";
+			html += "<div id='cross-" + i + "' class='balloon cross'>";
+			html += "<div class='bg-cover cross-img' style='background-image: url(./img/" + encodeURI(imgs[0]) + ");'></div>";
+			html += "<h2>" + atividade.tipo + "</h2>";
+			html += "<h1>" + nameParts[0];
+			html += nameParts[1] ? "<em> // " + nameParts[1] + "</em></h1>" : "</h1>";
+			html += "</div>";
+			$('#cross').append(html);
+			
+			str = "#cross-" + i;
+			context.id = ca_.siteId + "-" + atividades[i];
+			$(str).click($.proxy(crossClicked, context));
+		}
+	}
+	
 	//mostra
 	$('#balloon').css('display', 'block');
+}
+
+function crossClicked(event){
+	console.log(this.id);
 }
 
 function nextSlideImg(){
 	if(selectedSlideImgIndex < nSlideImgs-1){
 		var element = $('#slideshow-imgs');
 		var ml = parseInt(element.css('margin-left'));
-		ml -= 324;
+		ml -= SLIDESHOW_IMG_W;
 		element.css('margin-left', ml);
 		selectedSlideImgIndex ++;
 		hideOrShowSlideshowControls();
 	}
-	console.log("next " + selectedSlideImgIndex + "/" + nSlideImgs);
 }
 
 function prevSlideImg(){
 	if(selectedSlideImgIndex > 0){
 		var element = $('#slideshow-imgs');
 		var ml = parseInt(element.css('margin-left'));
-		ml += 324;
+		ml += SLIDESHOW_IMG_W;
 		element.css('margin-left', ml);
 		selectedSlideImgIndex --;
 		hideOrShowSlideshowControls();
 	}
-	console.log("prev " + selectedSlideImgIndex + "/" + nSlideImgs);
 }
 
 function hideOrShowSlideshowControls(){
