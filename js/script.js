@@ -43,8 +43,10 @@ function init(){
 	resizeEventWindow();
 	recenterBalloon();
 	
-	//aplica o clique no balloon
+	//aplica os cliques "fixos" do balloon
 	$('.balloon.top .fechar').click(function(event){fechaBalloon(event);});
+	$('#slideshow-controls .previous').click(function(event){prevSlideImg(event)});
+	$('#slideshow-controls .next').click(function(event){nextSlideImg(event)});
 	
 	//ajusta a altura do body no resize
 	$(window).resize(function(event){
@@ -879,10 +881,10 @@ function abreBaloon(){
 	html += "</div>";
 	
 	$('#slideshow').html(html);
-	$('#slideshow-controls .previous').off('click');
-	$('#slideshow-controls .previous').click(function(event){prevSlideImg(event)});
-	$('#slideshow-controls .next').off('click');
-	$('#slideshow-controls .next').click(function(event){nextSlideImg(event)});
+	// $('#slideshow-controls .previous').off('click');
+	// $('#slideshow-controls .previous').click(function(event){prevSlideImg(event)});
+	// $('#slideshow-controls .next').off('click');
+	// $('#slideshow-controls .next').click(function(event){nextSlideImg(event)});
 	
 	//MINI-BALLOON - INFO DA ATIVIDADE
 	
