@@ -895,13 +895,15 @@ function abreBaloon(){
 		var nameParts = [];
 		var imgs = ["default-img.png"];
 		var str = "";
-		var context = {};
 		
 		//reseta o HTML do cross
 		$('#cross').html("");
 		
 		//recria o HTML
 		for (i in atividades){
+			
+			var context = {};
+			
 			atividade = a[ca_.siteId][atividades[i]];
 			nameParts = atividade.nome.split(' // ');
 			imgs = atividade.imagens ? atividade.imagens.split('\n') : ["default-img.png"];
