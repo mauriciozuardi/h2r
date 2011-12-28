@@ -812,15 +812,38 @@ function mostraInfo(){
 	$('#selected-info').removeClass('closed');
 }
 
-function abreBaloon(){	
-	//popula o HTML do balloon
-	console.log(["dotSelected", dotSelected]);
-	var cID = dotSelected.id.split('-');
-	ca_ = ca[cID[0]][cID[1]];
+function abreBaloon(idComposto, aID){
+	console.log("parametro: " + idComposto);
+	//define quem é quem no jogo do bicho
+	if(!idComposto){
+		var cID = dotSelected.id.split('-');
+		var dot = dotSelected;
+		var ca_ = ca[cID[0]][cID[1]];
+		var a_ = a[ca_.siteId][ca_.atalho];
+		var e_ = e[a_.onde.split(', ')[0]];
+	} else {
+		var cID = idComposto.split('-');
+		var dot = {};
+		var ca_ = ca[cID[0]][cID[1]];
+		var a_ = a[ca_.siteId][aID];
+		var e_ = e[a_.onde.split(', ')[0]];
+		
+		// pega o onde do mesmo jeito que a dotSelected pegaria
+		if(ca_.maisDeUmOnde){
+			dot.onde = ca_.maisDeUmOnde;
+		} else if(ca_.atalho){
+			var espacos = a[ca_.siteId][ca_.atalho].onde
+			if(espacos){
+				espacos = espacos.split(", ");
+				if (espacos.length == 1){
+					dot.onde = e[espacos[0]].nome;
+				}
+			}
+		}
+	}
+	
 	console.log(["ca_", ca_]);
-	a_ = a[ca_.siteId][ca_.atalho];
 	console.log(["a_", a_]);
-	e_ = e[a_.onde.split(', ')[0]];
 	console.log(["e_", e_]);
 	
 	//BALLOON TOP - INFO ESPAÇO
@@ -830,7 +853,7 @@ function abreBaloon(){
 		var imgEspaco = "default-thumb.png";
 	}
 	
-	var nomeEspaco = e_.site ? "<a href='" + e_.site + "'>" + dotSelected.onde + "</a>" : dotSelected.onde;
+	var nomeEspaco = e_.site ? "<a href='" + e_.site + "'>" + dot.onde + "</a>" : dot.onde;
 	
 	var linha1 = ""; //rua, bairro, cidade e mapa
 	linha1 += e_.mapa ? "<a href='" + e_.mapa + "'>" : "";
@@ -903,7 +926,11 @@ function abreBaloon(){
 	}
 	
 	//MINI-BALLOON-FOOTER
-	
+	html = "";
+	html += desenhaTwitter();
+	html += desenhaFacebook();
+	html += desenhaOpine();
+	$('#mini-balloon-footer').html(html);
 	
 	//CROSS
 	//reseta o HTML pré-existente
@@ -935,7 +962,8 @@ function abreBaloon(){
 			$('#cross').append(html);
 			
 			str = "#cross-" + i;
-			context.id = ca_.siteId + "-" + atividades[i];
+			context.atividade = atividades[i];
+			context.id = ca_.siteId + "-" + ca_.id;
 			$(str).click($.proxy(crossClicked, context));
 		}
 	}
@@ -970,7 +998,7 @@ function updateMiniBalloonFooterPosition(){
 }
 
 function desenhaEstrelas(nEstrelas){
-	console.log(nEstrelas);
+	// console.log(nEstrelas);
 	if(nEstrelas){
 		var n = Math.round(parseFloat(nEstrelas));
 		var str = "<div id='estrelas'>";
@@ -984,8 +1012,21 @@ function desenhaEstrelas(nEstrelas){
 	return str;
 }
 
+function desenhaOpine(){
+	return "	<div id='opine'><p>Opine:</p><div id='estrelas-opine'><div class='estrela e1'></div><div class='estrela e2'></div><div class='estrela e3'></div><div class='estrela e4'></div><div class='estrela e5'></div></div></div>" ;
+}
+
+function desenhaTwitter(){
+	return "<div id='twitter'><a href='https://twitter.com/share' class='twitter-share-button' data-url='http://google.com' data-via='h2r' data-count='none' data-hashtags='ag_fotografia'>Tweet</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='//platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','twitter-wjs');</script></div>";
+}
+
+function desenhaFacebook(){
+	return "<div id='facebook'><fb:like href='http://www.google.com' send='false' layout='button_count' width='450' show_faces='false'></fb:like></div>";
+}
+
 function crossClicked(event){
-	console.log(this.id);
+	// console.log(this.id);
+	abreBaloon(this.id, this.atividade);
 }
 
 function nextSlideImg(){
