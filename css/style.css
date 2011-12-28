@@ -14,14 +14,15 @@ h2{
 	font-size:15px;
 	color:#444;
 }
-a{
+.fake-link, a{
 	text-decoration:none;
 	color:#444;
 }
-a:hover{
+.fake-link:hover, a:hover{
 	text-decoration:underline;
 	color:black;
 }
+
 p{
 	color:#444;
 }
@@ -232,16 +233,23 @@ em{
 	margin:0px;
 	margin-bottom:-2px;
 }
-#mini-balloon-body a{
+#mini-balloon-body a, #mini-balloon-body .fake-link{
 	font-weight:bold;
 }
+#bio{
+	display:block;
+}
+#bio.hidden{
+	display:none;
+}
 #mini-balloon-footer{
-	position:relative;
+	position:absolute;
 	float:right;
 	width:342px;
-/*	height:100px;*/
 	padding:20px;
 	background-color:rgba(255,255,255,.5);
+	top:20px;
+	right:20px;
 }
 /*=========== interface ============*/
 #interface{

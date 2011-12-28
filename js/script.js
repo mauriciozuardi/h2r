@@ -449,7 +449,6 @@ EventDot.drawThemAll = function(sortBy){
 	
 	//volta o array para a ordem esperada (ordem de inclusão – que é a ordem crescente dos IDs)
 	eventDotInstances.sort(compareIdStrings)
-	
 	console.log(destaques);
 }
 
@@ -879,16 +878,38 @@ function abreBaloon(){
 		html += "<div class='bg-cover slideshow-img' style='background-image: url(./img/" + encodeURI(imgs[i]) + ")'></div>";
 	}
 	html += "</div>";
-	
 	$('#slideshow').html(html);
-	// $('#slideshow-controls .previous').off('click');
-	// $('#slideshow-controls .previous').click(function(event){prevSlideImg(event)});
-	// $('#slideshow-controls .next').off('click');
-	// $('#slideshow-controls .next').click(function(event){nextSlideImg(event)});
 	
 	//MINI-BALLOON - INFO DA ATIVIDADE
+	var quem = p[string_to_slug(a_.quem)];
+	html = "";
+	html += "<h2>" + a_.tipo + "</h2>";
+	html += desenhaEstrelas();
+	html += "<h1>" + a_.nome + "</h1>";
+	html += a_.horario ? "<p><b>" + a_.horario + "</b></p>" : "";
+	html += "<div id='sinopse'>";
+	html += a_.sinopse ? "<p>" + a_.sinopse + "</p>" : "<p>(cadastrar sinopse da atividade)</p>";
+	html += "</div>";
+	
+	if(quem.bio){
+		html += "<div id='bio' class='hidden'></div>";
+		html += "<p><span class='fake-link'>Biografia</span>";
+		html += quem.site ?  " // <a href='" + quem.site + "'>Site</a></p>" : "</p>";
+		$('#mini-balloon-body').html(html);
+		$('#mini-balloon-body .fake-link').click(function(event){abreBio(event, quem);});
+	} else {
+		html += quem.site ? "<p><a href='" + quem.site + "'>Site</a></p>" : "";
+		$('#mini-balloon-body').html(html);
+	}
+	
+	//MINI-BALLOON-FOOTER
+	
 	
 	//CROSS
+	//reseta o HTML pré-existente
+	$('#cross').html("");
+	
+	//recria o HTML
 	if(ca_.atividades){
 		var atividades = ca_.atividades.split(', ');
 		var atividade = {};
@@ -896,10 +917,6 @@ function abreBaloon(){
 		var imgs = ["default-img.png"];
 		var str = "";
 		
-		//reseta o HTML do cross
-		$('#cross').html("");
-		
-		//recria o HTML
 		for (i in atividades){
 			
 			var context = {};
@@ -925,6 +942,35 @@ function abreBaloon(){
 	
 	//mostra
 	$('#balloon').css('display', 'block');
+	updateMiniBalloonFooterPosition();
+}
+
+function abreBio(event, quem){
+	var bio = $('#bio');
+	if(bio.hasClass('hidden')){
+		$('#bio').html(quem.bio);
+		$('#mini-balloon-body .fake-link').html("Fechar Bio");
+	} else {
+		$('#bio').html("");
+		$('#mini-balloon-body .fake-link').html("Biografia");
+	}
+	//
+	$('#bio').toggleClass('hidden');
+	updateMiniBalloonFooterPosition();
+}
+
+function updateMiniBalloonFooterPosition(){
+	//reposiciona o footer
+	var top = 20 + $('#mini-balloon-body').outerHeight(false);
+	$('#mini-balloon-footer').css('top', top);
+	
+	//ajusta o tamanho mínimo do balloon
+	var minHeight = $('#mini-balloon-footer').outerHeight(false) + top - 20;
+	$('#balloon-body').css('min-height', minHeight);
+}
+
+function desenhaEstrelas(){
+	return "<div id='estrelas'><img src='./img/estrela-amarela.png'/><img src='./img/estrela-amarela.png'/><img src='./img/estrela-amarela.png'/><img src='./img/estrela-cinza.png'/><img src='./img/estrela-cinza.png'/></div>";
 }
 
 function crossClicked(event){
