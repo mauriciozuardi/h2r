@@ -252,8 +252,10 @@ function updateTimelineDates(){
 }
 
 function EventDot(ca){
+	var atalho = ca.atividades.split(", ")[0];
+	
 	//escondo?
-	if(ca.esconder || a[ca.siteId][ca.atalho].esconder){ return true }
+	if(ca.esconder || a[ca.siteId][atalho].esconder){ return true }
 	
 	//ID
 	this.id = ca.siteId + "-" + ca.id;
@@ -263,8 +265,8 @@ function EventDot(ca){
 	//VISUAL
 	if(ca.visual){
 		var visual = ca.visual;
-	} else if(ca.atalho && a[ca.siteId][ca.atalho].visual){
-		var visual = a[ca.siteId][ca.atalho].visual;
+	} else if(atalho && a[ca.siteId][atalho].visual){
+		var visual = a[ca.siteId][atalho].visual;
 	} else {
 		var visual = "p";
 	}
@@ -272,25 +274,22 @@ function EventDot(ca){
 	// console.log(this.visual);
 	
 	//ONDE < default para Agenda
-	if(ca.maisDeUmOnde){
-		//se cadastrou o nome do local (para o caso de acontecer em todas as Starbucks, por exemplo)
-		var nomeLocal = ca.maisDeUmOnde;
-	} else if(ca.atalho){
+	if(atalho){
 		//senão, procura o atalho para a atividade em questão e confere quantos espaços tem
-		var espacos = a[ca.siteId][ca.atalho].onde
+		var espacos = a[ca.siteId][atalho].onde;
 		if(espacos){
 			espacos = espacos.split(", ");
-			if (espacos.length == 1){
+			if (espacos.length > 0){
 				var nomeLocal = e[espacos[0]].nome;
 			} else {
-				var nomeLocal = "MAIS DE UM ESPAÇO na ATIVIDADE indicada pelo ATALHO, cadastre ONDE no CA";
+				var nomeLocal = "-";
 			}
 		} else {
-			var nomeLocal = "NENHUM ESPAÇO na ATIVIDADE indicada pelo ATALHO, cadastre ONDE no CA";
+			var nomeLocal = "-";
 		}
 	} else {
 		//senão, assume que não foi cadastrado
-		var nomeLocal = "Cadastrar ONDE no CA ou indicar o ATALHO";
+		var nomeLocal = "-";
 	}
 	this.onde = nomeLocal;
 	// console.log(this.onde);
@@ -299,12 +298,12 @@ function EventDot(ca){
 	if(ca.nome){
 		//se cadastrou o nome do CA, entenda que é o nome da atividade
 		var nomeAtividade = ca.nome;
-	} else if(ca.atalho){
+	} else if(atalho){
 		//senão, procura o atalho para a atividade em questão e usa o nome dela
-		var nomeAtividade = a[ca.siteId][ca.atalho].nome;
+		var nomeAtividade = a[ca.siteId][atalho].nome;
 	} else {
 		//senão, assume que não foi cadastrado
-		var nomeAtividade = "Cadastrar NOME no CA ou na Atividade";
+		var nomeAtividade = "-";
 	}
 	this.oque = nomeAtividade;
 	// console.log(this.oque);
@@ -313,23 +312,23 @@ function EventDot(ca){
 	if(ca.quem){
 		//se cadastrou o nome da pessoa (para o caso de ter mais de uma pessoa envolvida)
 		var nomePessoa = ca.quem;
-	} else if(ca.atalho){
+	} else if(atalho){
 		//senão, procura o atalho para a atividade em questão e confere quantas pessoas tem listadas
-		var pessoas = a[ca.siteId][ca.atalho].quem;
+		var pessoas = a[ca.siteId][atalho].quem;
 		if(pessoas){
 			pessoas = pessoas.split(", ");
-			if (pessoas.length == 1){
+			if (pessoas.length > 0){
 				var nomePessoa = pessoas[0]; //pessoas não tem ID, o ID é o próprio nome (pedido da Helena)
 			} else {
-				var nomePessoa = "MAIS DE UMA PESSOA na ATIVIDADE indicada pelo ATALHO ("+ca.atalho+"), cadastre QUEM no CA";
+				var nomePessoa = "-";
 			}
 		} else {
-			var nomePessoa = "NENHUMA PESSOA na ATIVIDADE indicada pelo ATALHO, cadastre QUEM no CA ou na ATIVIDADE"
+			var nomePessoa = "-"
 		}
 
 	} else {
 		//senão, assume que não foi cadastrado
-		var nomePessoa = "Cadastrar QUEM no CA ou indicar o ATALHO";
+		var nomePessoa = "-";
 	}
 	this.quem = nomePessoa;
 	// console.log(this.quem);
@@ -339,8 +338,8 @@ function EventDot(ca){
 	// console.log(ca.atividades);
 	if(ca.atividades){
 		var arrAtividades = ca.atividades.split(', ');
-	} else if (ca.atalho){
-		var arrAtividades = [ca.atalho];
+	} else if (atalho){
+		var arrAtividades = [atalho];
 	}
 	
 	// console.log(arrAtividades);
@@ -435,7 +434,7 @@ EventDot.drawThemAll = function(sortBy){
 		}
 		
 		//cria o DIV com id com a bolinha, range e label dentro
-		var html = "<div data-id='" + e.id + "' class='event " + e.id + "'><span data-id='" + e.id + "' class='range'><span data-id='" + e.id + "' data-i='" + e.i + "' class='dot'></span></span><span data-i='" + e.i + "' class='label'>" + labelTxt + "</span></div>";
+		var html = "<div data-id='" + e.id + "' class='event " + e.id + "'><span data-id='" + e.id + "' class='range'><span data-id='" + e.id + "' data-i='" + e.i + "' class='dot'></span></span><span data-i='" + e.i + "' class='label'>" + labelTxt + "<img src='./img/nano-balloon.gif' class='nano' /></span></div>";
 		$(html).appendTo('#events');
 		
 		//aplica as classes baseado no status
@@ -443,13 +442,22 @@ EventDot.drawThemAll = function(sortBy){
 		
 		//inclui na lista de destaques se for o caso
 		if(e.visual == 'g'){
-			destaques.push(e);			
+			destaques.push(e);
 		}
 	}
 	
+	//aplica o mouse over nos labels
+	$('.label').mouseover(function(event){
+		$(event.target).addClass('over');
+	});
+		
+	$('.label').mouseout(function(event){
+		$(event.target).removeClass('over');
+	});
+	
 	//volta o array para a ordem esperada (ordem de inclusão – que é a ordem crescente dos IDs)
 	eventDotInstances.sort(compareIdStrings)
-	console.log(destaques);
+	console.log(["Destaques >", destaques]);
 }
 
 function compareDates(a,b){
@@ -718,13 +726,14 @@ function selectDot(eventDotId){
 function mudaFundo(eventDotId){
 	var id = eventDotId.split('-');
 	var ed = ca[id[0]][id[1]]; //eventDot
+	var atalho = ed.atividades.split(', ')[0];
 	
 	//MUDA O BG
 	//encontra o nome da imagem (sempre a primeira se tiver mais de uma cadastrada)
 	if(ed.imagens){
 		var imgs = ed.imagens.split('\n');
-	} else if(ed.atalho && a[ed.siteId][ed.atalho].imagens){
-		var imgs = a[ed.siteId][ed.atalho].imagens.split('\n');
+	} else if(atalho && a[ed.siteId][atalho].imagens){
+		var imgs = a[ed.siteId][atalho].imagens.split('\n');
 	} else {
 		var imgs = ["default-bg.gif"];
 	}
@@ -738,8 +747,8 @@ function mudaFundo(eventDotId){
 	//encontra o nome da atividade
 	if(ed.nome){
 		var nomeArr = ed.nome.split(' // ');
-	} else if(ed.atalho && a[ed.siteId][ed.atalho].nome){
-		var nomeArr = a[ed.siteId][ed.atalho].nome.split(' // ');
+	} else if(ed.atalho && a[ed.siteId][atalho].nome){
+		var nomeArr = a[ed.siteId][atalho].nome.split(' // ');
 	} else {
 		var nomeArr = ["sem nome"];
 	}
@@ -747,8 +756,8 @@ function mudaFundo(eventDotId){
 	//encontra a sinopse
 	if(ed.sinopse){
 		var sinopse = ed.sinopse;
-	} else if(ed.atalho && a[ed.siteId][ed.atalho].sinopse){
-		var sinopse = a[ed.siteId][ed.atalho].sinopse;
+	} else if(atalho && a[ed.siteId][atalho].sinopse){
+		var sinopse = a[ed.siteId][atalho].sinopse;
 	} else {
 		var sinopse = ["-"];
 	}
@@ -756,8 +765,8 @@ function mudaFundo(eventDotId){
 	//encontra o crédito
 	if(ed.credito){
 		var credito = ed.credito;
-	} else if(ed.atalho && a[ed.siteId][ed.atalho].credito){
-		var credito = a[ed.siteId][ed.atalho].credito;
+	} else if(atalho && a[ed.siteId][atalho].credito){
+		var credito = a[ed.siteId][atalho].credito;
 	} else {
 		var credito = ["sem sinopse"];
 	}
@@ -812,55 +821,74 @@ function mostraInfo(){
 	$('#selected-info').removeClass('closed');
 }
 
-function abreBaloon(idComposto, aID){
-	console.log("parametro: " + idComposto);
+function abreBaloon(idComposto, aID, skipIndex){
+	// console.log("parametro: " + idComposto);
+	
+	var cID = dotSelected.id.split('-');
+	var ca_ = ca[cID[0]][cID[1]];
+	var atalho = ca_.atividades.split(', ')[0];
+	// var dot = dotSelected;
+	
 	//define quem é quem no jogo do bicho
 	if(!idComposto){
-		var cID = dotSelected.id.split('-');
-		var dot = dotSelected;
-		var ca_ = ca[cID[0]][cID[1]];
-		var a_ = a[ca_.siteId][ca_.atalho];
+		var a_ = a[ca_.siteId][atalho];
 		var e_ = e[a_.onde.split(', ')[0]];
 	} else {
-		var cID = idComposto.split('-');
-		var dot = {};
-		var ca_ = ca[cID[0]][cID[1]];
 		var a_ = a[ca_.siteId][aID];
 		var e_ = e[a_.onde.split(', ')[0]];
-		
-		// pega o onde do mesmo jeito que a dotSelected pegaria
-		if(ca_.maisDeUmOnde){
-			dot.onde = ca_.maisDeUmOnde;
-		} else if(ca_.atalho){
-			var espacos = a[ca_.siteId][ca_.atalho].onde
-			if(espacos){
-				espacos = espacos.split(", ");
-				if (espacos.length == 1){
-					dot.onde = e[espacos[0]].nome;
-				}
-			}
-		}
+	}
+	
+	var espacos = a_.onde.split(", ");
+	var dot = {};
+	if (espacos.length == 1){
+		dot.onde = e[espacos[0]].nome;
+	} else if (espacos.length > 1){
+		dot.onde = e[espacos[0]].nome;
+		dot.todosEspacos = espacos;
+	} else {
+		dot.onde = "-";
 	}
 	
 	console.log(["ca_", ca_]);
 	console.log(["a_", a_]);
 	console.log(["e_", e_]);
+	console.log(["dot", dot]);
 	
 	//BALLOON TOP - INFO ESPAÇO
-	if(e_){
+	if(e_.imagens){
 		var imgEspaco = e_.imagens.split('\n')[0];
 	} else {
 		var imgEspaco = "default-thumb.png";
 	}
 	
-	var nomeEspaco = e_.site ? "<a href='" + e_.site + "'>" + dot.onde + "</a>" : dot.onde;
+	var nomeEspaco = e_.site ? "<a href='" + e_.site + "' target='_BLANK'>" + dot.onde + "</a>" : dot.onde;
+	if(dot.todosEspacos){
+		var opcoes = "";
+		for (var i in dot.todosEspacos){
+			opcoes += "<option>" + e[dot.todosEspacos[i]].nome + "</option>";
+		}
+		nomeEspaco += "<select class='todosEspacos'><option>+</option>" + opcoes + "</select>";
+		
+		// $("select").change(function () {
+		// 	console.log("HOHOHO");
+		// }).trigger('change');
+		
+		// $("select").change(function () {
+		// 	var str = "";
+		// 	$("select option:selected").each(function () {
+		// 		str += $(this).text() + " ";
+		// 	});
+		// 	console.log(str);
+		// 	}).trigger('change');
+	}
+
 	
 	var linha1 = ""; //rua, bairro, cidade e mapa
-	linha1 += e_.mapa ? "<a href='" + e_.mapa + "'>" : "";
+	linha1 += e_.mapa ? "<a href='" + e_.mapa + "' target='_BLANK'>" : "";
 	linha1 += e_.endereco;
 	linha1 += e_.bairro ? " // " + e_.bairro.split(', ')[0] : "";
 	linha1 += e_.cidade ? " // " + e_.cidade : "";
-	linha1 += e_.mapa ? "</a>" : "";
+	linha1 += e_.mapa ? "<img src='./img/pin.gif' class='pin' /></a>" : "";
 	
 	
 	var linha2 = ""; //fone, email e site
@@ -869,15 +897,22 @@ function abreBaloon(idComposto, aID){
 		fone = fone.split(" "); //depois divide entre código de pais, área e telefone
 		linha2 += "<a href='tel:+" + fone[0] + "-" + fone[1] + "-" + fone[2] + "'>" + e_.fone + "</a>";
 	}
-	linha2 += e_.email ? " // " + e_.email : "";
-	linha2 += e_.site ? " // " + e_.site : "";
+	// linha2 += e_.email ? " // <a href='mailto:" + e_.email + "'>" + e_.email + "</a>" : "";
+	if(e_.email){
+		if(e_.email.substr(0,7) == 'http://'){
+			linha2 += " // <a href='" + e_.email + "' target='_BLANK'>contato</a>";
+		} else {
+			linha2 += " // <a href='mailto:" + e_.email + "' target='_BLANK'>" + e_.email + "</a>";
+		}
+	}
+	linha2 += e_.site ? " // <a href='" + e_.site + "' target='_BLANK'>" + e_.site.replace('http://', '') + "</a>" : "";
 
 	var linha3 = ""; //horário de funcionamento (opcional?)
 	linha3 += e_.horario ? e_.horario.replace(/\n/g, ' // ') : "";
 	
 	var html = "";
 	html += "<img src='./img/" + imgEspaco + "' width='86' height='86'/><img src='./img/fechar.png' class='fechar'/>";
-	html += "<div id='txt-block'><h1>" + nomeEspaco + "</h1><p>" + linha1 + "</p><p>" + linha2 + "</p>";
+	html += "<div id='txt-block'><h1>" + nomeEspaco + "</h1><p class='first-p'>" + linha1 + "</p><p>" + linha2 + "</p>";
 	html += linha3;
 	$('#balloon-top').html(html);
 	$('#balloon-top .fechar').click(function(event){fechaBalloon(event);});
@@ -905,23 +940,25 @@ function abreBaloon(idComposto, aID){
 	
 	//MINI-BALLOON - INFO DA ATIVIDADE
 	var quem = p[string_to_slug(a_.quem)];
+	var di = googleDateToDate(a_.datainicial);
+	var df = googleDateToDate(a_.datafinal);
 	html = "";
 	html += "<h2>" + a_.tipo + "</h2>";
 	html += desenhaEstrelas(a_.estrelas);
 	html += "<h1>" + a_.nome + "</h1>";
-	html += a_.horario ? "<p><b>" + a_.horario + "</b></p>" : "";
+	html += a_.horario ? "<p><b>" + a_.horario + "</b></p>" : "<p><b>" + dataHelena(di, df) + "</b></p>"; 
 	html += "<div id='sinopse'>";
-	html += a_.sinopse ? "<p>" + a_.sinopse + "</p>" : "<p>(cadastrar sinopse da atividade)</p>";
+	html += a_.sobre ? "<p>" + a_.sobre + "</p>" : "<p>(cadastrar sinopse da atividade)</p>";
 	html += "</div>";
 	
 	if(quem.bio){
 		html += "<div id='bio' class='hidden'></div>";
 		html += "<p><span class='fake-link'>Biografia</span>";
-		html += quem.site ?  " // <a href='" + quem.site + "'>Site</a></p>" : "</p>";
+		html += quem.site ?  " // <a href='" + quem.site + "' target='_BLANK'>" + quem.site.replace('http://', '') + "</a></p>" : "</p>";
 		$('#mini-balloon-body').html(html);
 		$('#mini-balloon-body .fake-link').click(function(event){abreBio(event, quem);});
 	} else {
-		html += quem.site ? "<p><a href='" + quem.site + "'>Site</a></p>" : "";
+		html += quem.site ? "<p><a href='" + quem.site + "' target='_BLANK'>" + quem.site.replace('http://', '') + "</a></p>" : "";
 		$('#mini-balloon-body').html(html);
 	}
 	
@@ -939,32 +976,40 @@ function abreBaloon(idComposto, aID){
 	//recria o HTML
 	if(ca_.atividades){
 		var atividades = ca_.atividades.split(', ');
+		var alphaStep = 80/atividades.length;
 		var atividade = {};
 		var nameParts = [];
 		var imgs = ["default-img.png"];
 		var str = "";
+		var alpha = 0;
+		var n = 0;
+		skipIndex = skipIndex ? skipIndex : 0;
 		
 		for (i in atividades){
+			console.log(skipIndex);
+			if(i != skipIndex){
+				var context = {};
+				atividade = a[ca_.siteId][atividades[i]];
+				nameParts = atividade.nome.split(' // ');
+				imgs = atividade.imagens ? atividade.imagens.split('\n') : ["default-img.png"];
+				// alpha = (100 - (alphaStep * n))/100; n ++;
+				alpha = 1;
 			
-			var context = {};
+				html = "";
+				html += "<div id='cross-" + i + "' class='balloon cross' style='background-color:rgba(255,255,255," + alpha + ")'>";
+				html += "<div class='bg-cover cross-img' style='background-image: url(./img/" + encodeURI(imgs[0]) + ");'></div>";
+				html += "<h2>" + atividade.tipo + "</h2>";
+				html += "<h1>" + nameParts[0];
+				html += nameParts[1] ? "<em> // " + nameParts[1] + "</em></h1>" : "</h1>";
+				html += "</div>";
+				$('#cross').append(html);
 			
-			atividade = a[ca_.siteId][atividades[i]];
-			nameParts = atividade.nome.split(' // ');
-			imgs = atividade.imagens ? atividade.imagens.split('\n') : ["default-img.png"];
-			
-			html = "";
-			html += "<div id='cross-" + i + "' class='balloon cross'>";
-			html += "<div class='bg-cover cross-img' style='background-image: url(./img/" + encodeURI(imgs[0]) + ");'></div>";
-			html += "<h2>" + atividade.tipo + "</h2>";
-			html += "<h1>" + nameParts[0];
-			html += nameParts[1] ? "<em> // " + nameParts[1] + "</em></h1>" : "</h1>";
-			html += "</div>";
-			$('#cross').append(html);
-			
-			str = "#cross-" + i;
-			context.atividade = atividades[i];
-			context.id = ca_.siteId + "-" + ca_.id;
-			$(str).click($.proxy(crossClicked, context));
+				str = "#cross-" + i;
+				context.atividade = atividades[i];
+				context.id = ca_.siteId + "-" + ca_.id;
+				context.skipIndex = i;
+				$(str).click($.proxy(crossClicked, context));				
+			}
 		}
 	}
 	
@@ -973,10 +1018,35 @@ function abreBaloon(idComposto, aID){
 	updateMiniBalloonFooterPosition();
 }
 
+function dataHelena(di, df){
+	var str = "";
+	// var semana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab" ];
+	// var mesCurto = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+	var mesLongo = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+	var mesInicial = di.getMonth();
+	var mesFinal = df.getMonth();
+	var anoInicial = di.getFullYear();
+	var anoFinal = df.getFullYear();
+
+	if(anoInicial == anoFinal){
+		if(mesInicial == mesFinal){
+			//De 12 a 20 de Outubro
+			str = "De " +di.getDate()+ " até " +df.getDate()+ " de " +mesLongo[mesInicial] + " de " + anoFinal;
+		} else {
+			//De 12 de Jan. a 15 de Out.
+			str = "De " +di.getDate()+ " de " +mesLongo[mesInicial]+ " até " +df.getDate()+ " de " +mesLongo[mesFinal]+ " de " + anoFinal;
+		}
+	} else {
+		//De 10 de Dez. 2011 a 15 Fev. 2012
+		str = "De " +di.getDate()+ " de " +mesLongo[mesInicial]+ " " +anoInicial+ " até " +df.getDate()+ " de " +mesLongo[mesFinal]+ " de " + anoFinal;
+	}
+	return str;
+}
+
 function abreBio(event, quem){
 	var bio = $('#bio');
 	if(bio.hasClass('hidden')){
-		$('#bio').html(quem.bio);
+		$('#bio').html('<p>//</p><p>' + quem.bio + '<p>');
 		$('#mini-balloon-body .fake-link').html("Fechar Bio");
 	} else {
 		$('#bio').html("");
@@ -1026,7 +1096,7 @@ function desenhaFacebook(){
 
 function crossClicked(event){
 	// console.log(this.id);
-	abreBaloon(this.id, this.atividade);
+	abreBaloon(this.id, this.atividade, this.skipIndex);
 }
 
 function nextSlideImg(){

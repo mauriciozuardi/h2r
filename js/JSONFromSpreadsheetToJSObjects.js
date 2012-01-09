@@ -190,7 +190,7 @@ totalRequests = 0;
 finishedRequests = 0;
 imgName = "";
 
-function init(){
+function loadJSONs(){
 	//carrega os dados da tabela Geral e depois, baseado nos "sites", carrega Atividades e Conjuntos de Atividades.
 	var key = "0AnLIuvvW8l93dGR4OEtlNFlXT0VYOG44UExyQXd5N2c"; //Geral
 	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + key + "/1/public/basic?alt=json", function(json){listaEspacos(json)});
@@ -199,6 +199,6 @@ function init(){
 	totalRequests += 3;
 }
 
-$(init);
+$(loadJSONs);
 
 //como passar parâmetros: https://spreadsheets.google.com/feeds/cells/0AnLIuvvW8l93dGR4OEtlNFlXT0VYOG44UExyQXd5N2c/1/public/basic?min-row=2&max-row=3&sq=desde%3E2003&alt=json
