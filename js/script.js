@@ -12,20 +12,47 @@ MIN_WIDTH = 960;
 nSlideImgs = 0;
 selectedSlideImgIndex = 0;
 SLIDESHOW_IMG_W = 324;
+//home
+PHRASE_SNAP_FACTOR = .2;
+IDEAL_SINOPSE_CHAR_COUNT = 425;
+
 
 //começa qdo carregar o DOM
 $(init);
 
 //confere se tem algo na URL
 URLvars = getUrlVars();
-sID = URLvars.sID;
+sID = URLvars.sID ? URLvars.sID : "s1";
 
 //config e debug
 showDateDetails = false;
 timeMarksStr = "";
 aDay = "hoje";
 
+
+// function countTo(n){
+// 	var numero = "";
+// 	var numeros = "";
+// 	var nDecimais = (parseInt(n)).toString().length;
+// 	for (var i=1; i <= n; i++){
+// 		var iDecimais = i.toString().length;
+// 		var numero = "";
+// 		for (var j=1; j<=(nDecimais - iDecimais); j++){
+// 			numero += "0";
+// 		}
+// 		numero += i;
+// 		numeros += numero + '\n';
+// 	}
+// 	
+// 	$('#header').html("<textarea cols='30' rows='10'>" + numeros + "</textarea>");
+// 	$('#output').val(numeros);
+// 	// console.log(n + " (" + nDecimais + ")");
+// 	// $('#header').html("<p>" + n + " (" + nDecimais + ")</p>");
+// }
+
 function init(){
+	// countTo(1000);
+	
 	//que dia/hora são?
 	if(aDay != 'hoje'){
 		initDate = new Date(aDay);
@@ -77,6 +104,7 @@ function recenterBalloon(){
 }
 
 function drawTimeline(){
+	console.log(timeMarksStr);
 	//trata os nomes e datas
 	timeline = timeMarksStr.split('|');
 	for (var i in timeline){
@@ -254,8 +282,13 @@ function updateTimelineDates(){
 function EventDot(ca){
 	var atalho = ca.atividades.split(", ")[0];
 	
-	//escondo?
+	//pediu para esconder?
 	if(ca.esconder || a[ca.siteId][atalho].esconder){ return true }
+	
+	//falta alguma informação crítica?
+	if(!ca.id){ return true }
+	if(!ca.atividades){ return true }
+	if(!ca.siteId){ return true }
 	
 	//ID
 	this.id = ca.siteId + "-" + ca.id;
@@ -263,9 +296,7 @@ function EventDot(ca){
 	// console.log(this.i + " : " + this.id);
 	
 	//VISUAL
-	if(ca.visual){
-		var visual = ca.visual;
-	} else if(atalho && a[ca.siteId][atalho].visual){
+	if(atalho && a[ca.siteId][atalho].visual){
 		var visual = a[ca.siteId][atalho].visual;
 	} else {
 		var visual = "p";
@@ -295,10 +326,7 @@ function EventDot(ca){
 	// console.log(this.onde);
 	
 	//O QUÊ < default para os sites
-	if(ca.nome){
-		//se cadastrou o nome do CA, entenda que é o nome da atividade
-		var nomeAtividade = ca.nome;
-	} else if(atalho){
+	if(atalho){
 		//senão, procura o atalho para a atividade em questão e usa o nome dela
 		var nomeAtividade = a[ca.siteId][atalho].nome;
 	} else {
@@ -309,10 +337,7 @@ function EventDot(ca){
 	// console.log(this.oque);
 
 	//QUEM
-	if(ca.quem){
-		//se cadastrou o nome da pessoa (para o caso de ter mais de uma pessoa envolvida)
-		var nomePessoa = ca.quem;
-	} else if(atalho){
+	if(atalho){
 		//senão, procura o atalho para a atividade em questão e confere quantas pessoas tem listadas
 		var pessoas = a[ca.siteId][atalho].quem;
 		if(pessoas){
@@ -342,9 +367,14 @@ function EventDot(ca){
 		var arrAtividades = [atalho];
 	}
 	
-	// console.log(arrAtividades);
+	console.log(arrAtividades);
 	if(arrAtividades){
 		var datas = comparaDatasDasAtividades(ca, arrAtividades);
+		if(datas.corrupted){
+			var datas = {};
+			datas.menor = Date.now();
+			datas.maior = Date.now();
+		}
 	} else {
 		var datas = {};
 		datas.menor = Date.now();
@@ -355,8 +385,7 @@ function EventDot(ca){
 	this.dataInicial	= new Date(datas.menor);
 	this.dataFinal		= new Date(datas.maior);
 	
-	// console.log(this.dataInicial.toString());
-	// console.log(this.dataFinal.toString());
+	console.log(this.dataInicial.toString() + "  ||  " + this.dataFinal.toString());
 	
 	//IMAGENS
 	
@@ -364,6 +393,7 @@ function EventDot(ca){
 	//OUTROS
 	//avisa que ainda não recebeu a função de clique (para não anexar 2x)
 	this.semClique = true;
+	
 	//check-in
 	eventDotInstances.push(this);
 }
@@ -377,8 +407,19 @@ function comparaDatasDasAtividades(ca, arrAtividades){
 		// console.log(i);
 		// console.log(a[ca.siteId][arrAtividades[i]]);
 		//descobre os candidatos
-		var candidatoInicial	= googleDateToDate(a[ca.siteId][arrAtividades[i]].datainicial);
-		var candidatoFinal		= googleDateToDate(a[ca.siteId][arrAtividades[i]].datafinal);
+		var ci = a[ca.siteId][arrAtividades[i]].datainicial;
+		var cf = a[ca.siteId][arrAtividades[i]].datafinal;
+		
+		//confere se a data foi cadastrada na planilha (banco)
+		if(!ci || !cf){ datas.corrupted = true; return datas }
+		
+		//converte a data do google para a data do js
+		var candidatoInicial	= googleDateToDate(ci);
+		var candidatoFinal		= googleDateToDate(cf);
+		 
+		//confere se está tudo ok com o retorno do googleDateToDate
+		if(!candidatoInicial || !candidatoFinal){ datas.corrupted = true; return datas }
+		
 		//vê se o candidato é maior ou menor que os anteriores
 		datas.menor = Math.min(candidatoInicial.getTime(), datas.menor);
 		datas.maior = Math.max(candidatoFinal.getTime(), datas.maior);
@@ -387,6 +428,8 @@ function comparaDatasDasAtividades(ca, arrAtividades){
 }
 
 function googleDateToDate(gDate){
+	if(!gDate){ console.log("googleDateToDate() : parâmetro indefinido"); return undefined }
+	
 	//fatia a string de data do Google
 	var a = gDate.split(" "); //separa 0:data 1:hora
 	a[0] = a[0].split("/"); //separa 0:mês 1:dia 2:ano
@@ -416,22 +459,23 @@ EventDot.drawThemAll = function(sortBy){
 	if(sortBy == undefined){
 		eventDotInstances.sort(compareDates);
 	} else if(sortBy == "alfabetico"){
-		if(sID){
+		// if(sID){
 			eventDotInstances.sort(compareOqueStrings);
-		} else {
-			eventDotInstances.sort(compareOndeStrings);
-		}		
+		// } else {
+		// 	eventDotInstances.sort(compareOndeStrings);
+		// }		
 	}
 	
 	//percorre o array criando o HTML
 	for(var i in eventDotInstances){
 		var e = eventDotInstances[i];
 		
-		if(sID){
-			var labelTxt = e.oque;
-		} else {
+		if(sID == 's1'){
 			var labelTxt = e.onde;
+		} else {
+			var labelTxt = e.oque;
 		}
+		console.log(labelTxt)
 		
 		//cria o DIV com id com a bolinha, range e label dentro
 		var html = "<div data-id='" + e.id + "' class='event " + e.id + "'><span data-id='" + e.id + "' class='range'><span data-id='" + e.id + "' data-i='" + e.i + "' class='dot'></span></span><span data-i='" + e.i + "' class='label'>" + labelTxt + "<img src='./img/nano-balloon.gif' class='nano' /></span></div>";
@@ -636,7 +680,7 @@ function selecionaDestaqueRandomico(){
 function criaEventDotsHome(){
 	// console.log("criaEventDotsHome()");
 	//cria os elementos HTML
-	if(sID){
+	if(sID != "s1"){
 		// console.log("sID = " + sID);
 		//varre os CAs do 'site' em questão
 		for(var j in ca[sID]){
@@ -647,7 +691,8 @@ function criaEventDotsHome(){
 			new EventDot(obj);
 		}		
 	} else {
-		// console.log("sem sID");
+		console.log("sem sID");
+		// console.log(s);
 		//varre todos os CAs
 		for (var i in s){
 			for(var j in ca[s[i].id]){
@@ -735,7 +780,7 @@ function mudaFundo(eventDotId){
 	} else if(atalho && a[ed.siteId][atalho].imagens){
 		var imgs = a[ed.siteId][atalho].imagens.split('\n');
 	} else {
-		var imgs = ["default-bg.gif"];
+		var imgs = ["default-bg.jpg"];
 	}
 	
 	
@@ -747,7 +792,7 @@ function mudaFundo(eventDotId){
 	//encontra o nome da atividade
 	if(ed.nome){
 		var nomeArr = ed.nome.split(' // ');
-	} else if(ed.atalho && a[ed.siteId][atalho].nome){
+	} else if(atalho && a[ed.siteId][atalho].nome){
 		var nomeArr = a[ed.siteId][atalho].nome.split(' // ');
 	} else {
 		var nomeArr = ["sem nome"];
@@ -755,9 +800,9 @@ function mudaFundo(eventDotId){
 	
 	//encontra a sinopse
 	if(ed.sinopse){
-		var sinopse = ed.sinopse;
-	} else if(atalho && a[ed.siteId][atalho].sinopse){
-		var sinopse = a[ed.siteId][atalho].sinopse;
+		var sinopse = autoSinopse(ed.sobre);
+	} else if(atalho && a[ed.siteId][atalho].sobre){
+		var sinopse = autoSinopse(a[ed.siteId][atalho].sobre);
 	} else {
 		var sinopse = ["-"];
 	}
@@ -773,7 +818,8 @@ function mudaFundo(eventDotId){
 
 	//escreve o HTML
 	var remendo = "";
-	var html = "<h1>" + nomeArr[0].capitalize();
+	// var html = "<h1>" + nomeArr[0].capitalize();
+	var html = "<h1>" + nomeArr[0];
 	if(nomeArr.length > 1){
 		html += "<em> // " + nomeArr[1] + "</em>";
 		remendo = "style='opacity:.6'"
@@ -790,6 +836,31 @@ function mudaFundo(eventDotId){
 	$('#selected-info .icon').click(function(event){infoClicked(event);});
 	$('#selected-info p').click(function(event){infoClicked(event);});
 	$('#selected-info .fechar').click(function(event){fechaInfo(event);});
+}
+
+function autoSinopse(bigText){
+	//cropa o texto tentando não cortar frases no meio
+	// PHRASE_SNAP_FACTOR = .2;
+	// IDEAL_SINOPSE_CHAR_COUNT = 425;
+	if(bigText.length < IDEAL_SINOPSE_CHAR_COUNT){
+		console.log(bigText.length + " de " + bigText.length);
+		return bigText;
+	} else {
+		var frases = bigText.split('.');
+		var novoTexto = "";
+		var i = 0;
+		//aumenta até estar dentro da faixa mínima
+		while (novoTexto.length < IDEAL_SINOPSE_CHAR_COUNT * (1 - PHRASE_SNAP_FACTOR)){
+			novoTexto += frases[i] + "."; i++;
+		}
+		//confere se não passou da faixa máxima
+		if(novoTexto.length > IDEAL_SINOPSE_CHAR_COUNT * (1 + PHRASE_SNAP_FACTOR)){
+			novoTexto = novoTexto.substr(0,IDEAL_SINOPSE_CHAR_COUNT) + " [...]";
+		}
+		
+		console.log(novoTexto.length + " de " + bigText.length);
+		return novoTexto;
+	}
 }
 
 function labelClicked(event){
@@ -1031,14 +1102,14 @@ function dataHelena(di, df){
 	if(anoInicial == anoFinal){
 		if(mesInicial == mesFinal){
 			//De 12 a 20 de Outubro
-			str = "De " +di.getDate()+ " até " +df.getDate()+ " de " +mesLongo[mesInicial] + " de " + anoFinal;
+			str = "De " +horaComZero(di.getDate())+ " até " +horaComZero(df.getDate())+ " de " +mesLongo[mesInicial] + " de " + anoFinal;
 		} else {
 			//De 12 de Jan. a 15 de Out.
-			str = "De " +di.getDate()+ " de " +mesLongo[mesInicial]+ " até " +df.getDate()+ " de " +mesLongo[mesFinal]+ " de " + anoFinal;
+			str = "De " +horaComZero(di.getDate())+ " de " +mesLongo[mesInicial]+ " até " +horaComZero(df.getDate())+ " de " +mesLongo[mesFinal]+ " de " + anoFinal;
 		}
 	} else {
 		//De 10 de Dez. 2011 a 15 Fev. 2012
-		str = "De " +di.getDate()+ " de " +mesLongo[mesInicial]+ " " +anoInicial+ " até " +df.getDate()+ " de " +mesLongo[mesFinal]+ " de " + anoFinal;
+		str = "De " +horaComZero(di.getDate())+ " de " +mesLongo[mesInicial]+ " " +anoInicial+ " até " +horaComZero(df.getDate())+ " de " +mesLongo[mesFinal]+ " de " + anoFinal;
 	}
 	return str;
 }
@@ -1143,6 +1214,10 @@ function getUrlVars(){
 	  vars[hash[0]] = hash[1];
 	}
 	return vars;
+}
+
+function horaComZero(n){
+	return (n<10) ? "0" + n : n;
 }
 
 String.prototype.capitalize = function(){
