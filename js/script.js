@@ -27,7 +27,7 @@ sID = URLvars.sID ? URLvars.sID : "s1";
 //config e debug
 showDateDetails = false;
 timeMarksStr = "";
-aDay = "hoje";
+// aDay = "hoje";
 
 
 // function countTo(n){
@@ -54,13 +54,13 @@ function init(){
 	// countTo(1000);
 	
 	//que dia/hora são?
-	if(aDay != 'hoje'){
-		initDate = new Date(aDay);
-		initNow = initDate.getTime();
-	} else {
+	// if(aDay != 'hoje'){
+	// 	initDate = new Date(aDay);
+	// 	initNow = initDate.getTime();
+	// } else {
 		initNow = Date.now(); //ms desde 01 Jan 1970
 		initDate = new Date();
-	}
+	// }
 	
 	//
 	// incluiLogo();
@@ -83,6 +83,10 @@ function init(){
 		resizeEvents();
 		recenterBalloon();
 	});
+	
+	$('.oque').change(function() {
+	  alert('Handler for .change() called.');
+	});
 }
 
 function incluiLogo(){
@@ -104,7 +108,7 @@ function recenterBalloon(){
 }
 
 function drawTimeline(){
-	console.log(timeMarksStr);
+	// console.log(timeMarksStr);
 	//trata os nomes e datas
 	timeline = timeMarksStr.split('|');
 	for (var i in timeline){
@@ -367,7 +371,7 @@ function EventDot(ca){
 		var arrAtividades = [atalho];
 	}
 	
-	console.log(arrAtividades);
+	// console.log(arrAtividades);
 	if(arrAtividades){
 		var datas = comparaDatasDasAtividades(ca, arrAtividades);
 		if(datas.corrupted){
@@ -385,7 +389,7 @@ function EventDot(ca){
 	this.dataInicial	= new Date(datas.menor);
 	this.dataFinal		= new Date(datas.maior);
 	
-	console.log(this.dataInicial.toString() + "  ||  " + this.dataFinal.toString());
+	// console.log(this.dataInicial.toString() + "  ||  " + this.dataFinal.toString());
 	
 	//IMAGENS
 	
@@ -470,12 +474,12 @@ EventDot.drawThemAll = function(sortBy){
 	for(var i in eventDotInstances){
 		var e = eventDotInstances[i];
 		
-		if(sID == 's1'){
+		// if(sID == 's1'){
 			var labelTxt = e.onde;
-		} else {
-			var labelTxt = e.oque;
-		}
-		console.log(labelTxt)
+		// } else {
+		// 	var labelTxt = e.oque;
+		// }
+		// console.log(labelTxt)
 		
 		//cria o DIV com id com a bolinha, range e label dentro
 		var html = "<div data-id='" + e.id + "' class='event " + e.id + "'><span data-id='" + e.id + "' class='range'><span data-id='" + e.id + "' data-i='" + e.i + "' class='dot'></span></span><span data-i='" + e.i + "' class='label'>" + labelTxt + "<img src='./img/nano-balloon.gif' class='nano' /></span></div>";
@@ -680,7 +684,7 @@ function selecionaDestaqueRandomico(){
 function criaEventDotsHome(){
 	// console.log("criaEventDotsHome()");
 	//cria os elementos HTML
-	if(sID != "s1"){
+	// if(sID != "s1"){
 		// console.log("sID = " + sID);
 		//varre os CAs do 'site' em questão
 		for(var j in ca[sID]){
@@ -689,21 +693,31 @@ function criaEventDotsHome(){
 			var obj = ca[sID][j];
 			obj.siteId = sID;
 			new EventDot(obj);
-		}		
-	} else {
-		console.log("sem sID");
-		// console.log(s);
-		//varre todos os CAs
-		for (var i in s){
-			for(var j in ca[s[i].id]){
-				//cria uma bolinha para cada
-				// console.log(["ca." + i + "." + j, ca[s[i].id][j]]);
-				var obj = ca[s[i].id][j];
-				obj.siteId = i;
-				new EventDot(obj);
-			}
 		}
-	}
+	// } else {
+	// 	console.log("- AGENDA -");
+	// 	// console.log(s);
+	// 	
+	// 	//varre todos os CAs
+	// 	// for (var i in s){
+	// 	// 	for(var j in ca[s[i].id]){
+	// 	// 		//cria uma bolinha para cada
+	// 	// 		// console.log(["ca." + i + "." + j, ca[s[i].id][j]]);
+	// 	// 		var obj = ca[s[i].id][j];
+	// 	// 		obj.siteId = i;
+	// 	// 		new EventDot(obj);
+	// 	// 	}
+	// 	// }
+	// 	
+	// 	//varre os CAs do 'site' em questão
+	// 	for(var j in ca[sID]){
+	// 		//cria uma bolinha para cada
+	// 		// console.log(["ca." + sID + "." + j, ca[sID][j]]);
+	// 		var obj = ca[sID][j];
+	// 		obj.siteId = sID;
+	// 		new EventDot(obj);
+	// 	}
+	// }
 }
 
 function resizeEventWindow(){
@@ -775,9 +789,7 @@ function mudaFundo(eventDotId){
 	
 	//MUDA O BG
 	//encontra o nome da imagem (sempre a primeira se tiver mais de uma cadastrada)
-	if(ed.imagens){
-		var imgs = ed.imagens.split('\n');
-	} else if(atalho && a[ed.siteId][atalho].imagens){
+	if(atalho && a[ed.siteId][atalho].imagens){
 		var imgs = a[ed.siteId][atalho].imagens.split('\n');
 	} else {
 		var imgs = ["default-bg.jpg"];
@@ -790,30 +802,24 @@ function mudaFundo(eventDotId){
 	
 	//MUDA O NOME E O TEXTO
 	//encontra o nome da atividade
-	if(ed.nome){
-		var nomeArr = ed.nome.split(' // ');
-	} else if(atalho && a[ed.siteId][atalho].nome){
+	if(atalho && a[ed.siteId][atalho].nome){
 		var nomeArr = a[ed.siteId][atalho].nome.split(' // ');
 	} else {
 		var nomeArr = ["sem nome"];
 	}
 	
 	//encontra a sinopse
-	if(ed.sinopse){
-		var sinopse = autoSinopse(ed.sobre);
-	} else if(atalho && a[ed.siteId][atalho].sobre){
+	if(atalho && a[ed.siteId][atalho].sobre){
 		var sinopse = autoSinopse(a[ed.siteId][atalho].sobre);
 	} else {
 		var sinopse = ["-"];
 	}
 	
 	//encontra o crédito
-	if(ed.credito){
-		var credito = ed.credito;
-	} else if(atalho && a[ed.siteId][atalho].credito){
+	if(atalho && a[ed.siteId][atalho].credito){
 		var credito = a[ed.siteId][atalho].credito;
 	} else {
-		var credito = ["sem sinopse"];
+		var credito = ["sem crédito"];
 	}
 
 	//escreve o HTML
@@ -842,23 +848,23 @@ function autoSinopse(bigText){
 	//cropa o texto tentando não cortar frases no meio
 	// PHRASE_SNAP_FACTOR = .2;
 	// IDEAL_SINOPSE_CHAR_COUNT = 425;
-	if(bigText.length < IDEAL_SINOPSE_CHAR_COUNT){
-		console.log(bigText.length + " de " + bigText.length);
+	if(bigText.length < IDEAL_SINOPSE_CHAR_COUNT * (1 + PHRASE_SNAP_FACTOR)){
+		// console.log(bigText.length + " de " + bigText.length);
 		return bigText;
 	} else {
-		var frases = bigText.split('.');
+		var frases = bigText.split('. ');
 		var novoTexto = "";
 		var i = 0;
 		//aumenta até estar dentro da faixa mínima
 		while (novoTexto.length < IDEAL_SINOPSE_CHAR_COUNT * (1 - PHRASE_SNAP_FACTOR)){
-			novoTexto += frases[i] + "."; i++;
+			novoTexto += frases[i] + ". "; i++;
 		}
 		//confere se não passou da faixa máxima
 		if(novoTexto.length > IDEAL_SINOPSE_CHAR_COUNT * (1 + PHRASE_SNAP_FACTOR)){
 			novoTexto = novoTexto.substr(0,IDEAL_SINOPSE_CHAR_COUNT) + " [...]";
 		}
 		
-		console.log(novoTexto.length + " de " + bigText.length);
+		// console.log(novoTexto.length + " de " + bigText.length);
 		return novoTexto;
 	}
 }
@@ -1010,7 +1016,11 @@ function abreBaloon(idComposto, aID, skipIndex){
 	$('#slideshow').html(html);
 	
 	//MINI-BALLOON - INFO DA ATIVIDADE
-	var quem = p[string_to_slug(a_.quem)];
+	var variosQuem = a_.quem;
+	if(!variosQuem){alert("Precisa cadastrar algum QUEM dentro dessa atividade.")}
+	variosQuem = variosQuem.split(', ');
+	var quem = p[string_to_slug(variosQuem[0])];
+	if(!quem){alert("QUEM listado na atividade não existe na lista de pessoas.")}
 	var di = googleDateToDate(a_.datainicial);
 	var df = googleDateToDate(a_.datafinal);
 	html = "";
@@ -1057,7 +1067,7 @@ function abreBaloon(idComposto, aID, skipIndex){
 		skipIndex = skipIndex ? skipIndex : 0;
 		
 		for (i in atividades){
-			console.log(skipIndex);
+			// console.log(skipIndex);
 			if(i != skipIndex){
 				var context = {};
 				atividade = a[ca_.siteId][atividades[i]];

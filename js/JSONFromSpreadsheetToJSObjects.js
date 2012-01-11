@@ -66,7 +66,7 @@ function listaSites(root) {
 	
 	//decide se vai carregar os JSONS de um 'site' ou de todos
 	var context = {};
-	if(sID){
+	// if(sID){
 		// console.log("CHAMANDO " + sID.toUpperCase());
 		//define o contexto
 		context.id = s[sID].id;
@@ -75,34 +75,34 @@ function listaSites(root) {
 		$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[sID].key + "/2/public/basic?alt=json", $.proxy(listaAtividadesPrePreenchida, context));
 		//avisa qtos JSON requests devemos esperar (2)
 		totalRequests += 2;
-	} else {
-		// console.log("CHAMANDO TODAS");
-		//carrega as outras tabelas (listadas em sites) CARREGA TUDO
-		for(var i in s){
-			//define o contexto - info "hardcoded" (diferente para cada loop)
-			context.id = s[i].id;
-			//define os parametros da URL (para restringir a quantidade de dados pela data)
-			var paramURL = "https://spreadsheets.google.com/feeds/cells/" + s[i].key + "/2/public/basic?";
-			// paramURL += encodeURI("(datafinal>" + firstTimemark() + "&&");
-			// paramURL += encodeURI("datainicial<" + lastTimemark() + ")&");
-			paramURL += "alt=json";
-			//chama o jason
-			$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[i].key + "/1/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
-			$.getJSON( paramURL, $.proxy(listaAtividadesPrePreenchida, context));
-			//avisa qtos JSON requests devemos esperar (2 pra cada loop)
-			totalRequests += 2;
-		}
-	}
+	// } else {
+	// 	// console.log("CHAMANDO TODAS");
+	// 	//carrega as outras tabelas (listadas em sites) CARREGA TUDO
+	// 	for(var i in s){
+	// 		//define o contexto - info "hardcoded" (diferente para cada loop)
+	// 		context.id = s[i].id;
+	// 		//define os parametros da URL (para restringir a quantidade de dados pela data)
+	// 		var paramURL = "https://spreadsheets.google.com/feeds/cells/" + s[i].key + "/2/public/basic?";
+	// 		// paramURL += encodeURI("(datafinal>" + firstTimemark() + "&&");
+	// 		// paramURL += encodeURI("datainicial<" + lastTimemark() + ")&");
+	// 		paramURL += "alt=json";
+	// 		//chama o jason
+	// 		$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[i].key + "/1/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
+	// 		$.getJSON( paramURL, $.proxy(listaAtividadesPrePreenchida, context));
+	// 		//avisa qtos JSON requests devemos esperar (2 pra cada loop)
+	// 		totalRequests += 2;
+	// 	}
+	// }
 	
 	//define logo e a timeline seguindo o modelo abaixo
 	//timeMarksStr = 'mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem|fim do mundo=December 21, 2012 00:00:00';
-	if(sID){
+	// if(sID){
 		imgName = s[sID].logo;
 		timeMarksStr = s[sID].timeline;
-	} else {
-		imgName = "logo-agenda-de-fotografia.png";
-		timeMarksStr = "mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem";
-	}
+	// } else {
+	// 	imgName = "logo-agenda-de-fotografia.png";
+	// 	timeMarksStr = "mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem";
+	// }
 	
 	//inclui o logo
 	try {incluiLogo()}
