@@ -475,9 +475,9 @@ EventDot.drawThemAll = function(sortBy){
 		var e = eventDotInstances[i];
 		
 		// if(sID == 's1'){
-			var labelTxt = e.onde;
+			// var labelTxt = e.onde;
 		// } else {
-		// 	var labelTxt = e.oque;
+			var labelTxt = e.oque;
 		// }
 		// console.log(labelTxt)
 		
