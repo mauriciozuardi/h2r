@@ -27,6 +27,60 @@ function cellsToObjects(json){
 	return dados;
 }
 
+function listToObjects(json){
+	//assume que não existem vírgulas nos campos
+	var entry = json.feed.entry;
+	var arr = [];
+	//varre as entries, parseando a string
+	for(var i in entry){
+		var obj = {}
+		var string = entry[i].content.$t;
+		var colunas = string.split(', ');
+		for(var j in colunas){
+			colunas[j] = colunas[j].split(': ');
+			colunas[j][1] = colunas[j][1] ? colunas[j][1].replace(/¥Ω/g, ',') : undefined;
+			obj[colunas[j][0]] = colunas[j][1];
+		}
+		arr.push(obj);
+	}
+	
+	//converte o array num objeto com os ids(ou nomes) como identificador
+	var dados = {};
+	for(var i in arr){
+		if(arr[i].id){
+			dados[arr[i].id] = arr[i];
+		} else if(arr[i].nome) {
+			dados[string_to_slug(arr[i].nome)] = arr[i];
+		}
+	}
+	
+	//DEBUG
+	// for(var i in dados){
+	// 	if(dados[i].datainicial){
+	// 		var dJS = datevalueToDate(dados[i].datevalueinicial);
+	// 		dados[i].datainicialrecalculadaj = dJS.toString();
+	// 		
+	// 		var dG = googleDateToDate(dados[i].datainicial);
+	// 		dados[i].datainicialrecalculadag = dG.toString();	
+	// 		
+	// 		var dv = dateToDatevalue(dG);
+	// 		dados[i].datevalueinicia2 = dv.toString();	
+	// 	}
+	// }
+	
+	return dados;
+}
+
+OFFSET_DV2DATE = 2*60*60 //2h em segundos
+
+function datevalueToDate(dv){
+	return new Date((OFFSET_DV2DATE + parseInt(dv))*1000);
+}
+
+function dateToDatevalue(date){
+	return Math.round(date.getTime()/1000 - OFFSET_DV2DATE);
+}
+
 function string_to_slug(str) {
   str = str.replace(/^\s+|\s+$/g, ''); // trim
   str = str.toLowerCase();
@@ -64,46 +118,10 @@ function listaSites(root) {
 	console.log(["Sites", s]);
 	finishedRequests ++;
 	
-	//decide se vai carregar os JSONS de um 'site' ou de todos
-	var context = {};
-	// if(sID){
-		// console.log("CHAMANDO " + sID.toUpperCase());
-		//define o contexto
-		context.id = s[sID].id;
-		//chama o jason
-		$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[sID].key + "/1/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
-		$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[sID].key + "/2/public/basic?alt=json", $.proxy(listaAtividadesPrePreenchida, context));
-		//avisa qtos JSON requests devemos esperar (2)
-		totalRequests += 2;
-	// } else {
-	// 	// console.log("CHAMANDO TODAS");
-	// 	//carrega as outras tabelas (listadas em sites) CARREGA TUDO
-	// 	for(var i in s){
-	// 		//define o contexto - info "hardcoded" (diferente para cada loop)
-	// 		context.id = s[i].id;
-	// 		//define os parametros da URL (para restringir a quantidade de dados pela data)
-	// 		var paramURL = "https://spreadsheets.google.com/feeds/cells/" + s[i].key + "/2/public/basic?";
-	// 		// paramURL += encodeURI("(datafinal>" + firstTimemark() + "&&");
-	// 		// paramURL += encodeURI("datainicial<" + lastTimemark() + ")&");
-	// 		paramURL += "alt=json";
-	// 		//chama o jason
-	// 		$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[i].key + "/1/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
-	// 		$.getJSON( paramURL, $.proxy(listaAtividadesPrePreenchida, context));
-	// 		//avisa qtos JSON requests devemos esperar (2 pra cada loop)
-	// 		totalRequests += 2;
-	// 	}
-	// }
-	
-	//define logo e a timeline seguindo o modelo abaixo
-	//timeMarksStr = 'mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem|fim do mundo=December 21, 2012 00:00:00';
-	// if(sID){
-		imgName = s[sID].logo;
-		timeMarksStr = s[sID].timeline;
-	// } else {
-	// 	imgName = "logo-agenda-de-fotografia.png";
-	// 	timeMarksStr = "mês passado|último finde|ontem|hoje|amanhã|próximo finde|mês que vem";
-	// }
-	
+	//ajusta o logo do header e as marcas da timeline
+	imgName = s[sID].logo;
+	timeMarksStr = s[sID].timeline;
+		
 	//inclui o logo
 	try {incluiLogo()}
 	catch(err){}
@@ -111,14 +129,37 @@ function listaSites(root) {
 	//desenha a timeline
 	try {drawTimeline()}
 	catch(err){}
+	
+	//decide se vai carregar os JSONS de um 'site' ou de todos
+	var context = {};
+	context.id = s[sID].id;
+	//chama o jason
+	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[sID].key + "/1/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
+	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[sID].key + "/2/public/basic?alt=json", $.proxy(listaAtividadesPrePreenchida, context));
+	
+	//chamada nova, com query
+	var F = firstTimemark(true);
+	var L = lastTimemark(true);
+	query = "&sq=!((dvi<"+F+" and dvf<"+F+") or (dvi>"+L+" and dvf>"+L+"))";
+	query = encodeURI(query);
+	
+	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/3/public/basic?alt=json" + query, $.proxy(listaAtividadesProcessadasPrePreenchida, context));
+	
+	//QUERY URL
+	//https://spreadsheets.google.com/feeds/list/0AmllLSOQlMYpdGttZV9NeWNuYnoyalUtY3lHbGVSdEE/3/public/basic?alt=json&sq=datevalue>1330000000&orderby=column:datevalue
+	
+	//avisa qtos JSON requests devemos esperar
+	totalRequests += 3;
 }
 
-function firstTimemark(){
-	return dateToGoogleStr(timeline[0].date);
+function firstTimemark(datavalue){
+	var date = timeline[0].date;
+	return datavalue ? dateToDatevalue(date) : dateToGoogleStr(date);
 }
 
-function lastTimemark(){
-	return dateToGoogleStr(timeline[timeline.length-1].date);
+function lastTimemark(datavalue){
+	var date = timeline[timeline.length-1].date;
+	return datavalue ? dateToDatevalue(date) : dateToGoogleStr(date);
 }
 
 function dateToGoogleStr(date){
@@ -141,8 +182,15 @@ function listaConjuntosPrePreenchida(json){
 	finishedRequests ++;
 	drawDotsIfYouCan();
 }
+
 function listaAtividadesPrePreenchida(json){
 	listaAtividades(json, this.id);
+	finishedRequests ++;
+	drawDotsIfYouCan();
+}
+
+function listaAtividadesProcessadasPrePreenchida(json){
+	listaAtividadesProcessadas(json, this.id);
 	finishedRequests ++;
 	drawDotsIfYouCan();
 }
@@ -151,7 +199,7 @@ function listaConjuntos(root, parentId) {
 	ca[s[parentId].id] = cellsToObjects(root);
 	console.log([
 		"CAs : " + s[parentId].nome,
-		ca[s[parentId].id]
+		ca[s[parentId].id],
 		]);
 }
 
@@ -160,6 +208,14 @@ function listaAtividades(root, parentId) {
 	console.log([
 		"As  : " + s[parentId].nome,
 		a[s[parentId].id]
+		]);
+}
+
+function listaAtividadesProcessadas(root, parentId) {
+	a_list[s[parentId].id] = listToObjects(root);
+	console.log([
+		"As_LIST  : " + s[parentId].nome,
+		a_list[s[parentId].id]
 		]);
 }
 
@@ -181,11 +237,13 @@ function drawDotsIfYouCan(){
 }
 
 //globals
-e  = {};
-p  = {};
-s	 = {};
+// e  = {};
+// p  = {};
+// s	 = {};
 ca = {};
 a  = {};
+a_list  = {};
+
 totalRequests = 0;
 finishedRequests = 0;
 imgName = "";
@@ -200,5 +258,7 @@ function loadJSONs(){
 }
 
 $(loadJSONs);
+
+//https://spreadsheets.google.com/feeds/cells/0AnLIuvvW8l93dGR4OEtlNFlXT0VYOG44UExyQXd5N2c/1/public/basic?alt=json
 
 //como passar parâmetros: https://spreadsheets.google.com/feeds/cells/0AnLIuvvW8l93dGR4OEtlNFlXT0VYOG44UExyQXd5N2c/1/public/basic?min-row=2&max-row=3&sq=desde%3E2003&alt=json

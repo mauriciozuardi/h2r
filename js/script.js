@@ -67,13 +67,17 @@ function init(){
 	resizeBg();
 	// drawTimeline();		//<-- vai desenhar qdo carregar a planilha "Sites"
 	// drawHomeEvents();	//<-- vai desenhar qdo acabar de carregar tudo (JSONFromSpreadsheetToJSObjects.js cuida disso)
-	resizeEventWindow();
-	recenterBalloon();
 	
 	//aplica os cliques "fixos" do balloon
 	$('.balloon.top .fechar').click(function(event){fechaBalloon(event);});
 	$('#slideshow-controls .previous').click(function(event){prevSlideImg(event)});
 	$('#slideshow-controls .next').click(function(event){nextSlideImg(event)});
+	
+	//aplica os onChange() no header
+	$('.oque').change(function(){ onPullDownChange($(this)); });
+	$('.onde').change(function(){ onPullDownChange($(this)); });
+	$('.quem').change(function(){ onPullDownChange($(this)); });
+	// $('.btn_filtrar').click(filtrarClicked);
 	
 	//ajusta a altura do body no resize
 	$(window).resize(function(event){
@@ -84,9 +88,66 @@ function init(){
 		recenterBalloon();
 	});
 	
-	$('.oque').change(function() {
-	  alert('Handler for .change() called.');
-	});
+	$(window).scroll(function(){
+		resizeBg();
+		resizeTimeline();
+		resizeEventWindow();
+		resizeEvents();
+		recenterBalloon();
+  });
+}
+
+function onPullDownChange(element){
+	// alert('Mudou para: ' + element.val());
+}
+
+function filtrarClicked(){
+	// alert('Tipo: ' + $('.oque').val());
+}
+
+function updatePullDowns(){
+	fillPullDown($('.oque'), 'tipo');
+	fillPullDown($('.onde'), 'onde');
+	fillPullDown($('.quem'), 'quem');
+}
+
+function fillPullDown(el, campo){
+	//percorre todas as atividades procurando tipos diferentes
+	var encontrados = [];
+	for (var i in a[sID]){
+		if(a[sID][i][campo]){
+			var variosNoMesmoCampo = a[sID][i][campo].split(', ');
+			for (var j in variosNoMesmoCampo){
+				if(campo == 'onde'){
+					var valor = e[variosNoMesmoCampo[j]].nome;
+				} else {
+					var valor = variosNoMesmoCampo[j];					
+				}
+				if(!existe(valor, encontrados)){ encontrados.push(valor) }
+			}
+		}
+	}
+	// console.log(encontrados);
+	
+	//coloca em ordem alfabética
+	encontrados.sort(compareAlphabet);
+	
+	//enfia o valor inicial no começo
+	encontrados.splice(0,1,el.val());
+	
+	//muda o HTML de acordo com os tipos encontrados
+	var html = ""
+	for (var i in encontrados){
+		html += "<option>" + encontrados[i] + "</option>";
+	}
+	el.html(html);
+}
+
+function existe(value, array){
+	for (var i in array){
+		if(array[i] == value){ return true }
+	}
+	return false;
 }
 
 function incluiLogo(){
@@ -95,7 +156,7 @@ function incluiLogo(){
 }
 
 function resizeBg(){
-	$('#bg-photo').css('height', $(window).height());
+	$('#bg-photo').css('height', $(window).height() + $(window).scrollTop());
 }
 
 function recenterBalloon(){
@@ -150,7 +211,7 @@ function drawTimeline(){
 
 function resizeTimeline(){
 	//ajusta altura da linha
-	$('.line').css('height', $(window).height());
+	$('.line').css('height', $(window).height() + $(window).scrollTop());
 	
 	//ajusta posição x das linhas
 	ajustaLinhas();
@@ -464,7 +525,7 @@ EventDot.drawThemAll = function(sortBy){
 		eventDotInstances.sort(compareDates);
 	} else if(sortBy == "alfabetico"){
 		// if(sID){
-			eventDotInstances.sort(compareOqueStrings);
+			eventDotInstances.sort(compareAlphabet);
 		// } else {
 		// 	eventDotInstances.sort(compareOndeStrings);
 		// }		
@@ -513,21 +574,21 @@ function compareDates(a,b){
 	return b.dataInicial - a.dataInicial;
 }
 
-function compareOqueStrings(a,b){
-	var sA = string_to_slug(a.oque);
-	var sB = string_to_slug(b.oque);
+function compareAlphabet(a,b){
+	var sA = string_to_slug(a);
+	var sB = string_to_slug(b);
 	if (sA < sB) {return -1}
 	if (sA > sB) {return 1}
 	return 0;
 }
 
-function compareOndeStrings(a,b){
-	var sA = string_to_slug(a.onde);
-	var sB = string_to_slug(b.onde);
-	if (sA < sB) {return -1}
-	if (sA > sB) {return 1}
-	return 0;
-}
+// function compareOndeStrings(a,b){
+// 	var sA = string_to_slug(a.onde);
+// 	var sB = string_to_slug(b.onde);
+// 	if (sA < sB) {return -1}
+// 	if (sA > sB) {return 1}
+// 	return 0;
+// }
 
 function compareIdStrings(a,b){
 	var sA = string_to_slug(a.id);
@@ -616,10 +677,6 @@ EventDot.prototype.posicionar = function(){
 	dot.css('margin-left', x);
 	
 	//posiciona o label
-	//centraliza texto em relação a bola
-	// ml = (dot.outerWidth(false)/2)-(label.outerWidth(false)/2);
-	//considera o deslocamento da bola
-	// ml += parseInt(dot.css('margin-left'));
 	ml = parseInt(dot.css('margin-left')) + dot.outerWidth(false) + 7;
 	//aplica
 	label.css('margin-left', ml);
@@ -664,15 +721,16 @@ function dateToPosition(t){
 	}
 }
 
-// EventDot.prototype.die = function(){
-// 	//remove o elemento do HTML
-// 	//se remove da lista (check-out)
-// }
-
 function drawHomeEvents(){
+	//aproveita e atualiza o conteúdo do pulldown
+	updatePullDowns();
+	//home events
 	criaEventDotsHome();
 	EventDot.drawThemAll();
 	selecionaDestaqueRandomico();
+	resizeEventWindow();
+	recenterBalloon();
+	moveFooter();
 }
 
 function selecionaDestaqueRandomico(){
@@ -682,10 +740,6 @@ function selecionaDestaqueRandomico(){
 }
 
 function criaEventDotsHome(){
-	// console.log("criaEventDotsHome()");
-	//cria os elementos HTML
-	// if(sID != "s1"){
-		// console.log("sID = " + sID);
 		//varre os CAs do 'site' em questão
 		for(var j in ca[sID]){
 			//cria uma bolinha para cada
@@ -694,37 +748,27 @@ function criaEventDotsHome(){
 			obj.siteId = sID;
 			new EventDot(obj);
 		}
-	// } else {
-	// 	console.log("- AGENDA -");
-	// 	// console.log(s);
-	// 	
-	// 	//varre todos os CAs
-	// 	// for (var i in s){
-	// 	// 	for(var j in ca[s[i].id]){
-	// 	// 		//cria uma bolinha para cada
-	// 	// 		// console.log(["ca." + i + "." + j, ca[s[i].id][j]]);
-	// 	// 		var obj = ca[s[i].id][j];
-	// 	// 		obj.siteId = i;
-	// 	// 		new EventDot(obj);
-	// 	// 	}
-	// 	// }
-	// 	
-	// 	//varre os CAs do 'site' em questão
-	// 	for(var j in ca[sID]){
-	// 		//cria uma bolinha para cada
-	// 		// console.log(["ca." + sID + "." + j, ca[sID][j]]);
-	// 		var obj = ca[sID][j];
-	// 		obj.siteId = sID;
-	// 		new EventDot(obj);
-	// 	}
-	// }
 }
 
+eventsHeight = 0;
 function resizeEventWindow(){
+	//armazena o tamanho do div de eventos (para usar no scroll)
+	eventsHeight = (eventsHeight == 0) ? $('#events').height() : eventsHeight;
+	$('#events-scroller').css('height', eventsHeight);
+	// console.log(eventsHeight);
+	
 	//ajusta o tamanho do div q contém as instâncias de EventDot
 	var marginTop = 50;
+	var ajuste = 5;
+	if($('#selected-info').hasClass('closed')){
+		var h = $(window).height() - $('#header').outerHeight(true) - $('#about-info').outerHeight(true) - marginTop - ajuste + $(window).scrollTop();
+	} else {
+		var h = $(window).height() - $('#header').outerHeight(true) - $('#about-info').outerHeight(true) - $('#selected-info').outerHeight(true) - marginTop - ajuste + $(window).scrollTop();
+	}
+	
+	//aplica
 	$('#events').css('top', $('#header').height() + marginTop);
-	$('#events').css('height', $(window).height() - $('#header').height() - $('#about-info').height() - marginTop);
+	$('#events').css('height', h);
 }
 
 function resizeEvents(){
@@ -792,7 +836,7 @@ function mudaFundo(eventDotId){
 	if(atalho && a[ed.siteId][atalho].imagens){
 		var imgs = a[ed.siteId][atalho].imagens.split('\n');
 	} else {
-		var imgs = ["default-bg.jpg"];
+		var imgs = ["default-bg.png"];
 	}
 	
 	
@@ -888,14 +932,18 @@ function infoClicked(event){
 
 function fechaInfo(){
 	$('#selected-info').addClass('closed');
+	resizeEventWindow();
 }
 
 function fechaBalloon(){
 	$('#balloon').css('display', 'none');
+	mostraInfo();
+	resizeEventWindow()
 }
 
 function mostraInfo(){
 	$('#selected-info').removeClass('closed');
+	resizeEventWindow();
 }
 
 function abreBaloon(idComposto, aID, skipIndex){
@@ -909,96 +957,35 @@ function abreBaloon(idComposto, aID, skipIndex){
 	//define quem é quem no jogo do bicho
 	if(!idComposto){
 		var a_ = a[ca_.siteId][atalho];
-		var e_ = e[a_.onde.split(', ')[0]];
+		if(!a_.onde){ alert("Precisa cadastrar ONDE ou esconder.") }
 	} else {
 		var a_ = a[ca_.siteId][aID];
-		var e_ = e[a_.onde.split(', ')[0]];
+		if(!a_.onde){ alert("Precisa cadastrar ONDE ou esconder.") }
 	}
 	
-	var espacos = a_.onde.split(", ");
-	var dot = {};
-	if (espacos.length == 1){
-		dot.onde = e[espacos[0]].nome;
-	} else if (espacos.length > 1){
-		dot.onde = e[espacos[0]].nome;
-		dot.todosEspacos = espacos;
-	} else {
-		dot.onde = "-";
-	}
+	// var e_ = e[a_.onde.split(', ')[0]];
+	// var espacos = a_.onde.split(", ");
+	// var dot = {};
+	// if (espacos.length == 1){
+	// 	dot.onde = e[espacos[0]].nome;
+	// } else if (espacos.length > 1){
+	// 	dot.onde = e[espacos[0]].nome;
+	// 	dot.todosEspacos = espacos.slice();
+	// } else {
+	// 	dot.onde = "-";
+	// }
 	
 	console.log(["ca_", ca_]);
-	console.log(["a_", a_]);
-	console.log(["e_", e_]);
-	console.log(["dot", dot]);
+	console.log(["a_", a_]);	// 
+		// console.log(["e_", e_]);
+		// console.log(["dot", dot]);
 	
 	//BALLOON TOP - INFO ESPAÇO
-	if(e_.imagens){
-		var imgEspaco = e_.imagens.split('\n')[0];
-	} else {
-		var imgEspaco = "default-thumb.png";
-	}
-	
-	var nomeEspaco = e_.site ? "<a href='" + e_.site + "' target='_BLANK'>" + dot.onde + "</a>" : dot.onde;
-	if(dot.todosEspacos){
-		var opcoes = "";
-		for (var i in dot.todosEspacos){
-			opcoes += "<option>" + e[dot.todosEspacos[i]].nome + "</option>";
-		}
-		nomeEspaco += "<select class='todosEspacos'><option>+</option>" + opcoes + "</select>";
-		
-		// $("select").change(function () {
-		// 	console.log("HOHOHO");
-		// }).trigger('change');
-		
-		// $("select").change(function () {
-		// 	var str = "";
-		// 	$("select option:selected").each(function () {
-		// 		str += $(this).text() + " ";
-		// 	});
-		// 	console.log(str);
-		// 	}).trigger('change');
-	}
-
-	
-	var linha1 = ""; //rua, bairro, cidade e mapa
-	linha1 += e_.mapa ? "<a href='" + e_.mapa + "' target='_BLANK'>" : "";
-	linha1 += e_.endereco;
-	linha1 += e_.bairro ? " // " + e_.bairro.split(', ')[0] : "";
-	linha1 += e_.cidade ? " // " + e_.cidade : "";
-	linha1 += e_.mapa ? "<img src='./img/pin.gif' class='pin' /></a>" : "";
-	
-	
-	var linha2 = ""; //fone, email e site
-	if(e_.fone){
-		var fone = e_.fone.replace(/\./g, ''); //exclui "."
-		fone = fone.split(" "); //depois divide entre código de pais, área e telefone
-		linha2 += "<a href='tel:+" + fone[0] + "-" + fone[1] + "-" + fone[2] + "'>" + e_.fone + "</a>";
-	}
-	// linha2 += e_.email ? " // <a href='mailto:" + e_.email + "'>" + e_.email + "</a>" : "";
-	if(e_.email){
-		if(e_.email.substr(0,7) == 'http://'){
-			linha2 += " // <a href='" + e_.email + "' target='_BLANK'>contato</a>";
-		} else {
-			linha2 += " // <a href='mailto:" + e_.email + "' target='_BLANK'>" + e_.email + "</a>";
-		}
-	}
-	linha2 += e_.site ? " // <a href='" + e_.site + "' target='_BLANK'>" + e_.site.replace('http://', '') + "</a>" : "";
-
-	var linha3 = ""; //horário de funcionamento (opcional?)
-	linha3 += e_.horario ? e_.horario.replace(/\n/g, ' // ') : "";
-	
-	var html = "";
-	html += "<img src='./img/" + imgEspaco + "' width='86' height='86'/><img src='./img/fechar.png' class='fechar'/>";
-	html += "<div id='txt-block'><h1>" + nomeEspaco + "</h1><p class='first-p'>" + linha1 + "</p><p>" + linha2 + "</p>";
-	html += linha3;
-	$('#balloon-top').html(html);
-	$('#balloon-top .fechar').click(function(event){fechaBalloon(event);});
+	desenhaBalloonTop(a_);
 	
 	//SLIDESHOW - imgs não podem conter espaço no nome
 	html = "";
-	if(ca_.imagens){
-		var imgs = ca_.imagens.split('\n');
-	} else if(a_.imagens){
+	if(a_.imagens){
 		var imgs = a_.imagens.split('\n');
 	} else {
 		var imgs = ["default-img.png"];
@@ -1007,6 +994,7 @@ function abreBaloon(idComposto, aID, skipIndex){
 	selectedSlideImgIndex = 0;
 	nSlideImgs = imgs.length;
 	hideOrShowSlideshowControls();
+	
 	//escreve o HTML
 	html += "<div id='slideshow-imgs'>";
 	for(var i in imgs){
@@ -1016,13 +1004,9 @@ function abreBaloon(idComposto, aID, skipIndex){
 	$('#slideshow').html(html);
 	
 	//MINI-BALLOON - INFO DA ATIVIDADE
-	var variosQuem = a_.quem;
-	if(!variosQuem){alert("Precisa cadastrar algum QUEM dentro dessa atividade.")}
-	variosQuem = variosQuem.split(', ');
-	var quem = p[string_to_slug(variosQuem[0])];
-	if(!quem){alert("QUEM listado na atividade não existe na lista de pessoas.")}
-	var di = googleDateToDate(a_.datainicial);
-	var df = googleDateToDate(a_.datafinal);
+	var di = googleDateToDate(a_.datainicial ? a_.datainicial : new Date());
+	var df = googleDateToDate(a_.datafinal ? a_.datafinal : new Date());
+	
 	html = "";
 	html += "<h2>" + a_.tipo + "</h2>";
 	html += desenhaEstrelas(a_.estrelas);
@@ -1032,14 +1016,28 @@ function abreBaloon(idComposto, aID, skipIndex){
 	html += a_.sobre ? "<p>" + a_.sobre + "</p>" : "<p>(cadastrar sinopse da atividade)</p>";
 	html += "</div>";
 	
-	if(quem.bio){
-		html += "<div id='bio' class='hidden'></div>";
-		html += "<p><span class='fake-link'>Biografia</span>";
-		html += quem.site ?  " // <a href='" + quem.site + "' target='_BLANK'>" + quem.site.replace('http://', '') + "</a></p>" : "</p>";
-		$('#mini-balloon-body').html(html);
-		$('#mini-balloon-body .fake-link').click(function(event){abreBio(event, quem);});
-	} else {
-		html += quem.site ? "<p><a href='" + quem.site + "' target='_BLANK'>" + quem.site.replace('http://', '') + "</a></p>" : "";
+	var variosQuem = a_.quem;
+	// console.log("variosQuem: " + variosQuem);
+	if(variosQuem != undefined){
+	// console.log("variosQuem: " + variosQuem);
+		variosQuem = variosQuem.split(', ');
+		var quem = p[string_to_slug(variosQuem[0])];
+		// console.log(["quem: ", quem]);
+		if(quem != undefined){
+			if(quem.bio){
+				html += "<div id='bio' class='hidden'></div>";
+				html += "<p><span class='fake-link'>Biografia</span>";
+				html += quem.site ?  " // <a href='" + quem.site + "' target='_BLANK'>" + quem.site.replace('http://', '') + "</a></p>" : "</p>";
+				$('#mini-balloon-body').html(html);
+				$('#mini-balloon-body .fake-link').click(function(event){abreBio(event, quem);});
+			} else {
+				html += quem.site ? "<p><a href='" + quem.site + "' target='_BLANK'>" + quem.site.replace('http://', '') + "</a></p>" : "";
+				$('#mini-balloon-body').html(html);
+			}
+		}	else {
+				$('#mini-balloon-body').html(html);
+		}
+	}	else {
 		$('#mini-balloon-body').html(html);
 	}
 	
@@ -1079,6 +1077,7 @@ function abreBaloon(idComposto, aID, skipIndex){
 				html = "";
 				html += "<div id='cross-" + i + "' class='balloon cross' style='background-color:rgba(255,255,255," + alpha + ")'>";
 				html += "<div class='bg-cover cross-img' style='background-image: url(./img/" + encodeURI(imgs[0]) + ");'></div>";
+				html += "<div class='reticencias' style='background-image: url(./img/reticencias.png);'></div>";
 				html += "<h2>" + atividade.tipo + "</h2>";
 				html += "<h1>" + nameParts[0];
 				html += nameParts[1] ? "<em> // " + nameParts[1] + "</em></h1>" : "</h1>";
@@ -1097,6 +1096,94 @@ function abreBaloon(idComposto, aID, skipIndex){
 	//mostra
 	$('#balloon').css('display', 'block');
 	updateMiniBalloonFooterPosition();
+}
+
+function desenhaBalloonTop(a_, todosEspacos, value){
+	var index = 0;
+	
+	if(todosEspacos && value){
+		//procura o index do espaço selecionado
+		for(var i in todosEspacos){
+			// console.log(todosEspacos);
+			console.log('? ' + value);
+			console.log('> ' + e[todosEspacos[i]].nome);
+			if(string_to_slug(e[todosEspacos[i]].nome) == string_to_slug(value)){
+				console.log('sim! Index: ' + index);
+				index = i;
+				break;
+			} else {
+				console.log('naum!');
+			}
+		}
+	}
+	console.log('-');
+	
+	var e_ = e[a_.onde.split(', ')[index]];
+	var espacos = a_.onde.split(", ");
+	var dot = {};
+	if (espacos.length == 1){
+		dot.onde = e[espacos[index]].nome;
+	} else if (espacos.length > 1){
+		dot.onde = e[espacos[index]].nome;
+		dot.todosEspacos = espacos;
+	} else {
+		dot.onde = "-";
+	}
+	
+	if(e_.imagens){
+		var imgEspaco = e_.imagens.split('\n')[index];
+	} else {
+		var imgEspaco = "default-thumb.png";
+	}
+	
+	var nomeEspaco = "";
+	if(dot.todosEspacos){
+		var opcoes = "";
+		for (var i in dot.todosEspacos){
+			opcoes += "<option>" + e[dot.todosEspacos[i]].nome + "</option>";
+		}
+		nomeEspaco += "<select class='todosEspacos'><option>+</option>" + opcoes + "</select>";
+	}
+	nomeEspaco += e_.site ? "<a href='" + e_.site + "' target='_BLANK'>" + dot.onde + "</a>" : dot.onde;
+
+	
+	var linha1 = ""; //rua, bairro, cidade e mapa
+	linha1 += e_.mapa ? "<a href='" + e_.mapa + "' target='_BLANK'>" : "";
+	linha1 += e_.endereco;
+	linha1 += e_.bairro ? " // " + e_.bairro.split(', ')[0] : "";
+	linha1 += e_.cidade ? " // " + e_.cidade : "";
+	linha1 += e_.mapa ? "<img src='./img/pin.gif' class='pin' /></a>" : "";
+	
+	
+	var linha2 = ""; //fone, email e site
+	if(e_.fone){
+		var fone = e_.fone.replace(/\./g, ''); //exclui "."
+		fone = fone.split(" "); //depois divide entre código de pais, área e telefone
+		linha2 += "<a href='tel:+" + fone[0] + "-" + fone[1] + "-" + fone[2] + "'>" + e_.fone + "</a>";
+	}
+	// linha2 += e_.email ? " // <a href='mailto:" + e_.email + "'>" + e_.email + "</a>" : "";
+	if(e_.email){
+		if(e_.email.substr(0,7) == 'http://'){
+			linha2 += " // <a href='" + e_.email + "' target='_BLANK'>contato</a>";
+		} else {
+			linha2 += " // <a href='mailto:" + e_.email + "' target='_BLANK'>" + e_.email + "</a>";
+		}
+	}
+	linha2 += e_.site ? " // <a href='" + e_.site + "' target='_BLANK'>" + e_.site.replace('http://', '') + "</a>" : "";
+
+	var linha3 = ""; //horário de funcionamento (opcional?)
+	linha3 += e_.horario ? e_.horario.replace(/\n/g, ' // ') : "";
+	
+	var html = "";
+	html += "<img src='./img/" + imgEspaco + "' width='86' height='86'/><img src='./img/fechar.png' class='fechar'/>";
+	html += "<div id='txt-block'><h1>" + nomeEspaco + "</h1><p class='first-p'>" + linha1 + "</p><p>" + linha2 + "</p>";
+	html += linha3;
+	
+	
+	
+	$('#balloon-top').html(html);
+	$('#balloon-top .fechar').click(function(event){fechaBalloon(event);});
+	$('.todosEspacos').change(function(){desenhaBalloonTop(a_, dot.todosEspacos, $(this).val());});
 }
 
 function dataHelena(di, df){
@@ -1203,15 +1290,20 @@ function prevSlideImg(){
 }
 
 function hideOrShowSlideshowControls(){
-	if(selectedSlideImgIndex == 0){
-		$('#slideshow-controls .next').css('display', 'block');
-		$('#slideshow-controls .previous').css('display', 'none');
-	} else if(selectedSlideImgIndex == nSlideImgs-1){
-		$('#slideshow-controls .next').css('display', 'none');
-		$('#slideshow-controls .previous').css('display', 'block');
+	if(nSlideImgs > 1){
+		if(selectedSlideImgIndex == 0){
+			$('#slideshow-controls .next').css('display', 'block');
+			$('#slideshow-controls .previous').css('display', 'none');
+		} else if(selectedSlideImgIndex == nSlideImgs-1){
+			$('#slideshow-controls .next').css('display', 'none');
+			$('#slideshow-controls .previous').css('display', 'block');
+		} else {
+			$('#slideshow-controls .next').css('display', 'block');
+			$('#slideshow-controls .previous').css('display', 'block');	
+		}
 	} else {
-		$('#slideshow-controls .next').css('display', 'block');
-		$('#slideshow-controls .previous').css('display', 'block');	
+		$('#slideshow-controls .next').css('display', 'none');
+		$('#slideshow-controls .previous').css('display', 'none');
 	}
 }
 
