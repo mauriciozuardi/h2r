@@ -329,7 +329,7 @@ function updateTimelineDates(){
 
 function EventDot(ca){
 	var atalho = ca.atividades.split(", ")[0];
-	console.log(['a.' + ca.siteId + '.' + atalho,a[ca.siteId][atalho]]);
+	// console.log(['a.' + ca.siteId + '.' + atalho,a[ca.siteId][atalho]]);
 	
 	if(a[ca.siteId][atalho]){
 		//pediu para esconder?

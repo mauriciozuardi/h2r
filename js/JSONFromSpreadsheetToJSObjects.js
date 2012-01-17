@@ -28,7 +28,7 @@ function cellsToObjects(json){
 }
 
 function listToObjects(json){
-	//assume que não existem vírgulas nos campos
+	//IMPORTANTE: PRIMEIRA COLUNA DA SHEET PRECISA ESTAR VAZIA
 	var entry = json.feed.entry;
 	var arr = [];
 	//varre as entries, parseando a string
@@ -101,22 +101,21 @@ function string_to_slug(str) {
 }
 
 function listaEspacos(root) {
-	e = cellsToObjects(root);
+	e = listToObjects(root);
 	console.log(["Espaços", e]);
 	finishedRequests ++;
 	drawDotsIfYouCan();
 }
 
 function listaPessoas(root) {
-	p = cellsToObjects(root);
+	p = listToObjects(root);
 	console.log(["Pessoas", p]);
 	finishedRequests ++;
 	drawDotsIfYouCan();
 }
 
 function listaSites(root) {
-	s = cellsToObjects(root);
-	console.log(["Sites", s]);
+	s = listToObjects(root);
 	finishedRequests ++;
 	
 	//ajusta o logo do header e as marcas da timeline
@@ -131,24 +130,23 @@ function listaSites(root) {
 	try {drawTimeline()}
 	catch(err){}
 	
+	console.log("Mostrando eventos entre [" + timeline[0].date.toString() + "] e [" + timeline[timeline.length-1].date.toString() + "]");
+	console.log(["Sites", s]);
+	
 	//decide se vai carregar os JSONS de um 'site' ou de todos
 	var context = {};
 	context.id = s[sID].id;
-	//chama o jason
-	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[sID].key + "/1/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
-	// $.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[sID].key + "/2/public/basic?alt=json", $.proxy(listaAtividadesPrePreenchida, context));
+	
+	//chamada nova
+	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/3/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
 	
 	//chamada nova, com query
-	console.log("Mostrando eventos entre [" + timeline[0].date.toString() + "] e [" + timeline[timeline.length-1].date.toString() + "]");
 	var F = firstTimemark(true);
 	var L = lastTimemark(true);
 	query = "&sq=!((dvi<"+F+" and dvf<"+F+") or (dvi>"+L+" and dvf>"+L+"))";
 	query = encodeURI(query);
 	
-	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/3/public/basic?alt=json" + query, $.proxy(listaAtividadesProcessadasPrePreenchida, context));
-	
-	//QUERY URL
-	//https://spreadsheets.google.com/feeds/list/0AmllLSOQlMYpdGttZV9NeWNuYnoyalUtY3lHbGVSdEE/3/public/basic?alt=json&sq=datevalue>1330000000&orderby=column:datevalue
+	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/4/public/basic?alt=json" + query, $.proxy(listaAtividadesPrePreenchida, context));
 	
 	//avisa qtos JSON requests devemos esperar
 	totalRequests += 2;
@@ -191,14 +189,8 @@ function listaAtividadesPrePreenchida(json){
 	drawDotsIfYouCan();
 }
 
-function listaAtividadesProcessadasPrePreenchida(json){
-	listaAtividadesProcessadas(json, this.id);
-	finishedRequests ++;
-	drawDotsIfYouCan();
-}
-
 function listaConjuntos(root, parentId) {
-	ca[s[parentId].id] = cellsToObjects(root);
+	ca[s[parentId].id] = listToObjects(root);
 	console.log([
 		"CAs : " + s[parentId].nome,
 		ca[s[parentId].id],
@@ -206,17 +198,9 @@ function listaConjuntos(root, parentId) {
 }
 
 function listaAtividades(root, parentId) {
-	// a[s[parentId].id] = cellsToObjects(root);
-	// console.log([
-	// 	"As  : " + s[parentId].nome,
-	// 	a[s[parentId].id]
-	// 	]);
-}
-
-function listaAtividadesProcessadas(root, parentId) {
 	a[s[parentId].id] = listToObjects(root);
 	console.log([
-		"As (list)  : " + s[parentId].nome,
+		"As  : " + s[parentId].nome,
 		a[s[parentId].id]
 		]);
 }
@@ -253,14 +237,11 @@ imgName = "";
 function loadJSONs(){
 	//carrega os dados da tabela Geral e depois, baseado nos "sites", carrega Atividades e Conjuntos de Atividades.
 	var key = "0AnLIuvvW8l93dGR4OEtlNFlXT0VYOG44UExyQXd5N2c"; //Geral
-	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + key + "/1/public/basic?alt=json", function(json){listaEspacos(json)});
-	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + key + "/2/public/basic?alt=json", function(json){listaPessoas(json)});
-	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + key + "/3/public/basic?alt=json", function(json){listaSites(json)});
+	$.getJSON("https://spreadsheets.google.com/feeds/list/" + key + "/4/public/basic?alt=json", function(json){listaEspacos(json)});
+	$.getJSON("https://spreadsheets.google.com/feeds/list/" + key + "/5/public/basic?alt=json", function(json){listaPessoas(json)});
+	$.getJSON("https://spreadsheets.google.com/feeds/list/" + key + "/6/public/basic?alt=json", function(json){listaSites(json)});
+	
 	totalRequests += 3;
 }
 
 $(loadJSONs);
-
-//https://spreadsheets.google.com/feeds/cells/0AnLIuvvW8l93dGR4OEtlNFlXT0VYOG44UExyQXd5N2c/1/public/basic?alt=json
-
-//como passar parâmetros: https://spreadsheets.google.com/feeds/cells/0AnLIuvvW8l93dGR4OEtlNFlXT0VYOG44UExyQXd5N2c/1/public/basic?min-row=2&max-row=3&sq=desde%3E2003&alt=json
