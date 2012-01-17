@@ -146,6 +146,7 @@ function listaSites(root) {
 	query = "&sq=!((dvi<"+F+" and dvf<"+F+") or (dvi>"+L+" and dvf>"+L+"))";
 	query = encodeURI(query);
 	
+	//https://spreadsheets.google.com/feeds/list/0AnLIuvvW8l93dEp2UkxfOS1PVE02OFlpS1Btc2g5U0E/4/public/basic?alt=json
 	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/4/public/basic?alt=json" + query, $.proxy(listaAtividadesPrePreenchida, context));
 	
 	//avisa qtos JSON requests devemos esperar

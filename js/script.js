@@ -59,9 +59,9 @@ function init(){
 	$('#slideshow-controls .next').click(function(event){nextSlideImg(event)});
 	
 	//aplica os onChange() no header
-	$('.oque').change(function(){ onPullDownChange($(this)); });
-	$('.onde').change(function(){ onPullDownChange($(this)); });
-	$('.quem').change(function(){ onPullDownChange($(this)); });
+	$('.oque').change(function(){ onPullDownOqueChange($(this)); });
+	$('.onde').change(function(){ onPullDownOndeChange($(this)); });
+	$('.quem').change(function(){ onPullDownQuemChange($(this)); });
 	// $('.btn_filtrar').click(filtrarClicked);
 	
 	//ajusta a altura do body no resize
@@ -83,11 +83,42 @@ function init(){
 }
 
 function onPullDownChange(element){
-	// alert('Mudou para: ' + element.val());
+	// https://spreadsheets.google.com/feeds/list/0AnLIuvvW8l93dEp2UkxfOS1PVE02OFlpS1Btc2g5U0E/4/public/basic?alt=json&q=Afetos
+	var query = "&q=" + element.val();
+	query = encodeURI(query);
+	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/4/public/basic?alt=json" + query, function(json){mostraOque(json)});
 }
 
-function filtrarClicked(){
-	// alert('Tipo: ' + $('.oque').val());
+function onPullDownOqueChange(element){
+	var query = "&q=" + element.val();
+	query = encodeURI(query);
+	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/4/public/basic?alt=json" + query, function(json){mostraOque(json)});
+}
+
+function onPullDownOndeChange(element){
+	var query = "&q=" + ondeID(element.val());
+	query = encodeURI(query);
+	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/4/public/basic?alt=json" + query, function(json){mostraOque(json)});
+}
+
+function onPullDownQuemChange(element){
+	var query = "&q=" + element.val();
+	query = encodeURI(query);
+	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/4/public/basic?alt=json" + query, function(json){mostraOque(json)});
+}
+
+function ondeID(ondeName){
+	var o = string_to_slug(ondeName)
+	for (var i in e){
+		if(o == string_to_slug(e[i].nome)){
+			// console.log(ondeName + ' : ' + i);
+			return i;
+		}
+	}
+}
+
+function mostraOque(json){
+	console.log(listToObjects(json));
 }
 
 function updatePullDowns(){
@@ -112,13 +143,13 @@ function fillPullDown(el, campo){
 			}
 		}
 	}
-	// console.log(encontrados);
 	
 	//coloca em ordem alfabética
 	encontrados.sort(compareAlphabet);
 	
 	//enfia o valor inicial no começo
-	encontrados.splice(0,1,el.val());
+	encontrados.unshift(el.val());
+	// console.log(encontrados);
 	
 	//muda o HTML de acordo com os tipos encontrados
 	var html = ""
@@ -953,8 +984,8 @@ function abreBaloon(idComposto, aID, skipIndex){
 	// 	dot.onde = "-";
 	// }
 	
-	console.log(["ca_", ca_]);
-	console.log(["a_", a_]);	// 
+	// console.log(["ca_", ca_]);
+	// console.log(["a_", a_]);
 		// console.log(["e_", e_]);
 		// console.log(["dot", dot]);
 	
