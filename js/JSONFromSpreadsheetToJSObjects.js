@@ -74,6 +74,7 @@ function listToObjects(json){
 OFFSET_DV2DATE = 2*60*60 //2h em segundos
 
 function datevalueToDate(dv){
+	if(!dv){ console.log("datevalueToDate() : cadê o dv?"); return undefined }
 	return new Date((OFFSET_DV2DATE + parseInt(dv))*1000);
 }
 
@@ -135,9 +136,10 @@ function listaSites(root) {
 	context.id = s[sID].id;
 	//chama o jason
 	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[sID].key + "/1/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
-	$.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[sID].key + "/2/public/basic?alt=json", $.proxy(listaAtividadesPrePreenchida, context));
+	// $.getJSON("https://spreadsheets.google.com/feeds/cells/" + s[sID].key + "/2/public/basic?alt=json", $.proxy(listaAtividadesPrePreenchida, context));
 	
 	//chamada nova, com query
+	console.log("Mostrando eventos entre [" + timeline[0].date.toString() + "] e [" + timeline[timeline.length-1].date.toString() + "]");
 	var F = firstTimemark(true);
 	var L = lastTimemark(true);
 	query = "&sq=!((dvi<"+F+" and dvf<"+F+") or (dvi>"+L+" and dvf>"+L+"))";
@@ -149,7 +151,7 @@ function listaSites(root) {
 	//https://spreadsheets.google.com/feeds/list/0AmllLSOQlMYpdGttZV9NeWNuYnoyalUtY3lHbGVSdEE/3/public/basic?alt=json&sq=datevalue>1330000000&orderby=column:datevalue
 	
 	//avisa qtos JSON requests devemos esperar
-	totalRequests += 3;
+	totalRequests += 2;
 }
 
 function firstTimemark(datavalue){
@@ -204,18 +206,18 @@ function listaConjuntos(root, parentId) {
 }
 
 function listaAtividades(root, parentId) {
-	a[s[parentId].id] = cellsToObjects(root);
-	console.log([
-		"As  : " + s[parentId].nome,
-		a[s[parentId].id]
-		]);
+	// a[s[parentId].id] = cellsToObjects(root);
+	// console.log([
+	// 	"As  : " + s[parentId].nome,
+	// 	a[s[parentId].id]
+	// 	]);
 }
 
 function listaAtividadesProcessadas(root, parentId) {
-	a_list[s[parentId].id] = listToObjects(root);
+	a[s[parentId].id] = listToObjects(root);
 	console.log([
-		"As_LIST  : " + s[parentId].nome,
-		a_list[s[parentId].id]
+		"As (list)  : " + s[parentId].nome,
+		a[s[parentId].id]
 		]);
 }
 

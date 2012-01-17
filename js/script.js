@@ -27,8 +27,6 @@ sID = URLvars.sID ? URLvars.sID : "s1";
 //config e debug
 showDateDetails = false;
 timeMarksStr = "";
-// aDay = "hoje";
-
 
 // function countTo(n){
 // 	var numero = "";
@@ -51,22 +49,9 @@ timeMarksStr = "";
 // }
 
 function init(){
-	// countTo(1000);
-	
-	//que dia/hora são?
-	// if(aDay != 'hoje'){
-	// 	initDate = new Date(aDay);
-	// 	initNow = initDate.getTime();
-	// } else {
-		initNow = Date.now(); //ms desde 01 Jan 1970
-		initDate = new Date();
-	// }
-	
-	//
-	// incluiLogo();
+	initNow = Date.now(); //ms desde 01 Jan 1970
+	initDate = new Date();
 	resizeBg();
-	// drawTimeline();		//<-- vai desenhar qdo carregar a planilha "Sites"
-	// drawHomeEvents();	//<-- vai desenhar qdo acabar de carregar tudo (JSONFromSpreadsheetToJSObjects.js cuida disso)
 	
 	//aplica os cliques "fixos" do balloon
 	$('.balloon.top .fechar').click(function(event){fechaBalloon(event);});
@@ -151,7 +136,6 @@ function existe(value, array){
 }
 
 function incluiLogo(){
-	//vem do config/debug (acima)
 	$("<img src='./img/" + imgName + "' alt=''/>").appendTo('#header');
 }
 
@@ -169,7 +153,6 @@ function recenterBalloon(){
 }
 
 function drawTimeline(){
-	// console.log(timeMarksStr);
 	//trata os nomes e datas
 	timeline = timeMarksStr.split('|');
 	for (var i in timeline){
@@ -346,121 +329,124 @@ function updateTimelineDates(){
 
 function EventDot(ca){
 	var atalho = ca.atividades.split(", ")[0];
+	console.log(['a.' + ca.siteId + '.' + atalho,a[ca.siteId][atalho]]);
 	
-	//pediu para esconder?
-	if(ca.esconder || a[ca.siteId][atalho].esconder){ return true }
-	
-	//falta alguma informação crítica?
-	if(!ca.id){ return true }
-	if(!ca.atividades){ return true }
-	if(!ca.siteId){ return true }
-	
-	//ID
-	this.id = ca.siteId + "-" + ca.id;
-	this.i = eventDotInstances.length; //posição no array
-	// console.log(this.i + " : " + this.id);
-	
-	//VISUAL
-	if(atalho && a[ca.siteId][atalho].visual){
-		var visual = a[ca.siteId][atalho].visual;
-	} else {
-		var visual = "p";
-	}
-	this.visual = visual;
-	// console.log(this.visual);
-	
-	//ONDE < default para Agenda
-	if(atalho){
-		//senão, procura o atalho para a atividade em questão e confere quantos espaços tem
-		var espacos = a[ca.siteId][atalho].onde;
-		if(espacos){
-			espacos = espacos.split(", ");
-			if (espacos.length > 0){
-				var nomeLocal = e[espacos[0]].nome;
+	if(a[ca.siteId][atalho]){
+		//pediu para esconder?
+		if(ca.esconder || a[ca.siteId][atalho].esconder){ return true }
+
+		//falta alguma informação crítica?
+		if(!ca.id){ return true }
+		if(!ca.atividades){ return true }
+		if(!ca.siteId){ return true }
+
+		//ID
+		this.id = ca.siteId + "-" + ca.id;
+		this.i = eventDotInstances.length; //posição no array
+		// console.log(this.i + " : " + this.id);
+
+		//VISUAL
+		if(atalho && a[ca.siteId][atalho].visual){
+			var visual = a[ca.siteId][atalho].visual;
+		} else {
+			var visual = "p";
+		}
+		this.visual = visual;
+		// console.log(this.visual);
+
+		//ONDE < default para Agenda
+		if(atalho){
+			//senão, procura o atalho para a atividade em questão e confere quantos espaços tem
+			var espacos = a[ca.siteId][atalho].onde;
+			if(espacos){
+				espacos = espacos.split(", ");
+				if (espacos.length > 0){
+					var nomeLocal = e[espacos[0]].nome;
+				} else {
+					var nomeLocal = "-";
+				}
 			} else {
 				var nomeLocal = "-";
 			}
 		} else {
+			//senão, assume que não foi cadastrado
 			var nomeLocal = "-";
 		}
-	} else {
-		//senão, assume que não foi cadastrado
-		var nomeLocal = "-";
-	}
-	this.onde = nomeLocal;
-	// console.log(this.onde);
-	
-	//O QUÊ < default para os sites
-	if(atalho){
-		//senão, procura o atalho para a atividade em questão e usa o nome dela
-		var nomeAtividade = a[ca.siteId][atalho].nome;
-	} else {
-		//senão, assume que não foi cadastrado
-		var nomeAtividade = "-";
-	}
-	this.oque = nomeAtividade;
-	// console.log(this.oque);
+		this.onde = nomeLocal;
+		// console.log(this.onde);
 
-	//QUEM
-	if(atalho){
-		//senão, procura o atalho para a atividade em questão e confere quantas pessoas tem listadas
-		var pessoas = a[ca.siteId][atalho].quem;
-		if(pessoas){
-			pessoas = pessoas.split(", ");
-			if (pessoas.length > 0){
-				var nomePessoa = pessoas[0]; //pessoas não tem ID, o ID é o próprio nome (pedido da Helena)
-			} else {
-				var nomePessoa = "-";
-			}
+		//O QUÊ < default para os sites
+		if(atalho){
+			//senão, procura o atalho para a atividade em questão e usa o nome dela
+			var nomeAtividade = a[ca.siteId][atalho].nome;
 		} else {
-			var nomePessoa = "-"
+			//senão, assume que não foi cadastrado
+			var nomeAtividade = "-";
+		}
+		this.oque = nomeAtividade;
+		// console.log(this.oque);
+
+		//QUEM
+		if(atalho){
+			//senão, procura o atalho para a atividade em questão e confere quantas pessoas tem listadas
+			var pessoas = a[ca.siteId][atalho].quem;
+			if(pessoas){
+				pessoas = pessoas.split(", ");
+				if (pessoas.length > 0){
+					var nomePessoa = pessoas[0]; //pessoas não tem ID, o ID é o próprio nome (pedido da Helena)
+				} else {
+					var nomePessoa = "-";
+				}
+			} else {
+				var nomePessoa = "-"
+			}
+
+		} else {
+			//senão, assume que não foi cadastrado
+			var nomePessoa = "-";
+		}
+		this.quem = nomePessoa;
+		// console.log(this.quem);
+
+		//DATAS
+		//descobre o range de datas entre as atividades listadas
+		// console.log(ca.atividades);
+		if(ca.atividades){
+			var arrAtividades = ca.atividades.split(', ');
+		} else if (atalho){
+			var arrAtividades = [atalho];
 		}
 
-	} else {
-		//senão, assume que não foi cadastrado
-		var nomePessoa = "-";
-	}
-	this.quem = nomePessoa;
-	// console.log(this.quem);
-	
-	//DATAS
-	//descobre o range de datas entre as atividades listadas
-	// console.log(ca.atividades);
-	if(ca.atividades){
-		var arrAtividades = ca.atividades.split(', ');
-	} else if (atalho){
-		var arrAtividades = [atalho];
-	}
-	
-	// console.log(arrAtividades);
-	if(arrAtividades){
-		var datas = comparaDatasDasAtividades(ca, arrAtividades);
-		if(datas.corrupted){
+		// console.log(arrAtividades);
+		if(arrAtividades){
+			var datas = comparaDatasDasAtividades(ca, arrAtividades);
+			if(datas.corrupted){
+				var datas = {};
+				datas.menor = Date.now();
+				datas.maior = Date.now();
+			}
+		} else {
 			var datas = {};
 			datas.menor = Date.now();
 			datas.maior = Date.now();
 		}
-	} else {
-		var datas = {};
-		datas.menor = Date.now();
-		datas.maior = Date.now();
+
+		//armazena as datas escolhidas
+		this.dataInicial	= new Date(datas.menor);
+		this.dataFinal		= new Date(datas.maior);
+
+		// console.log(this.dataInicial.toString() + "  ||  " + this.dataFinal.toString());
+
+		//IMAGENS
+
+
+		//OUTROS
+		//avisa que ainda não recebeu a função de clique (para não anexar 2x)
+		this.semClique = true;
+
+		//check-in
+		eventDotInstances.push(this);
 	}
-	
-	//armazena as datas escolhidas
-	this.dataInicial	= new Date(datas.menor);
-	this.dataFinal		= new Date(datas.maior);
-	
-	// console.log(this.dataInicial.toString() + "  ||  " + this.dataFinal.toString());
-	
-	//IMAGENS
-	
-	
-	//OUTROS
-	//avisa que ainda não recebeu a função de clique (para não anexar 2x)
-	this.semClique = true;
-	
-	//check-in
-	eventDotInstances.push(this);
 }
 
 function comparaDatasDasAtividades(ca, arrAtividades){
@@ -520,16 +506,8 @@ EventDot.killThemAll = function(){
 }
 
 EventDot.drawThemAll = function(sortBy){
-	//sort
-	if(sortBy == undefined){
-		eventDotInstances.sort(compareDates);
-	} else if(sortBy == "alfabetico"){
-		// if(sID){
-			eventDotInstances.sort(compareAlphabet);
-		// } else {
-		// 	eventDotInstances.sort(compareOndeStrings);
-		// }		
-	}
+	//define o sort. Default é por data inicial.
+	(sortBy == 'alfabetico') ? eventDotInstances.sort(compareAlphabet) : eventDotInstances.sort(compareDates);
 	
 	//percorre o array criando o HTML
 	for(var i in eventDotInstances){
