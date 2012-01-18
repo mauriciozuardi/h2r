@@ -670,13 +670,19 @@ EventDot.prototype.posicionar = function(){
 	
 	// //posiciona o começo do evento
 	var x0 = dateToPosition(t0);
-	x0 -= dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
+	if(dot.hasClass('big')){
+		x0 -= dot.outerWidth(false)/2;	//compensa o tamanho da bolinha grande
+		x0 += 5;
+	} else {
+		// x0 -= (dot.outerWidth(false)/2) - 1;	//compensa o tamanho da bolinha pequena
+		x0 += 1;
+	}
 	div.css('margin-left', x0);
 	
 	//posiciona o fim do evento
 	var x1 = dateToPosition(t1);
 	var rangeEnd = x1-x0;
-	var length = rangeEnd += dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
+	var length = rangeEnd + dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
 	range.css('width', length);
 	
 	//posiciona a bolinha, representando o progresso geral do evento
@@ -685,8 +691,10 @@ EventDot.prototype.posicionar = function(){
 	var x = dateToPosition(t) - x0;
 	if(dot.hasClass('big')){
 		x -= dot.outerWidth(false)/2;	//compensa o tamanho da bolinha grande
+		x += 5;
 	} else {
-		x -= (dot.outerWidth(false)/2) - 1;	//compensa o tamanho da bolinha pequena
+		// x -= (dot.outerWidth(false)/2) - 1;	//compensa o tamanho da bolinha pequena
+		x += 1;
 	}
 	dot.css('margin-left', x);
 	
