@@ -668,34 +668,25 @@ EventDot.prototype.posicionar = function(){
 	var t0 = this.dataInicial.getTime();
 	var t1 = this.dataFinal.getTime();
 	
+	var COMP_DOT_BIG = 5 - dot.outerWidth(false)/2;
+	var COMP_DOT = 1;
+	var FINE_TUNING = dot.hasClass('big') ? COMP_DOT_BIG : COMP_DOT;
+	
 	// //posiciona o começo do evento
-	var x0 = dateToPosition(t0);
-	if(dot.hasClass('big')){
-		x0 -= dot.outerWidth(false)/2;	//compensa o tamanho da bolinha grande
-		x0 += 5;
-	} else {
-		// x0 -= (dot.outerWidth(false)/2) - 1;	//compensa o tamanho da bolinha pequena
-		x0 += 1;
-	}
+	var x0 = dateToPosition(t0) + FINE_TUNING;
 	div.css('margin-left', x0);
 	
 	//posiciona o fim do evento
-	var x1 = dateToPosition(t1);
+	var x1 = dateToPosition(t1) + FINE_TUNING;
+	
 	var rangeEnd = x1-x0;
-	var length = rangeEnd + dot.outerWidth(false)/2;	//compensa o tamanho da bolinha
+	var length = rangeEnd + dot.outerWidth(false);	//compensa o tamanho da bolinha
 	range.css('width', length);
 	
 	//posiciona a bolinha, representando o progresso geral do evento
 	t = (t < t0) ? t0 : t;
 	t = (t > t1) ? t1 : t;
-	var x = dateToPosition(t) - x0;
-	if(dot.hasClass('big')){
-		x -= dot.outerWidth(false)/2;	//compensa o tamanho da bolinha grande
-		x += 5;
-	} else {
-		// x -= (dot.outerWidth(false)/2) - 1;	//compensa o tamanho da bolinha pequena
-		x += 1;
-	}
+	var x = dateToPosition(t) + FINE_TUNING - x0;
 	dot.css('margin-left', x);
 	
 	//posiciona o label
@@ -719,7 +710,7 @@ function dateToPosition(t){
 		// return $(window).width();
 	} else if(t == timeline[timeline.length-1].date.getTime()){
 			//se t for igual a ultima marca
-			return timeline[timeline.length-1].position;
+			return timeline[timeline.length-1].position + 1;
 			// return $(window).width();
 	} else if(t < timeline[0].date.getTime()){
 		//se t for menor que a primeira marca da timeline
@@ -727,7 +718,7 @@ function dateToPosition(t){
 		// return 0;
 	} else if(t == timeline[0].date.getTime()){
 			//se t for igual a primeira marca da timeline
-			return timeline[0].position;
+			return timeline[0].position + 1;
 			// return 0;
 	} else {
 		//t está entre alguma das marcas
