@@ -55,19 +55,19 @@ function listToObjects(json){
 	}
 	
 	// DEBUG
-	for(var i in dados){
-		if(dados[i].dvi){
-			dados[i].DEBUG_di_from_dvi = dvToDate(dados[i].dvi);
-			dados[i].DEBUG_dvi_from_di = dateToDv(dados[i].DEBUG_di_from_dvi);
-			var testDi = dateToGoogleStr(dados[i].DEBUG_di_from_dvi);
-			(testDi != dados[i].datainicial) ? console.log(i + ' : ' + dados[i].datainicial + ' - ' + testDi) : null;
-			
-			dados[i].DEBUG_df_from_dvf = dvToDate(dados[i].dvf);
-			dados[i].DEBUG_dvf_from_df = dateToDv(dados[i].DEBUG_df_from_dvf);
-			var testDf = dateToGoogleStr(dados[i].DEBUG_df_from_dvf);
-			(testDf != dados[i].datafinal) ? console.log(i + ' : ' + dados[i].datafinal + ' - ' + testDf) : null;
-		}
-	}
+	// for(var i in dados){
+	// 	if(dados[i].dvi){
+	// 		dados[i].DEBUG_di_from_dvi = dvToDate(dados[i].dvi);
+	// 		dados[i].DEBUG_dvi_from_di = dateToDv(dados[i].DEBUG_di_from_dvi);
+	// 		var testDi = dateToGoogleStr(dados[i].DEBUG_di_from_dvi);
+	// 		(testDi != dados[i].datainicial) ? console.log(i + ' : ' + dados[i].datainicial + ' - ' + testDi) : null;
+	// 		
+	// 		dados[i].DEBUG_df_from_dvf = dvToDate(dados[i].dvf);
+	// 		dados[i].DEBUG_dvf_from_df = dateToDv(dados[i].DEBUG_df_from_dvf);
+	// 		var testDf = dateToGoogleStr(dados[i].DEBUG_df_from_dvf);
+	// 		(testDf != dados[i].datafinal) ? console.log(i + ' : ' + dados[i].datafinal + ' - ' + testDf) : null;
+	// 	}
+	// }
 	
 	return dados;
 }
@@ -76,7 +76,6 @@ OFFSET_DV2DATE = 2*60*60 //2h em segundos
 // OFFSET_DV2DATE = 0;
 
 function dvToDate(dv){
-	if(!dv){ console.log("dvToDate() : cadê o dv?"); return undefined }
 	return new Date((OFFSET_DV2DATE + parseInt(dv))*1000);
 }
 

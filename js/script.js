@@ -189,7 +189,7 @@ function drawTimeline(){
 	for (var i in timeline){
 		timeline[i] = timeline[i].split('=');		
 		var obj = {};
-		obj.htmlLabel = timeline[i][0] // afeta todas as instancias do caractere entre //g;
+		obj.htmlLabel = timeline[i][0];
 		obj.dateStr = timeline[i][1];
 		timeline[i] = obj;
 	}
@@ -465,12 +465,17 @@ function EventDot(ca){
 		//armazena as datas escolhidas
 		this.dataInicial	= new Date(datas.menor);
 		this.dataFinal		= new Date(datas.maior);
-
-		// console.log(this.dataInicial.toString() + "  ||  " + this.dataFinal.toString());
-
-		//IMAGENS
-
-
+		
+		// //empurrra uma hora e pouco pra frente para evitar problemas com horário de verão
+		// if(this.dataInicial.getDate() == 1 || this.dataFinal.getDate() == 1){
+		// 	var TAPEIA_VERAO = 90*60*1000;
+		// 	this.dataInicial = (this.dataInicial.getDate() == 1) ? new Date(this.dataInicial.getTime()	+ TAPEIA_VERAO) : this.dataInicial;
+		// 	this.dataFinal	 = (this.dataFinal.getDate() == 1) 	 ? new Date(this.dataFinal.getTime()		+ TAPEIA_VERAO) : this.dataFinal;
+		// 	console.log(ca.id + "> " + this.dataInicial.toString() + "  ||  " + this.dataFinal.toString());
+		// } else {
+		// 	console.log(ca.id + ": " + this.dataInicial.toString() + "  ||  " + this.dataFinal.toString());			
+		// }
+		
 		//OUTROS
 		//avisa que ainda não recebeu a função de clique (para não anexar 2x)
 		this.semClique = true;
@@ -700,12 +705,22 @@ EventDot.prototype.posicionar = function(){
 
 // EventDot.prototype.dateToPosition = function(t){
 function dateToPosition(t){	
-	if(t >= timeline[timeline.length-1].date.getTime()){
+	if(t > timeline[timeline.length-1].date.getTime()){
 		//se t for maior que a última marca da timeline
 		return $(window).width() + 50;
+		// return $(window).width();
+	} else if(t == timeline[timeline.length-1].date.getTime()){
+			//se t for igual a ultima marca
+			return timeline[timeline.length-1].position;
+			// return $(window).width();
 	} else if(t < timeline[0].date.getTime()){
 		//se t for menor que a primeira marca da timeline
 		return -50;
+		// return 0;
+	} else if(t == timeline[0].date.getTime()){
+			//se t for igual a primeira marca da timeline
+			return timeline[0].position;
+			// return 0;
 	} else {
 		//t está entre alguma das marcas
 		//identifica o intervalo
