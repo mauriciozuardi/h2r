@@ -54,31 +54,33 @@ function listToObjects(json){
 		}
 	}
 	
-	//DEBUG
-	// for(var i in dados){
-	// 	if(dados[i].datainicial){
-	// 		var dJS = datevalueToDate(dados[i].datevalueinicial);
-	// 		dados[i].datainicialrecalculadaj = dJS.toString();
-	// 		
-	// 		var dG = googleDateToDate(dados[i].datainicial);
-	// 		dados[i].datainicialrecalculadag = dG.toString();	
-	// 		
-	// 		var dv = dateToDatevalue(dG);
-	// 		dados[i].datevalueinicia2 = dv.toString();	
-	// 	}
-	// }
+	// DEBUG
+	for(var i in dados){
+		if(dados[i].dvi){
+			dados[i].DEBUG_di_from_dvi = dvToDate(dados[i].dvi);
+			dados[i].DEBUG_dvi_from_di = dateToDv(dados[i].DEBUG_di_from_dvi);
+			var testDi = dateToGoogleStr(dados[i].DEBUG_di_from_dvi);
+			(testDi != dados[i].datainicial) ? console.log(i + ' : ' + dados[i].datainicial + ' - ' + testDi) : null;
+			
+			dados[i].DEBUG_df_from_dvf = dvToDate(dados[i].dvf);
+			dados[i].DEBUG_dvf_from_df = dateToDv(dados[i].DEBUG_df_from_dvf);
+			var testDf = dateToGoogleStr(dados[i].DEBUG_df_from_dvf);
+			(testDf != dados[i].datafinal) ? console.log(i + ' : ' + dados[i].datafinal + ' - ' + testDf) : null;
+		}
+	}
 	
 	return dados;
 }
 
 OFFSET_DV2DATE = 2*60*60 //2h em segundos
+// OFFSET_DV2DATE = 0;
 
-function datevalueToDate(dv){
-	if(!dv){ console.log("datevalueToDate() : cadê o dv?"); return undefined }
+function dvToDate(dv){
+	if(!dv){ console.log("dvToDate() : cadê o dv?"); return undefined }
 	return new Date((OFFSET_DV2DATE + parseInt(dv))*1000);
 }
 
-function dateToDatevalue(date){
+function dateToDv(date){
 	return Math.round(date.getTime()/1000 - OFFSET_DV2DATE);
 }
 
@@ -143,7 +145,7 @@ function listaSites(root) {
 	//chamada nova, com query
 	var F = firstTimemark(true);
 	var L = lastTimemark(true);
-	query = "&sq=!((dvi<"+F+" and dvf<"+F+") or (dvi>"+L+" and dvf>"+L+"))";
+	query = "&sq=!((dvi<="+F+" and dvf<="+F+") or (dvi>="+L+" and dvf>="+L+"))";
 	query = encodeURI(query);
 	
 	//https://spreadsheets.google.com/feeds/list/0AnLIuvvW8l93dEp2UkxfOS1PVE02OFlpS1Btc2g5U0E/4/public/basic?alt=json
@@ -155,12 +157,12 @@ function listaSites(root) {
 
 function firstTimemark(datavalue){
 	var date = timeline[0].date;
-	return datavalue ? dateToDatevalue(date) : dateToGoogleStr(date);
+	return datavalue ? dateToDv(date) : dateToGoogleStr(date);
 }
 
 function lastTimemark(datavalue){
 	var date = timeline[timeline.length-1].date;
-	return datavalue ? dateToDatevalue(date) : dateToGoogleStr(date);
+	return datavalue ? dateToDv(date) : dateToGoogleStr(date);
 }
 
 function dateToGoogleStr(date){
