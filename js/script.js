@@ -763,21 +763,24 @@ eventsHeight = 0;
 function resizeEventWindow(){
 	//armazena o tamanho do div de eventos (para usar no scroll)
 	eventsHeight = (eventsHeight == 0) ? $('#events').height() : eventsHeight;
-	$('#events-scroller').css('height', eventsHeight);
 	// console.log(eventsHeight);
 	
 	//ajusta o tamanho do div q contém as instâncias de EventDot
-	var marginTop = 50;
-	var ajuste = 5;
+	var MARGIN_TOP = 50;
+	var AJUSTE = 5;
+	var MARGIN_BOTTOM = 20;
 	if($('#selected-info').hasClass('closed')){
-		var h = $(window).height() - $('#header').outerHeight(true) - $('#about-info').outerHeight(true) - marginTop - ajuste + $(window).scrollTop();
+		var h = $(window).height() - $('#header').outerHeight(true) - $('#about-info').outerHeight(true) - MARGIN_TOP - AJUSTE + $(window).scrollTop();
+		var hs = eventsHeight + $('#about-info').outerHeight(true) + $('#header').outerHeight(true);
 	} else {
-		var h = $(window).height() - $('#header').outerHeight(true) - $('#about-info').outerHeight(true) - $('#selected-info').outerHeight(true) - marginTop - ajuste + $(window).scrollTop();
+		var h = $(window).height() - $('#header').outerHeight(true) - $('#about-info').outerHeight(true) - $('#selected-info').outerHeight(true) - MARGIN_TOP - AJUSTE + $(window).scrollTop();
+		var hs = eventsHeight + $('#about-info').outerHeight(true) + $('#selected-info').outerHeight(true) + $('#header').outerHeight(true) ;
 	}
 	
 	//aplica
-	$('#events').css('top', $('#header').height() + marginTop);
+	$('#events').css('top', $('#header').height() + MARGIN_TOP);
 	$('#events').css('height', h);
+	$('#events-scroller').css('height', hs + MARGIN_BOTTOM);
 }
 
 function resizeEvents(){
