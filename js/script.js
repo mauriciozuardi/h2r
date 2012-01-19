@@ -167,13 +167,13 @@ function reloadWithSearch(searchWord){
 }
 
 function mostraRetorno(json){
-	console.log(listToObjects(json));
+	console.log(['JSON > ',listToObjects(json)]);
 }
 
 function updateHeader(){
 	if(URLvars.q){
 		// var html = "<button type='submit' class='btn_voltar'>voltar</button><button type='submit' class='btn_home'>home</button>";
-		var html = "<button type='submit' class='btn_home'>home</button>";
+		var html = "<button type='submit' class='btn_home'>voltar para a agenda</button>";
 		$('#header').html(html);
 		incluiLogo();
 		//aplica o onClick no botao
@@ -219,6 +219,7 @@ function homeClicked(){
 function fillPullDown(el, campo){
 	//percorre todas as atividades procurando tipos diferentes
 	var encontrados = [];
+	var encontrados_ids = [];
 	for (var i in a[sID]){
 		if(a[sID][i][campo]){
 			var variosNoMesmoCampo = a[sID][i][campo].split(', ');
@@ -228,10 +229,24 @@ function fillPullDown(el, campo){
 				} else {
 					var valor = variosNoMesmoCampo[j];					
 				}
-				if(!existe(valor, encontrados)){ encontrados.push(valor) }
+				if(!existe(valor, encontrados)){
+					encontrados.push(valor);
+					encontrados_ids.push(i);
+				}
 			}
 		}
 	}
+	
+	//exclui os que não aparecem no CA
+	// var excluidos = [];
+	// for(var i in encontrados){
+	// 	// console.log(encontrados_ids[i] + ":" + encontrados[i]);
+	// 	if(!existe(encontrados_ids[i], excluidos) && !atividadeListadaEmAlgumCA(encontrados_ids[i])){
+	// 		console.log('excluindo [ ' + campo + ':' + encontrados_ids[i] + ':' + encontrados[i] + ' ]. Não aparece em nenhum CA.');
+	// 		encontrados.splice(i,1);
+	// 		excluidos.push(encontrados_ids.splice(i,1));
+	// 	}
+	// }
 	
 	//coloca em ordem alfabética
 	encontrados.sort(compareAlphabet);
@@ -254,6 +269,7 @@ function fillPullDown(el, campo){
 }
 
 function existe(value, array){
+	// console.log(['checando se ' + value + ' existe no array', array]);
 	for (var i in array){
 		if(array[i] == value){ return true }
 	}
@@ -297,7 +313,9 @@ function refazTimeline(){
 	
 	for(var i in a[sID]){
 		var atividade = a[sID][i];
-		if(atividade.dvi && atividade.dvf && listadaEmAlgumCA(atividade.id)){
+		// if(atividade.dvi && atividade.dvf && atividadeListadaEmAlgumCA(atividade.id)){
+		!atividadeListadaEmAlgumCA(atividade.id) ? console.log(atividade.id + ' não aparece em CA.') : null;
+		if(atividade.dvi && atividade.dvf){
 			//guarda os recordistas
 			(atividade.dvi < datas.menor) ? datas.aMenor = atividade : null;
 			(atividade.dvf > datas.maior) ? datas.aMaior = atividade : null;
@@ -311,6 +329,7 @@ function refazTimeline(){
 	datas.menor = dvToDate(datas.menor);
 	datas.maior = dvToDate(datas.maior);
 	console.log(["Extremos da timeline customizada",datas]);
+	// console.log(['eventDotInstances', eventDotInstances]);
 	
 	var aI = datas.menor.getFullYear();
 	var aF = datas.maior.getFullYear();
@@ -342,7 +361,7 @@ function refazTimeline(){
 	// console.log("Mostrando eventos entre [" + datas.menor.toString() + "] e [" + datas.maior.toString() + "]")
 }
 
-function listadaEmAlgumCA(id){
+function atividadeListadaEmAlgumCA(id){
 	for(var i in ca[sID]){
 		var visiveis = ca[sID][i].atividades.split(', ');
 		for(var j in visiveis){
@@ -530,11 +549,7 @@ function updateTimelineDates(){
 function EventDot(ca){
 	var atalho = ca.atividades.split(", ")[0];
 	// console.log(['a.' + ca.siteId + '.' + atalho,a[ca.siteId][atalho]]);
-	
 	if(a[ca.siteId][atalho]){
-		//pediu para esconder?
-		// if(ca.esconder || a[ca.siteId][atalho].esconder){ return undefined }
-
 		//falta alguma informação crítica?
 		if(!ca.id){ return undefined }
 		if(!ca.atividades){ return undefined }
@@ -655,6 +670,7 @@ function EventDot(ca){
 		//check-in
 		// eventDotInstances.push(this);
 	} else {
+		console.log(atalho + ' não existe em a[sID]');
 		return undefined;
 	}
 }
@@ -955,26 +971,37 @@ function drawHomeEvents(){
 }
 
 function selecionaDestaqueRandomico(){
-	console.log(destaques.length);
 	var r = Math.floor(destaques.length * Math.random());
-	// console.log(destaques[r].i);
-	
-	console.log(r);
-	console.log(destaques);
 	selectDot(destaques[r].i);
 }
 
 function criaEventDotsHome(){
-	//varre os CAs do 'site' em questão
+	if(!URLvars.q){
+		console.log('procurando em CAs');
+	} else {
+		console.log('procurando em As');
+		var ondeProcurar = a[sID];
+		
+		//recria o CA, baseado nos As q retornaram da busca
+		var n = 0;
+		ca[sID] = [];
+		for(var i in ondeProcurar){
+			var id = 'c' + n;
+			ca[sID][id] = {};
+			ca[sID][id].id = id;
+			ca[sID][id].atividades = i;
+			n ++;
+		}
+		console.log(['CA recriado',ca[sID]]);
+	}
+	
+	// cria as EventDots
 	for(var j in ca[sID]){
-		//cria uma bolinha para cada
-		// console.log(["ca." + sID + "." + j, ca[sID][j]]);
-		var obj = ca[sID][j];
-		// console.log(['obj',obj]);
-		obj.siteId = sID;
-		var dot = new EventDot(obj);
-		console.log['dot', dot];
-		(dot.dataInicial && dot.dataFinal) ? eventDotInstances.push(dot) : dotsZuadas.push(obj);
+		var caToDot = ca[sID][j];
+		caToDot.siteId = sID;
+		// console.log(['caToDot', caToDot]);
+		var dot = new EventDot(caToDot);
+		(dot.dataInicial && dot.dataFinal) ? eventDotInstances.push(dot) : dotsZuadas.push(caToDot);
 	}
 	console.log(['Dot creation ERROR!', dotsZuadas]);
 }
