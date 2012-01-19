@@ -1295,31 +1295,34 @@ function abreBaloon(idComposto, aID, skipIndex){
 		var n = 0;
 		skipIndex = skipIndex ? skipIndex : 0;
 		
+		console.log(ca_.atividades);
 		for (i in atividades){
 			// console.log(skipIndex);
 			if(i != skipIndex){
 				var context = {};
 				atividade = a[ca_.siteId][atividades[i]];
-				nameParts = atividade.nome.split(' // ');
-				imgs = atividade.imagens ? atividade.imagens.split('\n') : ["default-img.png"];
-				// alpha = (100 - (alphaStep * n))/100; n ++;
-				alpha = 1;
+				if(atividade){
+					nameParts = atividade.nome.split(' // ');
+					imgs = atividade.imagens ? atividade.imagens.split('\n') : ["default-img.png"];
+					// alpha = (100 - (alphaStep * n))/100; n ++;
+					alpha = 1;
 			
-				html = "";
-				html += "<div id='cross-" + i + "' class='balloon cross' style='background-color:rgba(255,255,255," + alpha + ")'>";
-				html += "<div class='bg-cover cross-img' style='background-image: url(./img/" + encodeURI(imgs[0]) + ");'></div>";
-				html += "<div class='reticencias' style='background-image: url(./img/reticencias.png);'></div>";
-				html += "<h2>" + atividade.tipo + "</h2>";
-				html += "<h1>" + nameParts[0];
-				html += nameParts[1] ? "<em> // " + nameParts[1] + "</em></h1>" : "</h1>";
-				html += "</div>";
-				$('#cross').append(html);
+					html = "";
+					html += "<div id='cross-" + i + "' class='balloon cross' style='background-color:rgba(255,255,255," + alpha + ")'>";
+					html += "<div class='bg-cover cross-img' style='background-image: url(./img/" + encodeURI(imgs[0]) + ");'></div>";
+					html += "<div class='reticencias' style='background-image: url(./img/reticencias.png);'></div>";
+					html += "<h2>" + atividade.tipo + "</h2>";
+					html += "<h1>" + nameParts[0];
+					html += nameParts[1] ? "<em> // " + nameParts[1] + "</em></h1>" : "</h1>";
+					html += "</div>";
+					$('#cross').append(html);
 			
-				str = "#cross-" + i;
-				context.atividade = atividades[i];
-				context.id = ca_.siteId + "-" + ca_.id;
-				context.skipIndex = i;
-				$(str).click($.proxy(crossClicked, context));				
+					str = "#cross-" + i;
+					context.atividade = atividades[i];
+					context.id = ca_.siteId + "-" + ca_.id;
+					context.skipIndex = i;
+					$(str).click($.proxy(crossClicked, context));
+				}	
 			}
 		}
 	}
