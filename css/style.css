@@ -397,6 +397,9 @@ input {
 	padding-left:4px;
 	height:14px;
 }
+.btn_home{
+	margin-left:-20px;
+}
 .todosEspacos{
 	position: absolute;
 	margin-left: -64px;

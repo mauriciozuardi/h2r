@@ -6,6 +6,7 @@ dotSelected = {};
 //eventos
 createdDots = 0;
 eventDotInstances = [];
+dotsZuadas = [];
 destaques = [];
 MIN_WIDTH = 960;
 //balloon
@@ -58,12 +59,6 @@ function init(){
 	$('#slideshow-controls .previous').click(function(event){prevSlideImg(event)});
 	$('#slideshow-controls .next').click(function(event){nextSlideImg(event)});
 	
-	//aplica os onChange() no header
-	$('.oque').change(function(){ onPullDownOqueChange($(this)); });
-	$('.onde').change(function(){ onPullDownOndeChange($(this)); });
-	$('.quem').change(function(){ onPullDownQuemChange($(this)); });
-	// $('.btn_filtrar').click(filtrarClicked);
-	
 	//ajusta a altura do body no resize
 	$(window).resize(function(event){
 		resizeBg();
@@ -82,30 +77,55 @@ function init(){
   });
 }
 
-function onPullDownChange(element){
-	// https://spreadsheets.google.com/feeds/list/0AnLIuvvW8l93dEp2UkxfOS1PVE02OFlpS1Btc2g5U0E/4/public/basic?alt=json&q=Afetos
-	var query = "&q=" + element.val();
-	query = encodeURI(query);
-	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/4/public/basic?alt=json" + query, function(json){mostraOque(json)});
-}
+// function onPullDownChange(element){
+// 	// https://spreadsheets.google.com/feeds/list/0AnLIuvvW8l93dEp2UkxfOS1PVE02OFlpS1Btc2g5U0E/4/public/basic?alt=json&q=Afetos
+// 	var query = "&q=" + element.val();
+// 	query = encodeURI(query);
+// 	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/4/public/basic?alt=json" + query, function(json){mostraRetorno(json)});
+// }
 
 function onPullDownOqueChange(element){
-	var query = "&q=" + element.val();
-	query = encodeURI(query);
-	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/4/public/basic?alt=json" + query, function(json){mostraOque(json)});
+	var searchWord = element.val();
+	reloadWithSearch(searchWord);
 }
 
 function onPullDownOndeChange(element){
-	var query = "&q=" + ondeID(element.val());
-	query = encodeURI(query);
-	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/4/public/basic?alt=json" + query, function(json){mostraOque(json)});
+	var searchWord = ondeID(element.val());
+	reloadWithSearch(searchWord);
 }
 
 function onPullDownQuemChange(element){
-	var query = "&q=" + element.val();
-	query = encodeURI(query);
-	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/4/public/basic?alt=json" + query, function(json){mostraOque(json)});
+	var searchWord = element.val();
+	// if(nomeEhID(searchWord)){
+	// 	reloadWithSearch(searchWord);
+	// } else {
+	// 	console.log('ops');
+	// 	var id = nomeID(searchWord);
+	// 	id ? reloadWithSearch(id) : console.log('ERRO : nome não deveria estar no pulldown');
+	// }
+	reloadWithSearch(searchWord);
 }
+
+// function nomeEhID(nome){
+// 	return p[string_to_slug(nome)];
+// }
+// 
+// function nomeID(nomeNaoID){
+// 	var possivelSlug = string_to_slug(nomeNaoID)
+// 	for (var i in a[sID]){
+// 		var nomes = a[sID][i].quem;
+// 		if(nomes){
+// 			nomes = nomes.split(', ');
+// 			for(var j in nomes){
+// 				if(possivelSlug == string_to_slug(nomes[j])){
+// 					console.log('ACHEI! ' + nomeNaoID + ' : ' + i);
+// 					return i;
+// 				}			
+// 			}
+// 		}
+// 	}
+// 	return undefined;
+// }
 
 function ondeID(ondeName){
 	var o = string_to_slug(ondeName)
@@ -117,14 +137,80 @@ function ondeID(ondeName){
 	}
 }
 
-function mostraOque(json){
+function newURLSearch(searchWord){
+	searchWord = encodeURI(searchWord);
+	var search = window.location.search.toString().split('q=');
+	// console.log(search);
+	var firstChar = (search[0] == "" || search[0] == '?') ? '?' : '&';
+	var newSearch = firstChar + 'q=' + searchWord;
+	// console.log(newSearch);
+	return newSearch;
+}
+
+function reloadWithSearch(searchWord){
+	var URL = window.location.toString().split('?');
+	if(URL[1]){
+		var search = URL[1].split('&');
+		var searchThatShouldStay = "";
+		for(var i in search){
+			if(search[i].substr(0,2) != 'q='){
+				(searchThatShouldStay == "") ? searchThatShouldStay = "?" : null;
+				searchThatShouldStay += search[i];
+			}
+		}
+	} else {
+		searchThatShouldStay = "";
+	}
+
+	// console.log(search);
+	window.location = URL[0] + searchThatShouldStay + newURLSearch(searchWord);
+}
+
+function mostraRetorno(json){
 	console.log(listToObjects(json));
 }
 
-function updatePullDowns(){
-	fillPullDown($('.oque'), 'tipo');
-	fillPullDown($('.onde'), 'onde');
-	fillPullDown($('.quem'), 'quem');
+function updateHeader(){
+	if(URLvars.q){
+		// var html = "<button type='submit' class='btn_voltar'>voltar</button><button type='submit' class='btn_home'>home</button>";
+		var html = "<button type='submit' class='btn_home'>home</button>";
+		$('#header').html(html);
+		incluiLogo();
+		//aplica o onClick no botao
+		// $('.btn_voltar').click(voltarClicked);
+		$('.btn_home').click(homeClicked);
+	} else {
+		var html = "<select class='oque'><option>o quê</option></select><select class='onde'><option>onde</option></select><select class='quem'><option>quem</option></select>";
+		$('#header').html(html);
+		incluiLogo();
+		fillPullDown($('.oque'), 'tipo');
+		fillPullDown($('.onde'), 'onde');
+		fillPullDown($('.quem'), 'quem');
+		//aplica os onChange() no header
+		$('.oque').change(function(){ onPullDownOqueChange($(this)); });
+		$('.onde').change(function(){ onPullDownOndeChange($(this)); });
+		$('.quem').change(function(){ onPullDownQuemChange($(this)); });
+	}
+}
+
+// function voltarClicked(){
+// 	window.history.back();
+// 	// window.history.go(-1);
+// }
+
+function homeClicked(){
+	var URL = window.location.toString().split('?');
+	var search = URL[1].split('&');
+	var searchThatShouldStay = "";
+	for(var i in search){
+		if(search[i].substr(0,2) != 'q='){
+			(searchThatShouldStay == "") ? searchThatShouldStay = "?" : null;
+			searchThatShouldStay += search[i];
+		}
+	}
+	// console.log(search);
+	// console.log(URL[0] + searchThatShouldStay)
+	window.location = URL[0] + searchThatShouldStay;
 }
 
 function fillPullDown(el, campo){
@@ -146,6 +232,11 @@ function fillPullDown(el, campo){
 	
 	//coloca em ordem alfabética
 	encontrados.sort(compareAlphabet);
+	
+	//esconde se só tiver uma opção
+	if(encontrados.length == 1){
+		el.css('display','none');
+	}
 	
 	//enfia o valor inicial no começo
 	encontrados.unshift(el.val());
@@ -177,13 +268,13 @@ function resizeBg(){
 function recenterBalloon(){
 	var balloon = $('#balloon');
 	var minTop = $('#header').outerHeight(true);
-	var top = Math.floor(Math.max(minTop, ($(window).height()-balloon.outerHeight(true))/2));
+	var top = Math.floor(Math.max(minTop, (($('#events').outerHeight(true))-balloon.outerHeight(true))/2));
 	var left = Math.floor((Math.max(MIN_WIDTH, $(window).width()) - balloon.outerWidth(true))/2);
 	balloon.css('top', top);
 	balloon.css('left', left);
 }
 
-function drawTimeline(){
+function criaTimelineArray(){
 	//trata os nomes e datas
 	timeline = timeMarksStr.split('|');
 	for (var i in timeline){
@@ -193,9 +284,85 @@ function drawTimeline(){
 		obj.dateStr = timeline[i][1];
 		timeline[i] = obj;
 	}
-	
-	//
 	updateTimelineDates();
+}
+
+function refazTimeline(){
+	var datas = {};
+	datas.menor = 1.7976931348623157E+10308; //infinito
+	datas.maior = 0;
+	
+	for(var i in a[sID]){
+		var atividade = a[sID][i];
+		if(atividade.dvi && atividade.dvf && listadaEmAlgumCA(atividade.id)){
+			//guarda os recordistas
+			(atividade.dvi < datas.menor) ? datas.aMenor = atividade : null;
+			(atividade.dvf > datas.maior) ? datas.aMaior = atividade : null;
+			//atualiza a maior e a menor
+			datas.menor = Math.min(atividade.dvi, datas.menor);
+			datas.maior = Math.max(atividade.dvf, datas.maior);
+		}
+	}
+	
+	//converte os datevalues em datas
+	datas.menor = dvToDate(datas.menor);
+	datas.maior = dvToDate(datas.maior);
+	console.log(["Extremos da timeline customizada",datas]);
+	
+	var aI = datas.menor.getFullYear();
+	var aF = datas.maior.getFullYear();
+	var dA = aF - aI;
+	var mI = datas.menor.getMonth();
+	var mF = datas.maior.getMonth();
+	
+	if(dA > 0){
+		//tem mais de um ano entre as datas
+		var nM = (dA*12) - mI + mF;
+	} else {
+		//está tudo dentro do mesmo ano
+		var nM = mF - mI;
+	}
+	
+	// console.log(nM);
+	var mesCurto = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+	timeline = [];
+	
+	for(var i=0; i<=nM+1; i++){
+		var currentMonth = (mI + i)%12;
+		var currentYear = aI + Math.floor( (mI+i)/12 );
+		var mostraAno = (i==0 || currentMonth == 0) ? " " + currentYear : "";
+		var timelineItem = {}
+		timelineItem.date = new Date(currentYear,currentMonth,1);
+		timelineItem.htmlLabel = mesCurto[currentMonth] + mostraAno;
+		timeline.push(timelineItem);
+	}
+	
+	// console.log("Mostrando eventos entre [" + datas.menor.toString() + "] e [" + datas.maior.toString() + "]")
+}
+
+function listadaEmAlgumCA(id){
+	for(var i in ca[sID]){
+		var visiveis = ca[sID][i].atividades.split(', ');
+		for(var j in visiveis){
+			if(visiveis[j] == id){
+				// console.log(id + " aparece listada no " + ca[sID][i].id);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+function escreveData(date){
+	// var semana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab" ];
+	var mesCurto = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+	var str = date.getDate() + " de " + mesCurto[date.getMonth()] + ". de " + date.getFullYear()
+	return str;
+}
+
+function drawTimeline(){
+	//
+	// updateTimelineDates();
 	
 	//cria os elementos
 	for(var i in timeline){
@@ -364,12 +531,12 @@ function EventDot(ca){
 	
 	if(a[ca.siteId][atalho]){
 		//pediu para esconder?
-		if(ca.esconder || a[ca.siteId][atalho].esconder){ return true }
+		// if(ca.esconder || a[ca.siteId][atalho].esconder){ return undefined }
 
 		//falta alguma informação crítica?
-		if(!ca.id){ return true }
-		if(!ca.atividades){ return true }
-		if(!ca.siteId){ return true }
+		if(!ca.id){ return undefined }
+		if(!ca.atividades){ return undefined }
+		if(!ca.siteId){ return undefined }
 
 		//ID
 		this.id = ca.siteId + "-" + ca.id;
@@ -451,15 +618,18 @@ function EventDot(ca){
 		// console.log(arrAtividades);
 		if(arrAtividades){
 			var datas = comparaDatasDasAtividades(ca, arrAtividades);
+			// console.log(datas);
 			if(datas.corrupted){
-				var datas = {};
-				datas.menor = Date.now();
-				datas.maior = Date.now();
+				// var datas = {};
+				// datas.menor = Date.now();
+				// datas.maior = Date.now();
+				return undefined;
 			}
 		} else {
-			var datas = {};
-			datas.menor = Date.now();
-			datas.maior = Date.now();
+			// var datas = {};
+			// datas.menor = Date.now();
+			// datas.maior = Date.now();
+			return undefined;
 		}
 
 		//armazena as datas escolhidas
@@ -481,7 +651,9 @@ function EventDot(ca){
 		this.semClique = true;
 
 		//check-in
-		eventDotInstances.push(this);
+		// eventDotInstances.push(this);
+	} else {
+		return undefined;
 	}
 }
 
@@ -491,25 +663,27 @@ function comparaDatasDasAtividades(ca, arrAtividades){
 	datas.maior = 0;
 	// console.log(arrAtividades);
 	for (var i in arrAtividades){
-		// console.log(i);
-		// console.log(a[ca.siteId][arrAtividades[i]]);
-		//descobre os candidatos
-		var ci = a[ca.siteId][arrAtividades[i]].datainicial;
-		var cf = a[ca.siteId][arrAtividades[i]].datafinal;
+		// (a[ca.siteId][arrAtividades[i]]) ? console.log(arrAtividades[i] + ' OK!') : console.log('pulando ' + arrAtividades[i]);
+		if(a[ca.siteId][arrAtividades[i]]){
+			// console.log(a[ca.siteId][arrAtividades[i]]);
+			//descobre os candidatos
+			var ci = a[ca.siteId][arrAtividades[i]].datainicial;
+			var cf = a[ca.siteId][arrAtividades[i]].datafinal;
 		
-		//confere se a data foi cadastrada na planilha (banco)
-		if(!ci || !cf){ datas.corrupted = true; return datas }
+			//confere se a data foi cadastrada na planilha (banco)
+			if(!ci || !cf){ datas.corrupted = true; return datas }
 		
-		//converte a data do google para a data do js
-		var candidatoInicial	= googleDateToDate(ci);
-		var candidatoFinal		= googleDateToDate(cf);
+			//converte a data do google para a data do js
+			var candidatoInicial	= googleDateToDate(ci);
+			var candidatoFinal		= googleDateToDate(cf);
 		 
-		//confere se está tudo ok com o retorno do googleDateToDate
-		if(!candidatoInicial || !candidatoFinal){ datas.corrupted = true; return datas }
+			//confere se está tudo ok com o retorno do googleDateToDate
+			if(!candidatoInicial || !candidatoFinal){ datas.corrupted = true; return datas }
 		
-		//vê se o candidato é maior ou menor que os anteriores
-		datas.menor = Math.min(candidatoInicial.getTime(), datas.menor);
-		datas.maior = Math.max(candidatoFinal.getTime(), datas.maior);
+			//vê se o candidato é maior ou menor que os anteriores
+			datas.menor = Math.min(candidatoInicial.getTime(), datas.menor);
+			datas.maior = Math.max(candidatoFinal.getTime(), datas.maior);
+		}
 	}
 	return datas;
 }
@@ -548,13 +722,7 @@ EventDot.drawThemAll = function(sortBy){
 	//percorre o array criando o HTML
 	for(var i in eventDotInstances){
 		var e = eventDotInstances[i];
-		
-		// if(sID == 's1'){
-			// var labelTxt = e.onde;
-		// } else {
-			var labelTxt = e.oque;
-		// }
-		// console.log(labelTxt)
+		var labelTxt = e.oque;
 		
 		//cria o DIV com id com a bolinha, range e label dentro
 		var html = "<div data-id='" + e.id + "' class='event " + e.id + "'><span data-id='" + e.id + "' class='range'><span data-id='" + e.id + "' data-i='" + e.i + "' class='dot'></span></span><span data-i='" + e.i + "' class='label'>" + labelTxt + "<img src='./img/nano-balloon.gif' class='nano' /></span></div>";
@@ -566,6 +734,18 @@ EventDot.drawThemAll = function(sortBy){
 		//inclui na lista de destaques se for o caso
 		if(e.visual == 'g'){
 			destaques.push(e);
+		}
+	}
+	
+	//se não tem destaque algum, marca todos os q estão rolando como g
+	if(destaques.length == 0){
+		for(var i in eventDotInstances){
+			var e = eventDotInstances[i];
+			console.log(e);
+			if(e.dataFinal.getTime() >= Date.now()){
+				e.visual = 'g';
+				e.updateVisual();
+			}
 		}
 	}
 	
@@ -746,9 +926,13 @@ function dateToPosition(t){
 
 function drawHomeEvents(){
 	//aproveita e atualiza o conteúdo do pulldown
-	updatePullDowns();
+	updateHeader();
 	//home events
 	criaEventDotsHome();
+	URLvars.q ? refazTimeline() : null;
+	drawTimeline();
+	
+	// console.log(eventDotInstances);
 	EventDot.drawThemAll();
 	selecionaDestaqueRandomico();
 	resizeEventWindow();
@@ -763,14 +947,18 @@ function selecionaDestaqueRandomico(){
 }
 
 function criaEventDotsHome(){
-		//varre os CAs do 'site' em questão
-		for(var j in ca[sID]){
-			//cria uma bolinha para cada
-			// console.log(["ca." + sID + "." + j, ca[sID][j]]);
-			var obj = ca[sID][j];
-			obj.siteId = sID;
-			new EventDot(obj);
-		}
+	//varre os CAs do 'site' em questão
+	for(var j in ca[sID]){
+		//cria uma bolinha para cada
+		// console.log(["ca." + sID + "." + j, ca[sID][j]]);
+		var obj = ca[sID][j];
+		// console.log(['obj',obj]);
+		obj.siteId = sID;
+		var dot = new EventDot(obj);
+		console.log['dot', dot];
+		(dot.dataInicial && dot.dataFinal) ? eventDotInstances.push(dot) : dotsZuadas.push(obj);
+	}
+	console.log(['Dot creation ERROR!', dotsZuadas]);
 }
 
 eventsHeight = 0;

@@ -127,11 +127,12 @@ function listaSites(root) {
 	try {incluiLogo()}
 	catch(err){}
 		
-	//desenha a timeline
-	try {drawTimeline()}
+	//cria o array 'timeline'
+	try {criaTimelineArray()}
 	catch(err){}
 	
-	console.log("Mostrando eventos entre [" + timeline[0].date.toString() + "] e [" + timeline[timeline.length-1].date.toString() + "]");
+	// console.log(timeline);
+	!URLvars.q ? console.log("Mostrando eventos entre [" + timeline[0].date.toString() + "] e [" + timeline[timeline.length-1].date.toString() + "]") : null;
 	console.log(["Sites", s]);
 	
 	//decide se vai carregar os JSONS de um 'site' ou de todos
@@ -140,12 +141,17 @@ function listaSites(root) {
 	
 	//chamada nova
 	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/3/public/basic?alt=json", $.proxy(listaConjuntosPrePreenchida, context));
-	
-	//chamada nova, com query
-	var F = firstTimemark(true);
-	var L = lastTimemark(true);
-	query = "&sq=!((dvi<="+F+" and dvf<="+F+") or (dvi>="+L+" and dvf>="+L+"))";
-	query = encodeURI(query);
+	if(!URLvars.q){	
+		//chamada nova, com query default (todas atividades dentro da timeline)
+		var F = firstTimemark(true);
+		var L = lastTimemark(true);
+		var query = "&sq=!((dvi<="+F+" and dvf<="+F+") or (dvi>="+L+" and dvf>="+L+")) and esconder==0";
+		query = encodeURI(query);
+	} else {
+		// usuário veio com URL filtrada
+		var query = "&q=" + decodeURI(URLvars.q);
+		query = encodeURI(query);
+	}
 	
 	//https://spreadsheets.google.com/feeds/list/0AnLIuvvW8l93dEp2UkxfOS1PVE02OFlpS1Btc2g5U0E/4/public/basic?alt=json
 	$.getJSON("https://spreadsheets.google.com/feeds/list/" + s[sID].key + "/4/public/basic?alt=json" + query, $.proxy(listaAtividadesPrePreenchida, context));
@@ -187,6 +193,7 @@ function listaConjuntosPrePreenchida(json){
 
 function listaAtividadesPrePreenchida(json){
 	listaAtividades(json, this.id);
+	try {mostraRetorno(json)} catch(err){}
 	finishedRequests ++;
 	drawDotsIfYouCan();
 }
@@ -216,11 +223,13 @@ function allJSONLoaded(){
 }
 
 function drawDotsIfYouCan(){
+	var loaded = allJSONLoaded();
 	// console.log(finishedRequests + "/" + totalRequests);
-	if(allJSONLoaded()){
-		// console.log("YES, I CAN!");
-		try {drawHomeEvents()}
-		catch(err){}
+	// loaded ? console.log("YES, I CAN!") : null;
+	if(loaded){
+		// if(URLvars.q){ try {refazTimeline()} catch(err){} }
+		// try {drawTimeline()} catch(err){}
+		try {drawHomeEvents()} catch(err){}			
 	}
 }
 
