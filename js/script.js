@@ -741,7 +741,7 @@ EventDot.drawThemAll = function(sortBy){
 	for(var i in eventDotInstances){
 		var e = eventDotInstances[i];
 		var labelTxt = e.oque;
-		var past = (e.dataFinal.getTime() < Date.now()) ? " past" : "";
+		var past = (e.dataFinal.getTime() < Date.now() && s[sID].passadorelevante == '0') ? " past" : "";
 		
 		//cria o DIV com id com a bolinha, range e label dentro
 		var html = "<div data-id='" + e.id + "' class='event " + e.id + past +"'><span data-id='" + e.id + "' class='range'><span data-id='" + e.id + "' data-i='" + e.i + "' class='dot" + past + "'></span></span><span data-i='" + e.i + "' class='label'>" + labelTxt + "<img src='./img/nano-balloon.gif' class='nano' /></span></div>";
