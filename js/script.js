@@ -173,7 +173,7 @@ function mostraRetorno(json){
 function updateHeader(){
 	if(URLvars.q){
 		// var html = "<button type='submit' class='btn_voltar'>voltar</button><button type='submit' class='btn_home'>home</button>";
-		var html = "<button type='submit' class='btn_home'>voltar para a agenda</button>";
+		var html = "<button type='submit' class='btn_home'>voltar para a tela principal</button>";
 		$('#header').html(html);
 		incluiLogo();
 		//aplica o onClick no botao
@@ -202,6 +202,7 @@ function updateHeader(){
 // }
 
 function homeClicked(){
+	//TITULO:   Resultado da busca o quê : expo  [home] <- não é um botão, é só um link.
 	var URL = window.location.toString().split('?');
 	var search = URL[1].split('&');
 	var searchThatShouldStay = "";
@@ -352,7 +353,8 @@ function refazTimeline(){
 	for(var i=0; i<=nM+1; i++){
 		var currentMonth = (mI + i)%12;
 		var currentYear = aI + Math.floor( (mI+i)/12 );
-		var mostraAno = (i==0 || currentMonth == 0) ? " " + currentYear : "";
+		// var mostraAno = (i==0 || currentMonth == 0) ? " " + currentYear : "";
+		var mostraAno = " " + currentYear;
 		var timelineItem = {}
 		timelineItem.date = new Date(currentYear,currentMonth,1);
 		timelineItem.htmlLabel = mesCurto[currentMonth] + mostraAno;
@@ -363,10 +365,13 @@ function refazTimeline(){
 
 function atividadeListadaEmAlgumCA(id){
 	for(var i in ca[sID]){
+		console.log(i)
 		var visiveis = ca[sID][i].atividades.split(', ');
+		// console.log(visiveis);
 		for(var j in visiveis){
+			// console.log('comparando ' + visiveis[j] + ' e ' + id);
 			if(visiveis[j] == id){
-				// console.log(id + " aparece listada no " + ca[sID][i].id);
+				console.log(id + " aparece listada no " + ca[sID][i].id);
 				return true;
 			}
 		}
@@ -977,20 +982,23 @@ function selecionaDestaqueRandomico(){
 
 function criaEventDotsHome(){
 	if(!URLvars.q){
-		console.log('procurando em CAs');
+		// console.log('procurando em CAs');
 	} else {
-		console.log('procurando em As');
+		// console.log('procurando em As');
 		var ondeProcurar = a[sID];
 		
 		//recria o CA, baseado nos As q retornaram da busca
 		var n = 0;
 		ca[sID] = [];
 		for(var i in ondeProcurar){
-			var id = 'c' + n;
-			ca[sID][id] = {};
-			ca[sID][id].id = id;
-			ca[sID][id].atividades = i;
-			n ++;
+			// if(!atividadeListadaEmAlgumCA(i)){
+				console.log('>>> incluir ' + i);
+				var id = 'c' + n;
+				ca[sID][id] = {};
+				ca[sID][id].id = id;
+				ca[sID][id].atividades = i;
+				n ++;
+			// }
 		}
 		console.log(['CA recriado',ca[sID]]);
 	}
@@ -1009,7 +1017,8 @@ function criaEventDotsHome(){
 eventsHeight = 0;
 function resizeEventWindow(){
 	//armazena o tamanho do div de eventos (para usar no scroll)
-	eventsHeight = (eventsHeight == 0) ? $('#events').height() : eventsHeight;
+	// eventsHeight = (eventsHeight == 0) ? $('#events').height() : eventsHeight;
+	eventsHeight = eventDotInstances.length * (26+2);
 	// console.log(eventsHeight);
 	
 	//ajusta o tamanho do div q contém as instâncias de EventDot
@@ -1085,6 +1094,34 @@ function selectDot(eventDotId){
 	}
 }
 
+URLtoShow = "";
+actualURL = "";
+
+function checkAndFadeIn(loadedURL){
+	// console.log('checando ' + loadedURL);
+	// if(loadedURL == URLtoShow){
+	// 	//mostra
+	// 	console.log('comecei o fade IN');
+	// 	$('.fadeMe').fadeIn(1000, function() {
+	// 		console.log('acabei o fade IN');
+	// 	});
+	// 	actualURL = loadedURL;
+	// } else {
+	// 	//espera pq a outra já deve estar sendo carregada, usuário clicou mais rápido que o loading
+	// }
+}
+
+function carregaBg(imgURL){
+	// console.log('comecei o fade OUT');
+	// if(actualURL != imgURL){
+	// 	URLtoShow = imgURL;
+	// 	$('.fadeMe').fadeOut(1000, function() {
+	// 		console.log('acabei o fade OUT');
+	// 		// $('#bg-photo').smartBackgroundImage(imgURL, 'bg');
+	// 	});
+	// }
+}
+
 function mudaFundo(eventDotId){
 	var id = eventDotId.split('-');
 	var ed = ca[id[0]][id[1]]; //eventDot
@@ -1098,10 +1135,10 @@ function mudaFundo(eventDotId){
 		var imgs = ["default-bg.png"];
 	}
 	
-	
-	// console.log(imgs[0] + " : " + encodeURI(imgs[0]));
-	var imgURL = "url(./img/" + encodeURI(imgs[0]) + ")";
-	$('#bg-photo').css('background-image', imgURL);
+	var imgURL = "./img/" + encodeURI(imgs[0]);
+	// carregaBg(imgURL);
+	// $('#bg-photo').smartBackgroundImage(imgURL, 'bg');
+	$('#bg-photo').css('backgroundImage', 'url('+imgURL+')' );
 	
 	//MUDA O NOME E O TEXTO
 	//encontra o nome da atividade
@@ -1213,151 +1250,175 @@ function abreBaloon(idComposto, aID, skipIndex){
 	var atalho = ca_.atividades.split(', ')[0];
 	// var dot = dotSelected;
 	
-	//define quem é quem no jogo do bicho
-	if(!idComposto){
-		var a_ = a[ca_.siteId][atalho];
-		if(!a_.onde){ alert("Precisa cadastrar ONDE ou esconder.") }
-	} else {
-		var a_ = a[ca_.siteId][aID];
-		if(!a_.onde){ alert("Precisa cadastrar ONDE ou esconder.") }
-	}
-	
-	// var e_ = e[a_.onde.split(', ')[0]];
-	// var espacos = a_.onde.split(", ");
-	// var dot = {};
-	// if (espacos.length == 1){
-	// 	dot.onde = e[espacos[0]].nome;
-	// } else if (espacos.length > 1){
-	// 	dot.onde = e[espacos[0]].nome;
-	// 	dot.todosEspacos = espacos.slice();
-	// } else {
-	// 	dot.onde = "-";
-	// }
-	
-	// console.log(["ca_", ca_]);
-	// console.log(["a_", a_]);
-		// console.log(["e_", e_]);
-		// console.log(["dot", dot]);
-	
-	//BALLOON TOP - INFO ESPAÇO
-	desenhaBalloonTop(a_);
-	
-	//SLIDESHOW - imgs não podem conter espaço no nome
-	html = "";
-	if(a_.imagens){
-		var imgs = a_.imagens.split('\n');
-	} else {
-		var imgs = ["default-img.png"];
-	}
-	//atualiza as globais e os controles
-	selectedSlideImgIndex = 0;
-	nSlideImgs = imgs.length;
-	hideOrShowSlideshowControls();
-	
-	//escreve o HTML
-	html += "<div id='slideshow-imgs'>";
-	for(var i in imgs){
-		html += "<div class='bg-cover slideshow-img' style='background-image: url(./img/" + encodeURI(imgs[i]) + ")'></div>";
-	}
-	html += "</div>";
-	$('#slideshow').html(html);
-	
-	//MINI-BALLOON - INFO DA ATIVIDADE
-	var di = googleDateToDate(a_.datainicial ? a_.datainicial : new Date());
-	var df = googleDateToDate(a_.datafinal ? a_.datafinal : new Date());
-	
-	html = "";
-	html += "<h2>" + a_.tipo + "</h2>";
-	html += desenhaEstrelas(a_.estrelas);
-	html += "<h1>" + a_.nome + "</h1>";
-	html += a_.horario ? "<p><b>" + a_.horario + "</b></p>" : "<p><b>" + dataHelena(di, df) + "</b></p>"; 
-	html += "<div id='sinopse'>";
-	html += a_.sobre ? "<p>" + a_.sobre + "</p>" : "<p>(cadastrar sinopse da atividade)</p>";
-	html += "</div>";
-	
-	var variosQuem = a_.quem;
-	// console.log("variosQuem: " + variosQuem);
-	if(variosQuem != undefined){
-	// console.log("variosQuem: " + variosQuem);
-		variosQuem = variosQuem.split(', ');
-		var quem = p[string_to_slug(variosQuem[0])];
-		// console.log(["quem: ", quem]);
-		if(quem != undefined){
-			if(quem.bio){
-				html += "<div id='bio' class='hidden'></div>";
-				html += "<p><span class='fake-link'>Biografia</span>";
-				html += quem.site ?  " // <a href='" + quem.site + "' target='_BLANK'>" + quem.site.replace('http://', '') + "</a></p>" : "</p>";
-				$('#mini-balloon-body').html(html);
-				$('#mini-balloon-body .fake-link').click(function(event){abreBio(event, quem);});
-			} else {
-				html += quem.site ? "<p><a href='" + quem.site + "' target='_BLANK'>" + quem.site.replace('http://', '') + "</a></p>" : "";
-				$('#mini-balloon-body').html(html);
+	if(!ca_.siteinterno){
+		//define quem é quem no jogo do bicho
+		if(!idComposto){
+			var a_ = a[ca_.siteId][atalho];
+			if(!a_.onde){ alert("Precisa cadastrar ONDE ou esconder.") }
+		} else {
+			var a_ = a[ca_.siteId][aID];
+			if(!a_.onde){ alert("Precisa cadastrar ONDE ou esconder.") }
+		}
+
+		// var e_ = e[a_.onde.split(', ')[0]];
+		// var espacos = a_.onde.split(", ");
+		// var dot = {};
+		// if (espacos.length == 1){
+		// 	dot.onde = e[espacos[0]].nome;
+		// } else if (espacos.length > 1){
+		// 	dot.onde = e[espacos[0]].nome;
+		// 	dot.todosEspacos = espacos.slice();
+		// } else {
+		// 	dot.onde = "-";
+		// }
+
+		// console.log(["ca_", ca_]);
+		// console.log(["a_", a_]);
+			// console.log(["e_", e_]);
+			// console.log(["dot", dot]);
+
+		//BALLOON TOP - INFO ESPAÇO
+		desenhaBalloonTop(a_);
+
+		//SLIDESHOW - imgs não podem conter espaço no nome
+		html = "";
+		if(a_.imagens){
+			var imgs = a_.imagens.split('\n');
+		} else {
+			var imgs = ["default-img.png"];
+		}
+		//atualiza as globais e os controles
+		selectedSlideImgIndex = 0;
+		nSlideImgs = imgs.length;
+		hideOrShowSlideshowControls();
+
+		//escreve o HTML
+		html += "<div id='slideshow-imgs'>";
+		for(var i in imgs){
+			html += "<div class='bg-cover slideshow-img' style='background-image: url(./img/" + encodeURI(imgs[i]) + ")'></div>";
+		}
+		html += "</div>";
+		$('#slideshow').html(html);
+
+		//MINI-BALLOON - INFO DA ATIVIDADE
+		var di = googleDateToDate(a_.datainicial ? a_.datainicial : new Date());
+		var df = googleDateToDate(a_.datafinal ? a_.datafinal : new Date());
+
+		html = "";
+		html += "<h2>" + a_.tipo + "</h2>";
+		html += desenhaEstrelas(a_.estrelas);
+		html += "<h1>" + a_.nome + "</h1>";
+		html += a_.horario ? "<p><b>" + a_.horario + "</b></p>" : "<p><b>" + dataHelena(di, df) + "</b></p>"; 
+		html += "<div id='sinopse'>";
+		html += a_.sobre ? "<p>" + a_.sobre.replace(/\n/g, "<br />") + "</p>" : "<p>(cadastrar sinopse da atividade)</p>";
+		html += "</div>";
+
+		var variosQuem = a_.quem;
+		// console.log("variosQuem: " + variosQuem);
+		if(variosQuem != undefined){
+		// console.log("variosQuem: " + variosQuem);
+			variosQuem = variosQuem.split(', ');
+			var quem = p[string_to_slug(variosQuem[0])];
+			// console.log(["quem: ", quem]);
+			if(quem != undefined){
+				if(quem.bio){
+					html += "<div id='bio' class='hidden'></div>";
+					html += "<p><span class='fake-link'>Biografia</span>";
+					html += quem.site ?  " // <a href='" + quem.site + "' target='_BLANK'>" + quem.site.replace('http://', '') + "</a></p>" : "</p>";
+					$('#mini-balloon-body').html(html);
+					$('#mini-balloon-body .fake-link').click(function(event){abreBio(event, quem);});
+				} else {
+					html += quem.site ? "<p><a href='" + quem.site + "' target='_BLANK'>" + quem.site.replace('http://', '') + "</a></p>" : "";
+					$('#mini-balloon-body').html(html);
+				}
+			}	else {
+					$('#mini-balloon-body').html(html);
 			}
 		}	else {
-				$('#mini-balloon-body').html(html);
+			$('#mini-balloon-body').html(html);
 		}
-	}	else {
-		$('#mini-balloon-body').html(html);
-	}
-	
-	//MINI-BALLOON-FOOTER
-	html = "";
-	html += desenhaTwitter();
-	html += desenhaFacebook();
-	html += desenhaOpine();
-	$('#mini-balloon-footer').html(html);
-	
-	//CROSS
-	//reseta o HTML pré-existente
-	$('#cross').html("");
-	
-	//recria o HTML
-	if(ca_.atividades){
-		var atividades = ca_.atividades.split(', ');
-		var alphaStep = 80/atividades.length;
-		var atividade = {};
-		var nameParts = [];
-		var imgs = ["default-img.png"];
-		var str = "";
-		var alpha = 0;
-		var n = 0;
-		skipIndex = skipIndex ? skipIndex : 0;
-		
-		console.log(ca_.atividades);
-		for (i in atividades){
-			// console.log(skipIndex);
-			if(i != skipIndex){
-				var context = {};
-				atividade = a[ca_.siteId][atividades[i]];
-				if(atividade){
-					nameParts = atividade.nome.split(' // ');
-					imgs = atividade.imagens ? atividade.imagens.split('\n') : ["default-img.png"];
-					// alpha = (100 - (alphaStep * n))/100; n ++;
-					alpha = 1;
-			
-					html = "";
-					html += "<div id='cross-" + i + "' class='balloon cross' style='background-color:rgba(255,255,255," + alpha + ")'>";
-					html += "<div class='bg-cover cross-img' style='background-image: url(./img/" + encodeURI(imgs[0]) + ");'></div>";
-					html += "<div class='reticencias' style='background-image: url(./img/reticencias.png);'></div>";
-					html += "<h2>" + atividade.tipo + "</h2>";
-					html += "<h1>" + nameParts[0];
-					html += nameParts[1] ? "<em> // " + nameParts[1] + "</em></h1>" : "</h1>";
-					html += "</div>";
-					$('#cross').append(html);
-			
-					str = "#cross-" + i;
-					context.atividade = atividades[i];
-					context.id = ca_.siteId + "-" + ca_.id;
-					context.skipIndex = i;
-					$(str).click($.proxy(crossClicked, context));
-				}	
+
+		//MINI-BALLOON-FOOTER
+		html = "";
+		html += desenhaTwitter();
+		html += desenhaFacebook();
+		html += desenhaOpine();
+		$('#mini-balloon-footer').html(html);
+
+		//CROSS
+		//reseta o HTML pré-existente
+		$('#cross').html("");
+
+		//recria o HTML
+		if(ca_.atividades){
+			var atividades = ca_.atividades.split(', ');
+			var alphaStep = 80/atividades.length;
+			var atividade = {};
+			var nameParts = [];
+			var imgs = ["default-img.png"];
+			var str = "";
+			var alpha = 0;
+			var n = 0;
+			skipIndex = skipIndex ? skipIndex : 0;
+
+			// console.log(ca_.atividades);
+			for (i in atividades){
+				// console.log(skipIndex);
+				if(i != skipIndex){
+					var context = {};
+					atividade = a[ca_.siteId][atividades[i]];
+					if(atividade){
+						nameParts = atividade.nome.split(' // ');
+						imgs = atividade.imagens ? atividade.imagens.split('\n') : ["default-img.png"];
+						// alpha = (100 - (alphaStep * n))/100; n ++;
+						alpha = 1;
+
+						html = "";
+						html += "<div id='cross-" + i + "' class='balloon cross' style='background-color:rgba(255,255,255," + alpha + ")'>";
+						html += "<div class='bg-cover cross-img' style='background-image: url(./img/" + encodeURI(imgs[0]) + ");'></div>";
+						html += "<div class='reticencias' style='background-image: url(./img/reticencias.png);'></div>";
+						html += "<h2>" + atividade.tipo + "</h2>";
+						html += "<h1>" + nameParts[0];
+						html += nameParts[1] ? "<em> // " + nameParts[1] + "</em></h1>" : "</h1>";
+						html += "</div>";
+						$('#cross').append(html);
+
+						str = "#cross-" + i;
+						context.atividade = atividades[i];
+						context.id = ca_.siteId + "-" + ca_.id;
+						context.skipIndex = i;
+						$(str).click($.proxy(crossClicked, context));
+					}	
+				}
 			}
 		}
+
+		//mostra
+		$('#balloon').css('display', 'block');
+		updateMiniBalloonFooterPosition();		
+	} else {
+		chamaURLinterna(ca_.siteinterno);
+	}
+}
+
+function chamaURLinterna(siteID){
+	var URL = window.location.toString().split('?');
+	if(URL[1]){
+		var search = URL[1].split('&');
+		var searchThatShouldStay = "";
+		for(var i in search){
+			if(search[i].substr(0,2) != 'q='){
+				(searchThatShouldStay == "") ? searchThatShouldStay = "?" : null;
+				searchThatShouldStay += search[i];
+			}
+		}
+	} else {
+		searchThatShouldStay = "";
 	}
 	
-	//mostra
-	$('#balloon').css('display', 'block');
-	updateMiniBalloonFooterPosition();
+	console.log(URL[0] + searchThatShouldStay + '?sID=' + siteID);
+	// console.log(search);
+	// window.location = URL[0] + searchThatShouldStay + newURLSearch(searchWord);
 }
 
 function desenhaBalloonTop(a_, todosEspacos, value){
@@ -1378,7 +1439,7 @@ function desenhaBalloonTop(a_, todosEspacos, value){
 			}
 		}
 	}
-	console.log('-');
+	// console.log('-');
 	
 	var e_ = e[a_.onde.split(', ')[index]];
 	var espacos = a_.onde.split(", ");
@@ -1437,7 +1498,8 @@ function desenhaBalloonTop(a_, todosEspacos, value){
 	linha3 += e_.horario ? e_.horario.replace(/\n/g, ' // ') : "";
 	
 	var html = "";
-	html += "<img src='./img/" + imgEspaco + "' width='86' height='86'/><img src='./img/fechar.png' class='fechar'/>";
+	// html += "<img src='./img/" + imgEspaco + "' width='86' height='86'/><img src='./img/fechar.png' class='fechar'/>";
+	html += "<div class='bg-cover thumb-espaco' style='background-image: url(./img/" + encodeURI(imgEspaco) + ");'></div><img src='./img/fechar.png' class='fechar'/>";
 	html += "<div id='txt-block'><h1>" + nomeEspaco + "</h1><p class='first-p'>" + linha1 + "</p><p>" + linha2 + "</p>";
 	html += linha3;
 	
@@ -1587,3 +1649,27 @@ function horaComZero(n){
 String.prototype.capitalize = function(){
 	return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
 };
+
+$.fn.smartBackgroundImage = function(url, callerID){
+	var t = this;
+	//create an img so the browser will download the image:
+	$('<img />')
+	.attr('src', url)
+	.load(function(){ //attach onload to set background-image
+		t.each(function(){
+			console.log(url + ' CARREGOU');
+			if(callerID){
+				switch(callerID){
+					case 'bg':
+						checkAndFadeIn(url);
+					break;
+					default:
+						null
+					break;
+				}
+			}
+			$(this).css('backgroundImage', 'url('+url+')' );
+		});
+	});
+	return this;
+}

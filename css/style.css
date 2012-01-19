@@ -101,6 +101,11 @@ em{
 	padding:20px;
 	background-color:rgba(255,255,255,1);
 }
+.thumb-espaco{
+	width:86px;
+	height:86px;
+	float:left;
+}
 .balloon.top h1{
 	font-size:29px;
 	margin-left:-2px;
@@ -375,8 +380,15 @@ em{
 /*	position:fixed;*/
 }
 #bg-photo{
-	background-image: url(../img/default-bg.gif);
+/*	display:none;*/
+/*	background-image: url(../img/default-bg.gif);*/
+/*	float:left;*/
 }
+/*#bg-courtain{
+	width:100%;
+	height:1000px;
+	background-color:green;
+}*/
 .bg-cover{
 	background-repeat: no-repeat;
 	background-position: center;

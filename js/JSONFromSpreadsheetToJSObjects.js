@@ -39,6 +39,7 @@ function listToObjects(json){
 		for(var j in colunas){
 			colunas[j] = colunas[j].split(': ');
 			colunas[j][1] = colunas[j][1] ? colunas[j][1].replace(/¥Ω/g, ',') : undefined;
+			colunas[j][1] = colunas[j][1] ? colunas[j][1].replace(/•≈/g, '\n') : undefined;
 			obj[colunas[j][0]] = colunas[j][1];
 		}
 		arr.push(obj);
