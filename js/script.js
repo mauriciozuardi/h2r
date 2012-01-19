@@ -180,7 +180,10 @@ function updateHeader(){
 		// $('.btn_voltar').click(voltarClicked);
 		$('.btn_home').click(homeClicked);
 	} else {
-		var html = "<select class='oque'><option>o quê</option></select><select class='onde'><option>onde</option></select><select class='quem'><option>quem</option></select>";
+		var html = "";
+		(s[sID].esconderoque == '0') ? html += "<select class='oque'><option>o quê</option></select>"	: null;
+		(s[sID].esconderonde == '0') ? html += "<select class='onde'><option>onde</option></select>"	: null;
+		(s[sID].esconderquem == '0') ? html += "<select class='quem'><option>quem</option></select>"	: null;
 		$('#header').html(html);
 		incluiLogo();
 		fillPullDown($('.oque'), 'tipo');
