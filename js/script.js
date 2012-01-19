@@ -339,7 +339,6 @@ function refazTimeline(){
 		timelineItem.htmlLabel = mesCurto[currentMonth] + mostraAno;
 		timeline.push(timelineItem);
 	}
-	
 	// console.log("Mostrando eventos entre [" + datas.menor.toString() + "] e [" + datas.maior.toString() + "]")
 }
 
@@ -744,11 +743,22 @@ EventDot.drawThemAll = function(sortBy){
 	if(destaques.length == 0){
 		for(var i in eventDotInstances){
 			var e = eventDotInstances[i];
-			console.log(e);
+			// console.log(e);
 			if(e.dataFinal.getTime() >= Date.now()){
 				e.visual = 'g';
 				e.updateVisual();
+				destaques.push(e);
 			}
+		}
+	}
+	
+	//se ainda assim não tiver nada rolando .. apela, marca todos!
+	if(destaques.length == 0){
+		for(var i in eventDotInstances){
+			var e = eventDotInstances[i];
+			e.visual = 'g';
+			e.updateVisual();
+			destaques.push(e);
 		}
 	}
 	
@@ -944,8 +954,12 @@ function drawHomeEvents(){
 }
 
 function selecionaDestaqueRandomico(){
+	console.log(destaques.length);
 	var r = Math.floor(destaques.length * Math.random());
 	// console.log(destaques[r].i);
+	
+	console.log(r);
+	console.log(destaques);
 	selectDot(destaques[r].i);
 }
 
