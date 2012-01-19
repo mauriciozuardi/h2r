@@ -462,6 +462,9 @@ button{
 	margin-left:90px;
 	height:26px;
 }
+.event.past{
+	opacity:.4;
+}
 .dot{
 	position:relative;
 	display:block;
@@ -482,6 +485,9 @@ button{
 	-moz-transition-duration: .5s;
 	-o-transition-property: border-width, width, height;
 	-o-transition-duration: .5s;*/
+}
+.dot.past{
+	display:none;
 }
 .dot.selected{
 	background-color:white;
