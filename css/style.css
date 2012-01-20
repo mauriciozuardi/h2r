@@ -389,6 +389,8 @@ em{
 	height:1000px;
 	background-color:green;
 }*/
+#bg-container{
+}
 .bg-cover{
 	background-repeat: no-repeat;
 	background-position: center;

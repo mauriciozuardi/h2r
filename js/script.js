@@ -166,26 +166,28 @@ function reloadWithSearch(searchWord){
 	window.location = URL[0] + searchThatShouldStay + newURLSearch(searchWord);
 }
 
-function mostraRetorno(json){
-	console.log(['JSON > ',listToObjects(json)]);
+function mostraRetorno(json, id, URL){
+	console.log(['As(json) ' + id, json, {'url':URL}]);
 }
 
 function updateHeader(){
-	if(URLvars.q){
-		// var html = "<button type='submit' class='btn_voltar'>voltar</button><button type='submit' class='btn_home'>home</button>";
-		var html = "<button type='submit' class='btn_home'>voltar para a tela principal</button>";
-		$('#header').html(html);
-		incluiLogo();
-		//aplica o onClick no botao
-		// $('.btn_voltar').click(voltarClicked);
-		$('.btn_home').click(homeClicked);
-	} else {
+	// console.log('updateHeader');
+	// if(URLvars.q){
+	// 	// var html = "<button type='submit' class='btn_voltar'>voltar</button><button type='submit' class='btn_home'>home</button>";
+	// 	var html = "<button type='submit' class='btn_home'>voltar para a tela principal</button>";
+	// 	$('#header').html(html);
+	// 	incluiLogo();
+	// 	//aplica o onClick no botao
+	// 	// $('.btn_voltar').click(voltarClicked);
+	// 	$('.btn_home').click(homeClicked);
+	// } else {
 		var html = "";
 		(s[sID].esconderoque == '0') ? html += "<select class='oque'><option>o quê</option></select>"	: null;
 		(s[sID].esconderonde == '0') ? html += "<select class='onde'><option>onde</option></select>"	: null;
 		(s[sID].esconderquem == '0') ? html += "<select class='quem'><option>quem</option></select>"	: null;
 		$('#header').html(html);
 		incluiLogo();
+		
 		fillPullDown($('.oque'), 'tipo');
 		fillPullDown($('.onde'), 'onde');
 		fillPullDown($('.quem'), 'quem');
@@ -193,7 +195,8 @@ function updateHeader(){
 		$('.oque').change(function(){ onPullDownOqueChange($(this)); });
 		$('.onde').change(function(){ onPullDownOndeChange($(this)); });
 		$('.quem').change(function(){ onPullDownQuemChange($(this)); });
-	}
+	// }
+	// console.log('updateHeader : DONE');
 }
 
 // function voltarClicked(){
@@ -221,22 +224,30 @@ function fillPullDown(el, campo){
 	//percorre todas as atividades procurando tipos diferentes
 	var encontrados = [];
 	var encontrados_ids = [];
-	for (var i in a[sID]){
-		if(a[sID][i][campo]){
-			var variosNoMesmoCampo = a[sID][i][campo].split(', ');
-			for (var j in variosNoMesmoCampo){
-				if(campo == 'onde'){
-					var valor = e[variosNoMesmoCampo[j]].nome;
-				} else {
-					var valor = variosNoMesmoCampo[j];					
-				}
-				if(!existe(valor, encontrados)){
-					encontrados.push(valor);
-					encontrados_ids.push(i);
+	
+	// console.log('fillPullDown : pré-loops');
+	
+	for(var sID_ in s){
+		// console.log(sID_);
+		for (var i in pd[sID_]){
+			// console.log(i);
+			if(pd[sID_][i][campo]){
+				var variosNoMesmoCampo = pd[sID_][i][campo].split(', ');
+				for (var j in variosNoMesmoCampo){
+					if(campo == 'onde'){
+						var valor = e[variosNoMesmoCampo[j]].nome;
+					} else {
+						var valor = variosNoMesmoCampo[j];					
+					}
+					if(!existe(valor, encontrados)){
+						encontrados.push(valor);
+						encontrados_ids.push(i);
+					}
 				}
 			}
 		}
 	}
+	// console.log('fillPullDown : fim dos loops');
 	
 	//exclui os que não aparecem no CA
 	// var excluidos = [];
@@ -312,25 +323,26 @@ function refazTimeline(){
 	datas.menor = 1.7976931348623157E+10308; //infinito
 	datas.maior = 0;
 	
-	for(var i in a[sID]){
-		var atividade = a[sID][i];
-		// if(atividade.dvi && atividade.dvf && atividadeListadaEmAlgumCA(atividade.id)){
-		!atividadeListadaEmAlgumCA(atividade.id) ? console.log(atividade.id + ' não aparece em CA.') : null;
-		if(atividade.dvi && atividade.dvf){
-			//guarda os recordistas
-			(atividade.dvi < datas.menor) ? datas.aMenor = atividade : null;
-			(atividade.dvf > datas.maior) ? datas.aMaior = atividade : null;
-			//atualiza a maior e a menor
-			datas.menor = Math.min(atividade.dvi, datas.menor);
-			datas.maior = Math.max(atividade.dvf, datas.maior);
+	for(var sID_ in s){
+		for(var i in a[sID_]){
+			var atividade = a[sID_][i];
+			// if(atividade.dvi && atividade.dvf && atividadeListadaEmAlgumCA(atividade.id)){
+			// !atividadeListadaEmAlgumCA(atividade.id) ? console.log(atividade.id + ' não aparece em CA.') : null;
+			if(atividade.dvi && atividade.dvf){
+				//guarda os recordistas
+				(atividade.dvi < datas.menor) ? datas.aMenor = atividade : null;
+				(atividade.dvf > datas.maior) ? datas.aMaior = atividade : null;
+				//atualiza a maior e a menor
+				datas.menor = Math.min(atividade.dvi, datas.menor);
+				datas.maior = Math.max(atividade.dvf, datas.maior);
+			}
 		}
 	}
 	
 	//converte os datevalues em datas
 	datas.menor = dvToDate(datas.menor);
 	datas.maior = dvToDate(datas.maior);
-	console.log(["Extremos da timeline customizada",datas]);
-	// console.log(['eventDotInstances', eventDotInstances]);
+	console.log(["Extremos da timeline customizada", datas]);
 	
 	var aI = datas.menor.getFullYear();
 	var aF = datas.maior.getFullYear();
@@ -363,19 +375,21 @@ function refazTimeline(){
 	// console.log("Mostrando eventos entre [" + datas.menor.toString() + "] e [" + datas.maior.toString() + "]")
 }
 
-function atividadeListadaEmAlgumCA(id){
-	for(var i in ca[sID]){
-		console.log(i)
-		var visiveis = ca[sID][i].atividades.split(', ');
+function atividadeListadaEmAlgumCA(id, sID_){
+	sID_ = sID_ ? sID_ : sID;
+	for(var i in ca[sID_]){
+		// console.log(i)
+		var visiveis = ca[sID_][i].atividades.split(', ');
 		// console.log(visiveis);
 		for(var j in visiveis){
 			// console.log('comparando ' + visiveis[j] + ' e ' + id);
 			if(visiveis[j] == id){
-				console.log(id + " aparece listada no " + ca[sID][i].id);
-				return true;
+				console.log(id + " aparece listada no " + ca[sID_][i].id);
+				return ca[sID_][i].id;
 			}
 		}
 	}
+	console.log(id + " NAO aparece listada nos CAs carregados em " + sID_ + ".");
 	return false;
 }
 
@@ -387,9 +401,7 @@ function escreveData(date){
 }
 
 function drawTimeline(){
-	//
-	// updateTimelineDates();
-	
+	// console.log('drawTimeline');
 	//cria os elementos
 	for(var i in timeline){
 		//showDateDetails vem do config/debug (acima)
@@ -645,12 +657,14 @@ function EventDot(ca){
 				// var datas = {};
 				// datas.menor = Date.now();
 				// datas.maior = Date.now();
+				console.log(atalho + ': data corrompida');
 				return undefined;
 			}
 		} else {
 			// var datas = {};
 			// datas.menor = Date.now();
 			// datas.maior = Date.now();
+			console.log(atalho + ': data corrompida');
 			return undefined;
 		}
 
@@ -675,7 +689,7 @@ function EventDot(ca){
 		//check-in
 		// eventDotInstances.push(this);
 	} else {
-		console.log(atalho + ' não existe em a[sID]');
+		console.log(atalho + ' não existe em a.'+ ca.siteId);
 		return undefined;
 	}
 }
@@ -960,14 +974,16 @@ function dateToPosition(t){
 }
 
 function drawHomeEvents(){
+	// console.log('drawHomeEvents');
 	//aproveita e atualiza o conteúdo do pulldown
 	updateHeader();
 	//home events
 	criaEventDotsHome();
 	URLvars.q ? refazTimeline() : null;
 	drawTimeline();
-	
-	// console.log(eventDotInstances);
+
+	console.log(['eventDotInstances',eventDotInstances]);
+
 	EventDot.drawThemAll();
 	selecionaDestaqueRandomico();
 	resizeEventWindow();
@@ -981,37 +997,59 @@ function selecionaDestaqueRandomico(){
 }
 
 function criaEventDotsHome(){
-	if(!URLvars.q){
-		// console.log('procurando em CAs');
+	if(URLvars.q){
+		for(i in s){
+			criaDotsParaUmSite(i );
+		}
 	} else {
-		// console.log('procurando em As');
-		var ondeProcurar = a[sID];
-		
+		criaDotsParaUmSite(sID);	
+	}
+}
+
+function criaDotsParaUmSite(sID_){
+	if(URLvars.q){
+		//se é busca, procura direto nas atividades e preenche o CA se não existir
+		var ondeProcurar = a[sID_];
 		//recria o CA, baseado nos As q retornaram da busca
 		var n = 0;
-		ca[sID] = [];
 		for(var i in ondeProcurar){
-			// if(!atividadeListadaEmAlgumCA(i)){
-				console.log('>>> incluir ' + i);
-				var id = 'c' + n;
-				ca[sID][id] = {};
-				ca[sID][id].id = id;
-				ca[sID][id].atividades = i;
+			// console.log(i)
+			var caMatch = atividadeListadaEmAlgumCA(i, sID_);
+			// console.log(caMatch);
+			if(!caMatch){
+				console.log('caMatch undefined, criando ..');
+				var id = 'cFORCEPS' + n;
+				ca[sID_][id] = {};
+				ca[sID_][id].id = id;
+				ca[sID_][id].atividades = i;
+				caMatch = id;
 				n ++;
-			// }
+				console.log([sID_, caMatch]);
+			}
 		}
-		console.log(['CA recriado',ca[sID]]);
+		(n > 0) ? console.log(['CA recriado',ca[sID_]]) : null;
+		if(caMatch){
+			// cria as EventDots
+			for(var j in a[sID_]){
+				var caToDot = ca[sID_][caMatch];
+				caToDot.siteId = sID_;
+				var dot = new EventDot(caToDot);
+				console.log(['dot', dot]);
+				(dot.dataInicial && dot.dataFinal) ? eventDotInstances.push(dot) : dotsZuadas.push(caToDot);
+			}
+		} else {
+			console.log([sID_, caMatch]);
+		}
+	} else {
+		// cria as EventDots
+		for(var j in ca[sID_]){
+			var caToDot = ca[sID_][j];
+			caToDot.siteId = sID_;
+			var dot = new EventDot(caToDot);
+			(dot.dataInicial && dot.dataFinal) ? eventDotInstances.push(dot) : dotsZuadas.push(caToDot);
+		}	
 	}
-	
-	// cria as EventDots
-	for(var j in ca[sID]){
-		var caToDot = ca[sID][j];
-		caToDot.siteId = sID;
-		// console.log(['caToDot', caToDot]);
-		var dot = new EventDot(caToDot);
-		(dot.dataInicial && dot.dataFinal) ? eventDotInstances.push(dot) : dotsZuadas.push(caToDot);
-	}
-	console.log(['Dot creation ERROR!', dotsZuadas]);
+	(dotsZuadas.length > 0) ? console.log(['Dot creation ERROR!', dotsZuadas]) : null;
 }
 
 eventsHeight = 0;
@@ -1098,28 +1136,28 @@ URLtoShow = "";
 actualURL = "";
 
 function checkAndFadeIn(loadedURL){
-	// console.log('checando ' + loadedURL);
-	// if(loadedURL == URLtoShow){
-	// 	//mostra
-	// 	console.log('comecei o fade IN');
-	// 	$('.fadeMe').fadeIn(1000, function() {
-	// 		console.log('acabei o fade IN');
-	// 	});
-	// 	actualURL = loadedURL;
-	// } else {
-	// 	//espera pq a outra já deve estar sendo carregada, usuário clicou mais rápido que o loading
-	// }
+	console.log('checando ' + loadedURL);
+	if(loadedURL == URLtoShow){
+		//mostra
+		console.log('comecei o fade IN');
+		$('.fadeMe').show(0, function() {
+			console.log('acabei o fade IN');
+		});
+		actualURL = loadedURL;
+	} else {
+		//espera pq a outra já deve estar sendo carregada, usuário clicou mais rápido que o loading
+	}
 }
 
 function carregaBg(imgURL){
-	// console.log('comecei o fade OUT');
-	// if(actualURL != imgURL){
-	// 	URLtoShow = imgURL;
-	// 	$('.fadeMe').fadeOut(1000, function() {
-	// 		console.log('acabei o fade OUT');
-	// 		// $('#bg-photo').smartBackgroundImage(imgURL, 'bg');
-	// 	});
-	// }
+	console.log('comecei o fade OUT');
+	if(actualURL != imgURL){
+		URLtoShow = imgURL;
+		$('.fadeMe').hide(0, function() {
+			console.log('acabei o fade OUT');
+			$('#bg-photo').smartBackgroundImage(imgURL, 'bg');
+		});
+	}
 }
 
 function mudaFundo(eventDotId){
@@ -1136,9 +1174,9 @@ function mudaFundo(eventDotId){
 	}
 	
 	var imgURL = "./img/" + encodeURI(imgs[0]);
-	// carregaBg(imgURL);
+	carregaBg(imgURL);
 	// $('#bg-photo').smartBackgroundImage(imgURL, 'bg');
-	$('#bg-photo').css('backgroundImage', 'url('+imgURL+')' );
+	// $('#bg-photo').css('backgroundImage', 'url('+imgURL+')' );
 	
 	//MUDA O NOME E O TEXTO
 	//encontra o nome da atividade
