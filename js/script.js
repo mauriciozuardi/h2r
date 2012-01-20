@@ -22,7 +22,7 @@ IDEAL_SINOPSE_CHAR_COUNT = 425;
 $(init);
 
 //confere se tem algo na URL
-URLvars = getUrlVars();
+URLvars = customGetUrlVars();
 sID = URLvars.sID ? URLvars.sID : "s1";
 
 //config e debug
@@ -50,6 +50,8 @@ timeMarksStr = "";
 // }
 
 function init(){
+	console.log(['URLparts', [window.location.host, window.location.search, window.location.hash]]);
+	
 	initNow = Date.now(); //ms desde 01 Jan 1970
 	initDate = new Date();
 	resizeBg();
@@ -979,6 +981,37 @@ function dateToPosition(t){
 	}
 }
 
+function abreBalloonHash(){
+	console.log('QUERO ABRIR! : ' + URLvars.sID_hash);
+	var parte1 = URLvars.sID_hash.split('+');
+	var parte2 = parte1[1].split('|');
+	
+	var idComposto_ = parte1[0];
+	var aID_ = parte2[0];
+	var skipIndex_ = parte2[1] ? parte2[1] : null;
+	
+	var d = procuraDot(idComposto_);
+	if(d){
+		selectDot(d.i);
+		abreBalloon(idComposto_, aID_, skipIndex_);
+	} else {
+		selecionaDestaqueRandomico();
+		console.log('ERRO: ' + idComposto_ + ' não existe em ' + sID);
+	}
+}
+
+function procuraDot(idComposto_){
+	for(var i in eventDotInstances){
+		// console.log(eventDotInstances[i]);
+		if(eventDotInstances[i].id == idComposto_){
+			console.log('ACHEI!');
+			return eventDotInstances[i];
+			break;
+		}
+	}
+	// return false;
+}
+
 function drawHomeEvents(){
 	// console.log('drawHomeEvents');
 	//aproveita e atualiza o conteúdo do pulldown
@@ -988,10 +1021,14 @@ function drawHomeEvents(){
 	URLvars.q ? refazTimeline() : null;
 	drawTimeline();
 
-	console.log(['eventDotInstances',eventDotInstances]);
+	// console.log(['eventDotInstances',eventDotInstances]);
 
 	EventDot.drawThemAll();
-	selecionaDestaqueRandomico();
+	if(URLvars.sID_hash){
+		abreBalloonHash();
+	} else {
+		selecionaDestaqueRandomico();
+	}
 	resizeEventWindow();
 	recenterBalloon();
 	moveFooter();
@@ -1261,13 +1298,13 @@ function labelClicked(event){
 	//
 	selectDot(element.data('i'));
 	fechaInfo();
-	abreBaloon();
+	abreBalloon();
 }
 
 function infoClicked(event){
 	// console.log('infoClicked');
 	fechaInfo();
-	abreBaloon();
+	abreBalloon();
 }
 
 function fechaInfo(){
@@ -1277,6 +1314,7 @@ function fechaInfo(){
 
 function fechaBalloon(){
 	$('#balloon').css('display', 'none');
+	window.location.hash = "";
 	mostraInfo();
 	resizeEventWindow()
 }
@@ -1286,13 +1324,21 @@ function mostraInfo(){
 	resizeEventWindow();
 }
 
-function abreBaloon(idComposto, aID, skipIndex){
-	// console.log("parametro: " + idComposto);
+function abreBalloon(idComposto, aID, skipIndex){
+	// console.log([idComposto, aID, skipIndex]);
 	
 	var cID = dotSelected.id.split('-');
+	console.log(cID);
 	var ca_ = ca[cID[0]][cID[1]];
 	var atalho = ca_.atividades.split(', ')[0];
-	// var dot = dotSelected;
+	
+	skipIndex = skipIndex ? skipIndex : 0;
+	
+	var hash = "";
+	hash += ca_.siteId + "-" + ca_.id;
+	hash += aID ? "+" + aID : "+" + atalho;
+	hash += skipIndex ? "|" + skipIndex : "";
+	window.location.hash = hash;
 	
 	if(!ca_.siteinterno){
 		//define quem é quem no jogo do bicho
@@ -1303,23 +1349,6 @@ function abreBaloon(idComposto, aID, skipIndex){
 			var a_ = a[ca_.siteId][aID];
 			if(!a_.onde){ alert("Precisa cadastrar ONDE ou esconder.") }
 		}
-
-		// var e_ = e[a_.onde.split(', ')[0]];
-		// var espacos = a_.onde.split(", ");
-		// var dot = {};
-		// if (espacos.length == 1){
-		// 	dot.onde = e[espacos[0]].nome;
-		// } else if (espacos.length > 1){
-		// 	dot.onde = e[espacos[0]].nome;
-		// 	dot.todosEspacos = espacos.slice();
-		// } else {
-		// 	dot.onde = "-";
-		// }
-
-		// console.log(["ca_", ca_]);
-		// console.log(["a_", a_]);
-			// console.log(["e_", e_]);
-			// console.log(["dot", dot]);
 
 		//BALLOON TOP - INFO ESPAÇO
 		desenhaBalloonTop(a_);
@@ -1388,6 +1417,8 @@ function abreBaloon(idComposto, aID, skipIndex){
 		html += desenhaFacebook();
 		html += desenhaOpine();
 		$('#mini-balloon-footer').html(html);
+		$('#twitter').click(function(event){abreSocial(event,'t');});
+		$('#facebook').click(function(event){abreSocial(event,'f');});
 
 		//CROSS
 		//reseta o HTML pré-existente
@@ -1403,7 +1434,6 @@ function abreBaloon(idComposto, aID, skipIndex){
 			var str = "";
 			var alpha = 0;
 			var n = 0;
-			skipIndex = skipIndex ? skipIndex : 0;
 
 			// console.log(ca_.atividades);
 			for (i in atividades){
@@ -1441,28 +1471,32 @@ function abreBaloon(idComposto, aID, skipIndex){
 		$('#balloon').css('display', 'block');
 		updateMiniBalloonFooterPosition();		
 	} else {
-		chamaURLinterna(ca_.siteinterno);
+		chamaURLinterna(ca_);
 	}
 }
 
-function chamaURLinterna(siteID){
-	var URL = window.location.toString().split('?');
-	if(URL[1]){
-		var search = URL[1].split('&');
-		var searchThatShouldStay = "";
-		for(var i in search){
-			if(search[i].substr(0,2) != 'q='){
-				(searchThatShouldStay == "") ? searchThatShouldStay = "?" : null;
-				searchThatShouldStay += search[i];
-			}
-		}
-	} else {
-		searchThatShouldStay = "";
+function abreSocial(event, serviceCode){
+	switch(serviceCode){
+		case 't':
+			var baseURL = "http://twitter.com/home?status=";
+		break;
+		case 'f':
+			var baseURL = "http://www.facebook.com/share.php?u=";
+		break;
+		default:
+		break;
 	}
-	
-	console.log(URL[0] + searchThatShouldStay + '?sID=' + siteID);
-	// console.log(search);
-	// window.location = URL[0] + searchThatShouldStay + newURLSearch(searchWord);
+	var actualURL = window.location.toString();
+	console.log(actualURL);
+}
+
+
+function chamaURLinterna(ca_){
+	var siteID = ca_.siteinterno;
+	var URL = "http://" + window.location.host.toString() + '?sID=' + siteID;
+	URL += (window.location.hash) ? window.location.hash.toString() : "";
+	console.log('SITE INTERNO: ' + URL);
+	window.location = URL;
 }
 
 function desenhaBalloonTop(a_, todosEspacos, value){
@@ -1624,17 +1658,17 @@ function desenhaOpine(){
 
 function desenhaTwitter(){
 	//http://twitter.com/home?status= <add your link and/or text here>
-	return "<div id='twitter'><a href='http://twitter.com/home?status=" + window.location.toString() + "' target='_BLANK'><img src='./img/btn_tweet.png'/></a></div>";
+	return "<div id='twitter'><img src='./img/btn_tweet.png'/></div>";
 }
 
 function desenhaFacebook(){
 	//http://www.facebook.com/share.php?u= <add your link here>
-	return "<div id='facebook'><a href='http://www.facebook.com/share.php?u=" + window.location.toString() + "' target='_BLANK'><img src='./img/btn_like.png'/></a></div>";
+	return "<div id='facebook'><img src='./img/btn_like.png'/></div>";
 }
 
 function crossClicked(event){
 	// console.log(this.id);
-	abreBaloon(this.id, this.atividade, this.skipIndex);
+	abreBalloon(this.id, this.atividade, this.skipIndex);
 }
 
 function nextSlideImg(){
@@ -1677,13 +1711,33 @@ function hideOrShowSlideshowControls(){
 	}
 }
 
-function getUrlVars(){
+function customGetUrlVars(){
+	//original
+	// var vars = [], hash;
+	// var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+	// for(var i = 0; i < hashes.length; i++){
+	// 	hash = hashes[i].split('=');
+	// 	vars.push(hash[0]);
+	// 	vars[hash[0]] = hash[1];
+	// }
+	// return vars;
+	
 	var vars = [], hash;
 	var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-	for(var i = 0; i < hashes.length; i++){
-	  hash = hashes[i].split('=');
-	  vars.push(hash[0]);
-	  vars[hash[0]] = hash[1];
+	//cria as variáveis comuns
+	for(var i in hashes){
+		hash = hashes[i].split('=');
+		vars.push(hash[0]);
+		if(hash[1]){
+			hash[1] = hash[1].split('#');
+			vars[hash[0]] = hash[1][0];
+			hash[1][1] ? vars[hash[0] + '_hash'] = hash[1][1] : null;
+		}
+	}
+	//cria só a do #hash se não tiver outras
+	if(hashes.length == 1){
+		h = hashes.toString().split('#');
+		vars.sID_hash = h[1];
 	}
 	return vars;
 }
