@@ -611,11 +611,16 @@ button{
 }
 /*============ Facebook =============*/
 #facebook{
-	display:inline-block;
-	margin-left:10px;
+	float: right;
+	position: absolute;
+	top:20px;
+	left:80px;
+	width:50px;
+	height:20px;
+	overflow:hidden;
 }
-#twitter{
-	display:inline-block;
+#twitter iframe{
+	width:56px;
 }
 /*============ D E B U G =============*/
 /*#balloon{

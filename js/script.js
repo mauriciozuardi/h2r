@@ -1142,28 +1142,28 @@ URLtoShow = "";
 actualURL = "";
 
 function checkAndFadeIn(loadedURL){
-	console.log('checando ' + loadedURL);
-	if(loadedURL == URLtoShow){
-		//mostra
-		console.log('comecei o fade IN');
-		$('.fadeMe').fadeIn(1000, function() {
-			console.log('acabei o fade IN');
-		});
-		actualURL = loadedURL;
-	} else {
-		//espera pq a outra já deve estar sendo carregada, usuário clicou mais rápido que o loading
-	}
+	// console.log('checando ' + loadedURL);
+	// if(loadedURL == URLtoShow){
+	// 	//mostra
+	// 	console.log('comecei o fade IN');
+	// 	$('.fadeMe').show(0, function() {
+	// 		console.log('acabei o fade IN');
+	// 	});
+	// 	actualURL = loadedURL;
+	// } else {
+	// 	//espera pq a outra já deve estar sendo carregada, usuário clicou mais rápido que o loading
+	// }
 }
 
 function carregaBg(imgURL){
-	console.log('comecei o fade OUT');
-	if(actualURL != imgURL){
-		URLtoShow = imgURL;
-		$('.fadeMe').fadeOut(1000, function() {
-			console.log('acabei o fade OUT');
-			$('#bg-photo').smartBackgroundImage(imgURL, 'bg');
-		});
-	}
+	// console.log('comecei o fade OUT');
+	// if(actualURL != imgURL){
+	// 	URLtoShow = imgURL;
+	// 	$('.fadeMe').hide(0, function() {
+	// 		console.log('acabei o fade OUT');
+	// 		$('#bg-photo').smartBackgroundImage(imgURL, 'bg');
+	// 	});
+	// }
 }
 
 function mudaFundo(eventDotId){
@@ -1180,8 +1180,8 @@ function mudaFundo(eventDotId){
 	}
 	
 	var imgURL = "./img/" + encodeURI(imgs[0]);
-	carregaBg(imgURL);
-	// $('#bg-photo').smartBackgroundImage(imgURL, 'bg');
+	// carregaBg(imgURL);
+	$('#bg-photo').smartBackgroundImage(imgURL, 'bg');
 	// $('#bg-photo').css('backgroundImage', 'url('+imgURL+')' );
 	
 	//MUDA O NOME E O TEXTO
@@ -1623,11 +1623,13 @@ function desenhaOpine(){
 }
 
 function desenhaTwitter(){
-	return "<div id='twitter'><a href='https://twitter.com/share' class='twitter-share-button' data-url='http://google.com' data-via='h2r' data-count='none' data-hashtags='ag_fotografia'>Tweet</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='//platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','twitter-wjs');</script></div>";
+	//http://twitter.com/home?status= <add your link and/or text here>
+	return "<div id='twitter'><a href='http://twitter.com/home?status=" + window.location.toString() + "' target='_BLANK'><img src='./img/btn_tweet.png'/></a></div>";
 }
 
 function desenhaFacebook(){
-	return "<div id='facebook'><fb:like href='http://www.google.com' send='false' layout='button_count' width='450' show_faces='false'></fb:like></div>";
+	//http://www.facebook.com/share.php?u= <add your link here>
+	return "<div id='facebook'><a href='http://www.facebook.com/share.php?u=" + window.location.toString() + "' target='_BLANK'><img src='./img/btn_like.png'/></a></div>";
 }
 
 function crossClicked(event){
