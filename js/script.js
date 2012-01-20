@@ -307,8 +307,8 @@ function resizeBg(){
 function recenterBalloon(){
 	var balloon = $('#balloon');
 	var minTop = $('#header').outerHeight(true);
-	var top = Math.floor(Math.max(minTop, (($('#events').outerHeight(true))-balloon.outerHeight(true))/2));
-	var left = Math.floor((Math.max(MIN_WIDTH, $(window).width()) - balloon.outerWidth(true))/2);
+	var top = Math.floor(Math.max(minTop, (($('#events').outerHeight(true))-balloon.outerHeight(false))/2));
+	var left = Math.floor((Math.max(MIN_WIDTH, $(window).width()) - balloon.outerWidth(false))/2);
 	balloon.css('top', top);
 	balloon.css('left', left);
 }
@@ -1315,6 +1315,7 @@ function fechaInfo(){
 function fechaBalloon(){
 	$('#balloon').css('display', 'none');
 	window.location.hash = "";
+	window.location = window.location.toString().replace(/#/g,'');
 	mostraInfo();
 	resizeEventWindow()
 }
