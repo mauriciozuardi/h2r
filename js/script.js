@@ -171,32 +171,27 @@ function mostraRetorno(json, id, URL){
 }
 
 function updateHeader(){
-	// console.log('updateHeader');
-	// if(URLvars.q){
-	// 	// var html = "<button type='submit' class='btn_voltar'>voltar</button><button type='submit' class='btn_home'>home</button>";
-	// 	var html = "<button type='submit' class='btn_home'>voltar para a tela principal</button>";
-	// 	$('#header').html(html);
-	// 	incluiLogo();
-	// 	//aplica o onClick no botao
-	// 	// $('.btn_voltar').click(voltarClicked);
-	// 	$('.btn_home').click(homeClicked);
-	// } else {
-		var html = "";
-		(s[sID].esconderoque == '0') ? html += "<select class='oque'><option>o quê</option></select>"	: null;
-		(s[sID].esconderonde == '0') ? html += "<select class='onde'><option>onde</option></select>"	: null;
-		(s[sID].esconderquem == '0') ? html += "<select class='quem'><option>quem</option></select>"	: null;
-		$('#header').html(html);
-		incluiLogo();
-		
-		fillPullDown($('.oque'), 'tipo');
-		fillPullDown($('.onde'), 'onde');
-		fillPullDown($('.quem'), 'quem');
-		//aplica os onChange() no header
-		$('.oque').change(function(){ onPullDownOqueChange($(this)); });
-		$('.onde').change(function(){ onPullDownOndeChange($(this)); });
-		$('.quem').change(function(){ onPullDownQuemChange($(this)); });
-	// }
-	// console.log('updateHeader : DONE');
+	var html = "";
+	
+	(s[sID].esconderoque == '0') ? html += "<select class='oque'><option>o quê</option></select>"	: null;
+	(s[sID].esconderonde == '0') ? html += "<select class='onde'><option>onde</option></select>"	: null;
+	(s[sID].esconderquem == '0') ? html += "<select class='quem'><option>quem</option></select>"	: null;
+	(URLvars.q)									 ? html += "<button type='submit' class='btn_home'>home</button>" : null;
+	
+	$('#header').html(html);
+	incluiLogo();
+	
+	fillPullDown($('.oque'), 'tipo');
+	fillPullDown($('.onde'), 'onde');
+	fillPullDown($('.quem'), 'quem');
+	
+	//aplica os onChange() no header
+	$('.oque').change(function(){ onPullDownOqueChange($(this)); });
+	$('.onde').change(function(){ onPullDownOndeChange($(this)); });
+	$('.quem').change(function(){ onPullDownQuemChange($(this)); });
+	
+	//aplica o click no botao
+	(URLvars.q) ? $('.btn_home').click(homeClicked) : null;
 }
 
 // function voltarClicked(){
@@ -257,6 +252,17 @@ function fillPullDown(el, campo){
 	// 		console.log('excluindo [ ' + campo + ':' + encontrados_ids[i] + ':' + encontrados[i] + ' ]. Não aparece em nenhum CA.');
 	// 		encontrados.splice(i,1);
 	// 		excluidos.push(encontrados_ids.splice(i,1));
+	// 	}
+	// }
+	
+	
+	// //seleciona o pull-down de acordo com a query
+	// for(var i in encontrados){
+	// 	console.log('testando ' + URLvars.q +' : '+ encontrados_ids[i] +' : '+ encontrados[i]);
+	// 	if(encontrados[i] == URLvars.q || encontrados_ids[i] == URLvars.q){
+	// 		var elementValue = encontrados[i];
+	// 		console.log('Já sei! Você procurou por ' + elementValue);
+	// 		break;
 	// 	}
 	// }
 	
@@ -1140,7 +1146,7 @@ function checkAndFadeIn(loadedURL){
 	if(loadedURL == URLtoShow){
 		//mostra
 		console.log('comecei o fade IN');
-		$('.fadeMe').show(0, function() {
+		$('.fadeMe').fadeIn(1000, function() {
 			console.log('acabei o fade IN');
 		});
 		actualURL = loadedURL;
@@ -1153,7 +1159,7 @@ function carregaBg(imgURL){
 	console.log('comecei o fade OUT');
 	if(actualURL != imgURL){
 		URLtoShow = imgURL;
-		$('.fadeMe').hide(0, function() {
+		$('.fadeMe').fadeOut(1000, function() {
 			console.log('acabei o fade OUT');
 			$('#bg-photo').smartBackgroundImage(imgURL, 'bg');
 		});
