@@ -98,36 +98,8 @@ function onPullDownOndeChange(element){
 
 function onPullDownQuemChange(element){
 	var searchWord = element.val();
-	// if(nomeEhID(searchWord)){
-	// 	reloadWithSearch(searchWord);
-	// } else {
-	// 	console.log('ops');
-	// 	var id = nomeID(searchWord);
-	// 	id ? reloadWithSearch(id) : console.log('ERRO : nome não deveria estar no pulldown');
-	// }
 	reloadWithSearch(searchWord);
 }
-
-// function nomeEhID(nome){
-// 	return p[string_to_slug(nome)];
-// }
-// 
-// function nomeID(nomeNaoID){
-// 	var possivelSlug = string_to_slug(nomeNaoID)
-// 	for (var i in a[sID]){
-// 		var nomes = a[sID][i].quem;
-// 		if(nomes){
-// 			nomes = nomes.split(', ');
-// 			for(var j in nomes){
-// 				if(possivelSlug == string_to_slug(nomes[j])){
-// 					console.log('ACHEI! ' + nomeNaoID + ' : ' + i);
-// 					return i;
-// 				}			
-// 			}
-// 		}
-// 	}
-// 	return undefined;
-// }
 
 function ondeID(ondeName){
 	var o = string_to_slug(ondeName)
@@ -163,9 +135,11 @@ function reloadWithSearch(searchWord){
 	} else {
 		searchThatShouldStay = "";
 	}
+	
+	var URLsemHash = 
 
 	// console.log(search);
-	window.location = URL[0] + searchThatShouldStay + newURLSearch(searchWord);
+	window.location = URL[0].toString().replace(/#/g,'') + searchThatShouldStay + newURLSearch(searchWord);
 }
 
 function mostraRetorno(json, id, URL){
@@ -214,7 +188,7 @@ function homeClicked(){
 	}
 	// console.log(search);
 	// console.log(URL[0] + searchThatShouldStay)
-	window.location = URL[0] + searchThatShouldStay;
+	window.location = URL[0].toString().replace(/#/g,'') + searchThatShouldStay;
 }
 
 function fillPullDown(el, campo){
@@ -1315,7 +1289,7 @@ function fechaInfo(){
 function fechaBalloon(){
 	$('#balloon').css('display', 'none');
 	window.location.hash = "";
-	window.location = window.location.toString().replace(/#/g,'');
+	// window.location = window.location.toString().replace(/#/g,'');
 	mostraInfo();
 	resizeEventWindow()
 }
@@ -1494,7 +1468,7 @@ function abreSocial(event, serviceCode){
 
 function chamaURLinterna(ca_){
 	var siteID = ca_.siteinterno;
-	var URL = "http://" + window.location.host.toString() + '?sID=' + siteID;
+	var URL = "http://" + window.location.host.toString() + window.location.pathname.toString() + '?sID=' + siteID;
 	URL += (window.location.hash) ? window.location.hash.toString() : "";
 	console.log('SITE INTERNO: ' + URL);
 	window.location = URL;
